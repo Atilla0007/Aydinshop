@@ -75,7 +75,7 @@ function initSocket() {
         return;
     }
 
-    socket = io({ withCredentials: true });
+    socket = io({ withCredentials: true, transports: ['websocket', 'polling'] });
 
     socket.on('connect', () => {
         socket.emit('join_room', { room_user_id: userId }, (res) => {

@@ -110,8 +110,17 @@ async def connect(sid, environ, auth):
     scope = (environ or {}).get("asgi.scope") or {}
     user = await get_user_from_scope(scope)
 
+    # اگر کاربر لاگین نیست، ارتباط را برقرار می‌کنیم ولی سشن خالی می‌گذاریم
+    # تا سمت کلاینت پیام مناسب بگیرد و بتواند برای لاگین هدایت شود.
     if not user or not user.is_authenticated:
-        raise ConnectionRefusedError("authentication_required")
+        await sio.save_session(
+            sid,
+            {
+                "user_id": None,
+                "is_staff": False,
+            },
+        )
+        return
 
     await ensure_thread_for_user(user.id)
     await sio.save_session(
