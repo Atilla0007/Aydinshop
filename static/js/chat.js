@@ -103,15 +103,20 @@ function sendMessage(text, btnElement, inputElement) {
         headers: { 'X-CSRFToken': csrftoken },
         body: formData,
     })
-        .then((res) => res.json())
-        .then((data) => {
-            if (data.status !== 'ok') {
-                alert(data.error || 'ارسال پیام انجام نشد.');
-            } else {
-                loadMessages();
-                if (data.handoff) {
-                    showNotification('سؤال شما برای پشتیبان ارسال شد.');
-                }
+        .then(async (res) => {
+            let data;
+            try {
+                data = await res.json();
+            } catch (e) {
+                throw new Error('invalid_json');
+            }
+            if (!res.ok || !data || data.status !== 'ok') {
+                const errMsg = (data && data.error) || 'ارسال پیام انجام نشد.';
+                throw new Error(errMsg);
+            }
+            loadMessages();
+            if (data.handoff) {
+                showNotification('سؤال شما برای پشتیبان ارسال شد.');
             }
         })
         .catch((err) => {

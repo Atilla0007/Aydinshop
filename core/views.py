@@ -48,7 +48,7 @@ def _build_user_context(user):
         items = ", ".join(f"{it.product.title} x{it.quantity}" for it in o.items.all())
         order_lines.append(f"Order #{o.id} on {o.created_at:%Y-%m-%d} items: {items}")
 
-    product_lines = [f"{p.title} - {p.price}" for p in products]
+    product_lines = [f"{p.name} - {p.price}" for p in products]
 
     return (
         f"user: {user.username} | email: {user.email} | joined: {user.date_joined:%Y-%m-%d}\n"
@@ -357,6 +357,9 @@ def chat_bot(request):
     """
     Endpoint for chatbot: saves user message, asks LLM with context, saves bot reply.
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": "error", "error": "login_required"}, status=401)
+
     text = (request.POST.get("message") or "").strip()
     if not text:
         return JsonResponse({"status": "error", "error": "متن پيام خالي است"}, status=400)
