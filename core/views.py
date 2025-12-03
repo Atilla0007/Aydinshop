@@ -2,6 +2,7 @@ import json
 import time
 from pathlib import Path
 
+import logging
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -18,6 +19,7 @@ from .forms import ContactForm
 from .models import ChatMessage, ChatThread, ContactMessage, News
 from store.models import Category, Order, Product
 
+logger = logging.getLogger(__name__)
 
 def _get_first_staff():
     return User.objects.filter(is_staff=True).order_by("id").first()
@@ -392,7 +394,9 @@ def chat_bot(request):
         bot_reply = resp.reply
         handoff = resp.handoff
     except Exception:
-        bot_reply = "در حال حاضر ربات در دسترس نيست. لطفاً بعداً تلاش کنيد."
+        logger.exception("chatbot error")
+        bot_reply = "در حال حاضر ربات در دسترس نیست. لطفاً بعداً تلاش کنید."
+        handoff = True
         handoff = True
 
     ChatMessage.objects.create(

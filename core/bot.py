@@ -1,8 +1,7 @@
 ﻿import os
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List
 
-from django.conf import settings
 from openai import OpenAI
 
 
@@ -13,17 +12,34 @@ class BotResponse:
 
 
 class ShopBot:
-    """Lightweight wrapper around OpenAI/Router chat completions."""
+    """Lightweight wrapper around OpenAI/OpenRouter chat completions."""
 
     def __init__(self):
         api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError("No API key provided in env (OPENROUTER_API_KEY or OPENAI_API_KEY)")
+
+        base_url = None
+        default_headers = None
+        model = os.getenv("OPENROUTER_MODEL")
+
+        if os.getenv("OPENROUTER_API_KEY"):
+            base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+            default_headers = {
+                "HTTP-Referer": os.getenv("OPENROUTER_REF", "http://localhost"),
+                "X-Title": os.getenv("OPENROUTER_TITLE", "aydinshop-chatbot"),
+            }
+            model = model or "openai/gpt-4o-mini"
+        else:
+            # Using OpenAI direct
+            model = model or "gpt-4o-mini"
+
         self.client = OpenAI(
             api_key=api_key,
-            base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            base_url=base_url,
+            default_headers=default_headers,
         )
-        self.model = os.getenv("OPENROUTER_MODEL", "gpt-4o-mini")
+        self.model = model
 
     def build_messages(
         self,

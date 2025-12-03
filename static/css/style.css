@@ -1305,7 +1305,8 @@ textarea:focus {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    overflow: hidden;
+    max-height: 65vh;
+    overflow-y: auto;
     flex: 1;
 }
 
@@ -1327,6 +1328,7 @@ textarea:focus {
 
 .picker-group-list {
     overflow-y: auto;
+    max-height: 50vh;
     padding-right: 0.2rem;
     display: flex;
     flex-direction: column;
