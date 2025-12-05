@@ -48,7 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    toggle?.addEventListener('click', openSidebar);
+    toggle?.addEventListener('click', () => {
+        if (!sidebar) return;
+        if (sidebar.classList.contains('open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
     closeBtn?.addEventListener('click', closeSidebar);
     overlay?.addEventListener('click', closeSidebar);
 

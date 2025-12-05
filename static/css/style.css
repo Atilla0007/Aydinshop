@@ -451,8 +451,8 @@ img {
     width: 260px;
     border-radius: 16px;
     padding: 0 16px;
-    background: rgba(10, 20, 35, 0.55);
-    backdrop-filter: blur(30px);
+    background: rgba(10, 20, 35, 0.78);
+    backdrop-filter: blur(38px) saturate(140%);
     transition: transform 0.28s ease;
     transform: translateX(120%);
     border: 1px solid var(--border);
@@ -605,7 +605,7 @@ img {
 .sidebar-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.62);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
