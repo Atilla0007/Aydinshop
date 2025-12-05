@@ -1,25 +1,44 @@
-
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}ورود{% endblock %}
+{% block title %}ورود | آیدین شاپ{% endblock %}
 
 {% block content %}
-<section class="section auth-section">
-    <div class="container auth-container">
-        <div class="auth-card">
-            <h1>ورود به حساب کاربری</h1>
-            <form method="post">
+<section class="login-page">
+    <div class="login-grid container">
+        <div class="login-hero">
+            <div class="hero-badge">به آیدین شاپ خوش آمدید</div>
+            <h1>با حساب کاربری خود وارد شوید</h1>
+            <p>سفارش‌ها، چت پشتیبانی و پیشنهادهای شخصی‌سازی‌شده را در یکجا مدیریت کنید.</p>
+            <ul class="login-highlights">
+                <li>پشتیبانی سریع و لحظه‌ای</li>
+                <li>دسترسی به وضعیت سفارش و سبد خرید</li>
+                <li>تخفیف‌های اختصاصی برای اعضا</li>
+            </ul>
+        </div>
+
+        <div class="login-card">
+            <div class="login-card-header">
+                <span class="login-logo">🛍️</span>
+                <div>
+                    <h2>ورود به حساب</h2>
+                    <p>لطفاً نام کاربری و گذرواژه خود را وارد کنید.</p>
+                </div>
+            </div>
+
+            <form method="post" class="login-form">
                 {% csrf_token %}
                 {{ form.non_field_errors }}
-                <label>نام کاربری</label>
+                <label for="{{ form.username.id_for_label }}">نام کاربری</label>
                 {{ form.username }}
-                <label>رمز عبور</label>
+                <label for="{{ form.password.id_for_label }}">گذرواژه</label>
                 {{ form.password }}
-                <button type="submit" class="btn btn-primary">ورود</button>
+                <button type="submit" class="btn btn-primary full">ورود</button>
             </form>
-            <p class="auth-extra">
-                حساب کاربری ندارید؟ <a href="{% url 'signup' %}">ثبت‌نام کنید</a>
-            </p>
+
+            <div class="login-footer">
+                <span>حساب ندارید؟</span>
+                <a class="link-accent" href="{% url 'signup' %}">ثبت‌نام کنید</a>
+            </div>
         </div>
     </div>
 </section>
