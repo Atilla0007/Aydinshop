@@ -27,6 +27,16 @@
             <span class="logo-icon">آی</span>
             <span class="logo-text light">آیدین شاپ</span>
         </a>
+        <div class="nav-actions">
+            <a href="{% url 'cart' %}" class="btn btn-light small">سبد خرید</a>
+            {% if user.is_authenticated %}
+                <span class="user-name">{{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-ghost small">خروج</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline small">ورود</a>
+                <a href="{% url 'signup' %}" class="btn btn-primary small">ثبت نام</a>
+            {% endif %}
+        </div>
     </div>
 </header>
 
@@ -78,33 +88,6 @@
             <button type="button" onclick="gotoPage(this)" data-url="{% url 'admin_chat' %}">
                 <i class="ai-chat"></i>
                 <p>پنل چت ادمین</p>
-            </button>
-        </li>
-        {% endif %}
-        <li>
-            <button type="button" onclick="gotoPage(this)" data-url="{% url 'cart' %}">
-                <i class="ai-bag"></i>
-                <p>سبد خرید</p>
-            </button>
-        </li>
-        {% if user.is_authenticated %}
-        <li>
-            <button type="button" onclick="gotoPage(this)" data-url="{% url 'logout' %}">
-                <i class="ai-exit"></i>
-                <p>خروج</p>
-            </button>
-        </li>
-        {% else %}
-        <li>
-            <button type="button" onclick="gotoPage(this)" data-url="{% url 'login' %}">
-                <i class="ai-login"></i>
-                <p>ورود</p>
-            </button>
-        </li>
-        <li>
-            <button type="button" onclick="gotoPage(this)" data-url="{% url 'signup' %}">
-                <i class="ai-add-user"></i>
-                <p>ثبت نام</p>
             </button>
         </li>
         {% endif %}
