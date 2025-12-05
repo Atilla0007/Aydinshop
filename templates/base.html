@@ -3,7 +3,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}آیدین شاپ{% endblock %}</title>
+    <title>{% block title %}А?Д?А?Д?Б? А?А?Б?{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
@@ -13,33 +13,88 @@
 
 <header class="main-header">
     <div class="container nav-container">
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="باز کردن منو">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
         <a href="{% url 'home' %}" class="logo">
-            <span class="logo-icon">🍽</span>
-            <span class="logo-text light">آیدین شاپ</span>
+            <span class="logo-icon">Я???</span>
+            <span class="logo-text light">А?Д?А?Д?Б? А?А?Б?</span>
         </a>
+    </div>
+</header>
 
-        <nav class="nav-links">
-            <a href="{% url 'shop' %}">فروشگاه</a>
-            <a href="{% url 'news_list' %}">اخبار</a>
-            <a href="{% url 'faq' %}">سوالات متداول</a>
-            <a href="{% url 'contact' %}">تماس با ما</a>
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<aside id="app-sidebar" class="app-sidebar">
+    <div class="sidebar-inner">
+        <div class="sidebar-head">
+            <div class="sidebar-brand">
+                <span class="logo-icon">Я???</span>
+                <div>
+                    <div class="brand-title">А?Д?А?Д?Б? А?А?Б?</div>
+                    <div class="brand-subtitle">مسیر خرید راحت</div>
+                </div>
+            </div>
+            <button id="sidebar-close" class="sidebar-close" aria-label="بستن منو">×</button>
+        </div>
+
+        <div class="sidebar-user">
+            {% if user.is_authenticated %}
+                <div class="avatar">{{ user.username|first|upper }}</div>
+                <div>
+                    <div class="user-name-strong">{{ user.username }}</div>
+                    <div class="user-muted">خوش آمدید</div>
+                </div>
+            {% else %}
+                <div class="avatar ghost">?</div>
+                <div>
+                    <div class="user-name-strong">میهمان</div>
+                    <div class="user-muted">برای تجربه بهتر وارد شوید</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="{% url 'home' %}">
+                <span class="icon">🏠</span>
+                <span>خانه</span>
+            </a>
+            <a href="{% url 'shop' %}">
+                <span class="icon">🛍️</span>
+                <span>فروشگاه</span>
+            </a>
+            <a href="{% url 'news_list' %}">
+                <span class="icon">📰</span>
+                <span>اخبار</span>
+            </a>
+            <a href="{% url 'faq' %}">
+                <span class="icon">❓</span>
+                <span>سوالات متداول</span>
+            </a>
+            <a href="{% url 'contact' %}">
+                <span class="icon">📞</span>
+                <span>تماس با ما</span>
+            </a>
             {% if user.is_staff %}
-                <a href="{% url 'admin_chat' %}">چت ادمین</a>
+            <a href="{% url 'admin_chat' %}">
+                <span class="icon">💬</span>
+                <span>پنل چت ادمین</span>
+            </a>
             {% endif %}
         </nav>
 
-        <div class="nav-actions">
-            <a href="{% url 'cart' %}" class="btn btn-light small">سبد خرید</a>
+        <div class="sidebar-cta">
+            <a href="{% url 'cart' %}" class="btn btn-primary full">سبد خرید</a>
             {% if user.is_authenticated %}
-                <span class="user-name">{{ user.username }}</span>
-                <a href="{% url 'logout' %}" class="btn btn-ghost small">خروج</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline full">خروج</a>
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline small">ورود</a>
-                <a href="{% url 'signup' %}" class="btn btn-primary small">ثبت نام</a>
+                <a href="{% url 'login' %}" class="btn btn-outline full">ورود</a>
+                <a href="{% url 'signup' %}" class="btn btn-light full">ثبت نام</a>
             {% endif %}
         </div>
     </div>
-</header>
+</aside>
 
 <main>
     {% block content %}{% endblock %}
@@ -48,50 +103,50 @@
 <footer class="main-footer">
     <div class="container footer-top">
         <div class="footer-brand">
-            <h4>آیدین شاپ</h4>
-            <p>فروش تخصصی تجهیزات آشپزخانه صنعتی با پشتیبانی واقعی.</p>
+            <h4>А?Д?А?Д?Б? А?А?Б?</h4>
+            <p>Б?А?Б?А? А?А?АФАФД? А?А?Б?Д?АЩА?А? А?А?Б?АЩА?А?Б?Б? АФБ?А?А?Д? А?А? Б?А?А?Д?А?А?Б?Д? Б?А?Б?А?Д?.</p>
         </div>
         <div class="footer-column">
-            <h4>دسترسی سریع</h4>
-            <a href="{% url 'shop' %}">فروشگاه</a>
-            <a href="{% url 'news_list' %}">اخبار</a>
-            <a href="{% url 'faq' %}">سوالات متداول</a>
+            <h4>А?А?А?А?А?Д? А?А?Д?А?</h4>
+            <a href="{% url 'shop' %}">Б?А?Б?А?Ц?А?Б?</a>
+            <a href="{% url 'news_list' %}">А?А?А?А?А?</a>
+            <a href="{% url 'faq' %}">А?Б?А?Б?А?А? Б?А?А?А?Б?Б?</a>
         </div>
         <div class="footer-column">
-            <h4>خدمات</h4>
-            <a href="{% url 'contact' %}">درخواست مشاوره</a>
-            <a href="{% url 'contact' %}">گارانتی و خدمات پس از فروش</a>
+            <h4>А?А?Б?А?А?</h4>
+            <a href="{% url 'contact' %}">А?А?А?Б?А?А?А? Б?А?А?Б?А?Б?</a>
+            <a href="{% url 'contact' %}">Ц?А?А?А?Б?А?Д? Б? А?А?Б?А?А? Б?А? А?АЩ Б?А?Б?А?</a>
         </div>
         <div class="footer-column">
-            <h4>ارتباط</h4>
-            <p>تلفن: ۰۲۱-xxxxxxx</p>
-            <p>ایمیل: info@example.com</p>
+            <h4>А?А?А?А?А?АЗ</h4>
+            <p>А?Б?Б?Б?: ДЬДЩД?-xxxxxxx</p>
+            <p>А?Д?Б?Д?Б?: info@example.com</p>
         </div>
     </div>
     <div class="container footer-bottom">
-        <p>© تمامی حقوق برای آیدین شاپ محفوظ است.</p>
+        <p>≥? А?Б?А?Б?Д? А?Б?Б?Б? А?А?А?Д? А?Д?А?Д?Б? А?А?Б? Б?А?Б?Б?А? А?А?А?.</p>
     </div>
 </footer>
 
-<!-- دکمه چت شناور -->
+<!-- А?Ц?Б?Б? Ц?А? А?Б?А?Б?А? -->
 {% if user.is_authenticated %}
 <div id="global-chat-toggle" class="floating-chat-btn">
-    💬
+    Я???
 </div>
 
-<!-- پنل چت شناور -->
+<!-- Б?Б?Б? Ц?А? А?Б?А?Б?А? -->
 <div id="global-chat-widget" class="global-chat hidden">
     <div class="global-chat-header">
-        <span>چت آنلاین با پشتیبان</span>
-        <button type="button" id="global-chat-close" class="close-btn">×</button>
+        <span>Ц?А? А?Б?Б?А?Д?Б? А?А? Б?А?А?Д?А?А?Б?</span>
+        <button type="button" id="global-chat-close" class="close-btn"> ?</button>
     </div>
     <div id="global-chat-messages" class="global-chat-messages">
-        <!-- پیام‌ها اینجا نمایش داده می‌شوند -->
+        <!-- Б?Д?А?Б?┐??Б?А? А?Д?Б?А?А? Б?Б?А?Д?А? А?А?А?Б? Б?Д?┐??А?Б?Б?А? -->
     </div>
     <form id="global-chat-form" class="global-chat-form">
         {% csrf_token %}
-        <input id="global-chat-input" type="text" placeholder="پیام خود را بنویسید..." autocomplete="off">
-        <button type="submit">ارسال</button>
+        <input id="global-chat-input" type="text" placeholder="Б?Д?А?Б? А?Б?А? А?А? А?Б?Б?Д?А?Д?А?..." autocomplete="off">
+        <button type="submit">А?А?А?А?Б?</button>
     </form>
 </div>
 {% endif %}
@@ -99,6 +154,7 @@
 <!-- JavaScript -->
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
 <script src="{% static 'js/chat.js' %}"></script>
+<script src="{% static 'js/sidebar.js' %}"></script>
 <script src="{% static 'js/theme.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
