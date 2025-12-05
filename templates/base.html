@@ -3,9 +3,14 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
-<title>{% block title %}آیدین شاپ{% endblock %}</title>
+    <title>{% block title %}آیدین شاپ{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/akar-icons-fonts"></script>
 </head>
 <body class="body"
       data-user-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
@@ -26,74 +31,84 @@
 </header>
 
 <div id="sidebar-overlay" class="sidebar-overlay"></div>
-<aside id="app-sidebar" class="app-sidebar">
-    <div class="sidebar-inner">
-        <div class="sidebar-head">
-            <div class="sidebar-brand">
-                <span class="logo-icon">آی</span>
-                <div>
-                    <div class="brand-title">آیدین شاپ</div>
-                    <div class="brand-subtitle">مسیر خرید راحت</div>
-                </div>
+<aside id="app-sidebar" class="sidebar">
+    <header class="sidebar-header">
+        <div class="sidebar-brand">
+            <span class="logo-icon">آی</span>
+            <div class="brand-text">
+                <div class="brand-title">آیدین شاپ</div>
+                <div class="brand-subtitle">مسیر خرید راحت</div>
             </div>
-            <button id="sidebar-close" class="sidebar-close" aria-label="بستن منو">×</button>
         </div>
-
-        <div class="sidebar-user">
-            {% if user.is_authenticated %}
-                <div class="avatar">{{ user.username|first|upper }}</div>
-                <div>
-                    <div class="user-name-strong">{{ user.username }}</div>
-                    <div class="user-muted">خوش آمدید</div>
-                </div>
-            {% else %}
-                <div class="avatar ghost">?</div>
-                <div>
-                    <div class="user-name-strong">میهمان</div>
-                    <div class="user-muted">برای تجربه بهتر وارد شوید</div>
-                </div>
-            {% endif %}
-        </div>
-
-        <nav class="sidebar-menu">
-            <a href="{% url 'home' %}">
-                <span class="icon">🏠</span>
-                <span>خانه</span>
-            </a>
-            <a href="{% url 'shop' %}">
-                <span class="icon">🛍️</span>
-                <span>فروشگاه</span>
-            </a>
-            <a href="{% url 'news_list' %}">
-                <span class="icon">📰</span>
-                <span>اخبار</span>
-            </a>
-            <a href="{% url 'faq' %}">
-                <span class="icon">❓</span>
-                <span>سوالات متداول</span>
-            </a>
-            <a href="{% url 'contact' %}">
-                <span class="icon">📞</span>
-                <span>تماس با ما</span>
-            </a>
-            {% if user.is_staff %}
-            <a href="{% url 'admin_chat' %}">
-                <span class="icon">💬</span>
-                <span>پنل چت ادمین</span>
-            </a>
-            {% endif %}
-        </nav>
-
-        <div class="sidebar-cta">
-            <a href="{% url 'cart' %}" class="btn btn-primary full">سبد خرید</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="btn btn-outline full">خروج</a>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline full">ورود</a>
-                <a href="{% url 'signup' %}" class="btn btn-light full">ثبت نام</a>
-            {% endif %}
-        </div>
-    </div>
+        <button id="sidebar-close" class="sidebar-close-btn" aria-label="بستن منو">×</button>
+    </header>
+    <ul>
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'home' %}" class="active">
+                <i class="ai-home"></i>
+                <p>خانه</p>
+            </button>
+        </li>
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'shop' %}">
+                <i class="ai-cart"></i>
+                <p>فروشگاه</p>
+            </button>
+        </li>
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'news_list' %}">
+                <i class="ai-broadcast"></i>
+                <p>اخبار</p>
+            </button>
+        </li>
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'faq' %}">
+                <i class="ai-question"></i>
+                <p>سوالات متداول</p>
+            </button>
+        </li>
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'contact' %}">
+                <i class="ai-phone"></i>
+                <p>تماس با ما</p>
+            </button>
+        </li>
+        {% if user.is_staff %}
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'admin_chat' %}">
+                <i class="ai-chat"></i>
+                <p>پنل چت ادمین</p>
+            </button>
+        </li>
+        {% endif %}
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'cart' %}">
+                <i class="ai-bag"></i>
+                <p>سبد خرید</p>
+            </button>
+        </li>
+        {% if user.is_authenticated %}
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'logout' %}">
+                <i class="ai-exit"></i>
+                <p>خروج</p>
+            </button>
+        </li>
+        {% else %}
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'login' %}">
+                <i class="ai-login"></i>
+                <p>ورود</p>
+            </button>
+        </li>
+        <li>
+            <button type="button" onclick="gotoPage(this)" data-url="{% url 'signup' %}">
+                <i class="ai-add-user"></i>
+                <p>ثبت نام</p>
+            </button>
+        </li>
+        {% endif %}
+    </ul>
 </aside>
 
 <main>

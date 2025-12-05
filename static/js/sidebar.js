@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('sidebar-overlay');
     const toggle = document.getElementById('sidebar-toggle');
     const closeBtn = document.getElementById('sidebar-close');
+    const subMenus = sidebar ? sidebar.querySelectorAll('.sub-menu') : [];
+    const buttons = sidebar ? sidebar.querySelectorAll('button') : [];
 
     const openSidebar = () => {
         if (!sidebar) return;
@@ -16,6 +18,36 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay?.classList.remove('show');
     };
 
+    const resetSidebarState = () => {
+        buttons.forEach((btn) => btn.classList.remove('active'));
+        subMenus.forEach((menu) => {
+            menu.style.height = 0;
+        });
+    };
+
+    const openSubmenu = (element) => {
+        resetSidebarState();
+        element.classList.add('active');
+        const sibling = element.nextElementSibling;
+        const ul = sibling.querySelector('ul');
+        if (sibling.clientHeight === 0) {
+            sibling.style.height = `${ul.clientHeight}px`;
+        } else {
+            sibling.style.height = 0;
+            element.classList.remove('active');
+        }
+    };
+
+    const gotoPage = (element) => {
+        resetSidebarState();
+        element.classList.add('active');
+        const url = element.dataset.url;
+        closeSidebar();
+        if (url) {
+            window.location.href = url;
+        }
+    };
+
     toggle?.addEventListener('click', openSidebar);
     closeBtn?.addEventListener('click', closeSidebar);
     overlay?.addEventListener('click', closeSidebar);
@@ -25,4 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
             closeSidebar();
         }
     });
+
+    // expose for inline handlers
+    window.openSubmenu = openSubmenu;
+    window.gotoPage = gotoPage;
 });
