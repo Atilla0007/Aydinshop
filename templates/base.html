@@ -102,53 +102,51 @@
 <footer class="main-footer">
     <div class="container footer-top">
         <div class="footer-brand">
-            <h4>А?Д?А?Д?Б? А?А?Б?</h4>
-            <p>Б?А?Б?А? А?А?АФАФД? А?А?Б?Д?АЩА?А? А?А?Б?АЩА?А?Б?Б? АФБ?А?А?Д? А?А? Б?А?А?Д?А?А?Б?Д? Б?А?Б?А?Д?.</p>
+            <h4>آیدین شاپ</h4>
+            <p>تجربه خرید آسان با پشتیبانی سریع، قیمت‌های به‌صرفه و ارسال مطمئن.</p>
         </div>
         <div class="footer-column">
-            <h4>А?А?А?А?А?Д? А?А?Д?А?</h4>
-            <a href="{% url 'shop' %}">Б?А?Б?А?Ц?А?Б?</a>
-            <a href="{% url 'news_list' %}">А?А?А?А?А?</a>
-            <a href="{% url 'faq' %}">А?Б?А?Б?А?А? Б?А?А?А?Б?Б?</a>
+            <h4>لینک‌های مفید</h4>
+            <a href="{% url 'shop' %}">فروشگاه</a>
+            <a href="{% url 'news_list' %}">اخبار</a>
+            <a href="{% url 'faq' %}">سوالات متداول</a>
         </div>
         <div class="footer-column">
-            <h4>А?А?Б?А?А?</h4>
-            <a href="{% url 'contact' %}">А?А?А?Б?А?А?А? Б?А?А?Б?А?Б?</a>
-            <a href="{% url 'contact' %}">Ц?А?А?А?Б?А?Д? Б? А?А?Б?А?А? Б?А? А?АЩ Б?А?Б?А?</a>
+            <h4>ارتباط با ما</h4>
+            <a href="{% url 'contact' %}">فرم تماس</a>
+            <a href="{% url 'contact' %}">پشتیبانی مشتریان</a>
         </div>
         <div class="footer-column">
-            <h4>А?А?А?А?А?АЗ</h4>
-            <p>А?Б?Б?Б?: ДЬДЩД?-xxxxxxx</p>
-            <p>А?Д?Б?Д?Б?: info@example.com</p>
+            <h4>اطلاعات تماس</h4>
+            <p>تلفن: ۰۲۱-XXXXXXX</p>
+            <p>ایمیل: info@example.com</p>
         </div>
     </div>
     <div class="container footer-bottom">
-        <p>≥? А?Б?А?Б?Д? А?Б?Б?Б? А?А?А?Д? А?Д?А?Д?Б? А?А?Б? Б?А?Б?Б?А? А?А?А?.</p>
+        <p>تمام حقوق برای آیدین شاپ محفوظ است.</p>
     </div>
 </footer>
 
-<!-- А?Ц?Б?Б? Ц?А? А?Б?А?Б?А? -->
-{% if user.is_authenticated %}
+<!-- Global chat -->
 <div id="global-chat-toggle" class="floating-chat-btn">
-    Я???
+    💬
 </div>
 
-<!-- Б?Б?Б? Ц?А? А?Б?А?Б?А? -->
+<!-- Chat widget -->
 <div id="global-chat-widget" class="global-chat hidden">
     <div class="global-chat-header">
-        <span>Ц?А? А?Б?Б?А?Д?Б? А?А? Б?А?А?Д?А?А?Б?</span>
-        <button type="button" id="global-chat-close" class="close-btn"> ?</button>
+        <span>چت با پشتیبان</span>
+        <button type="button" id="global-chat-close" class="close-btn">×</button>
     </div>
     <div id="global-chat-messages" class="global-chat-messages">
-        <!-- Б?Д?А?Б?┐??Б?А? А?Д?Б?А?А? Б?Б?А?Д?А? А?А?А?Б? Б?Д?┐??А?Б?Б?А? -->
+        <!-- Messages render here -->
     </div>
     <form id="global-chat-form" class="global-chat-form">
         {% csrf_token %}
-        <input id="global-chat-input" type="text" placeholder="Б?Д?А?Б? А?Б?А? А?А? А?Б?Б?Д?А?Д?А?..." autocomplete="off">
-        <button type="submit">А?А?А?А?Б?</button>
+        <input id="global-chat-input" type="text" placeholder="پیام خود را بنویسید..." autocomplete="off">
+        <button type="submit">ارسال</button>
     </form>
 </div>
-{% endif %}
 
 <!-- JavaScript -->
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>

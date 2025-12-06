@@ -1,50 +1,41 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block title %}Login | Aydin Shop{% endblock %}
 
 {% block content %}
 <section class="auth-viewport">
-    <div class="auth-hero">
-        <span class="brand-mark">BALA .</span>
-        <h1>Login page</h1>
-        <p>Start your journey<br>now with us</p>
-    </div>
-
-    <div class="auth-panel">
-        <div class="auth-cards">
-            <div class="auth-card signup-card">
-                <h3>Create an account</h3>
-                <label>Email</label>
-                <input type="email" placeholder="you@example.com">
-                <label>Password</label>
-                <div class="input-password">
-                    <input type="password" placeholder="Enter your password">
-                    <span class="icon-eye"></span>
+    <div class="auth-inner">
+        <div class="card login-card">
+            <a class="login">Log in</a>
+            <form method="post" class="login-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="inputBox">
+                    <input type="text" name="username" required="required" placeholder=" " autocomplete="username">
+                    <span class="user">Username</span>
                 </div>
-                <button type="button" class="btn-solid">Create account</button>
-                <button type="button" class="btn-ghost">Continue with Google</button>
-                <p class="muted">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
-            </div>
+                <div class="inputBox">
+                    <input type="password" name="password" required="required" placeholder=" " autocomplete="current-password">
+                    <span>Password</span>
+                </div>
+                <button class="enter" type="submit">Enter</button>
+            </form>
+        </div>
 
-            <div class="auth-card login-card">
-                <h3>Login to your account</h3>
-                <form method="post" class="login-form">
-                    {% csrf_token %}
-                    {{ form.non_field_errors }}
-                    <label for="{{ form.username.id_for_label }}">Email</label>
-                    {{ form.username }}
-                    <div class="field-row">
-                        <label for="{{ form.password.id_for_label }}">Password</label>
-                        <a class="link-accent" href="#">Forgot?</a>
-                    </div>
-                    <div class="input-password">
-                        {{ form.password }}
-                        <span class="icon-eye"></span>
-                    </div>
-                    <button type="submit" class="btn-solid">Login now</button>
-                </form>
-                <p class="muted">Don’t have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+        <div class="card signup-card">
+            <a class="singup">Sign Up</a>
+            <div class="inputBox1">
+                <input type="text" required="required" placeholder=" ">
+                <span class="user">Email</span>
             </div>
+            <div class="inputBox">
+                <input type="text" required="required" placeholder=" ">
+                <span>Username</span>
+            </div>
+            <div class="inputBox">
+                <input type="password" required="required" placeholder=" ">
+                <span>Password</span>
+            </div>
+            <a class="enter" href="{% url 'signup' %}">Enter</a>
         </div>
     </div>
 </section>
