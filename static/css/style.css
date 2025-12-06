@@ -159,7 +159,7 @@ img {
 .main-header {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 120;
     backdrop-filter: blur(16px);
     background: linear-gradient(to bottom, rgba(11,29,58,0.96), rgba(11,29,58,0.88));
     color: #fff;
@@ -441,7 +441,7 @@ img {
 
 /* Sidebar 3 (original layout, colors tuned) */
 .sidebar {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
@@ -458,6 +458,8 @@ img {
     border: 1px solid var(--border);
     direction: rtl;
     text-align: right;
+    overflow-y: auto;
+    z-index: 200;
 }
 
 .sidebar.open {
@@ -580,7 +582,7 @@ img {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
-    z-index: 45;
+    z-index: 180;
 }
 
 .sidebar-overlay.show {
@@ -588,7 +590,6 @@ img {
     pointer-events: auto;
 }
 
-body.sidebar-open .main-header,
 body.sidebar-open main,
 body.sidebar-open .main-footer {
     filter: blur(3px);
