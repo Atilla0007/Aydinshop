@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY='test'
@@ -20,3 +21,9 @@ LOGIN_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+
+# SMS settings
+SMS_BACKEND = os.getenv('SMS_BACKEND', 'console')  # console | kavenegar
+KAVENEGAR_API_KEY = os.getenv('KAVENEGAR_API_KEY', '')
+KAVENEGAR_SENDER = os.getenv('KAVENEGAR_SENDER', '')

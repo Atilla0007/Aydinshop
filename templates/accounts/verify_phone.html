@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}????? ????? ??????{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/otp.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/otp.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<section class="otp-shell">
+  <form class="otp-form" method="post">
+    {% csrf_token %}
+    <a class="close" href="{% url 'profile' %}">?</a>
+
+    <div class="info">
+      <span class="title">OTP Verification</span>
+      <p class="description">Please enter the code we have sent you.</p>
+    </div>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="inputs" dir="ltr">
+      <input name="d1" type="tel" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+      <input name="d2" type="tel" inputmode="numeric" maxlength="1">
+      <input name="d3" type="tel" inputmode="numeric" maxlength="1">
+      <input name="d4" type="tel" inputmode="numeric" maxlength="1">
+    </div>
+
+    <button class="validate" type="submit">Verify</button>
+    <p class="resend">You don't receive the code? <a class="resend-action" href="{% url 'verify_phone' %}?resend=1">resend</a></p>
+  </form>
+</section>
+{% endblock %}

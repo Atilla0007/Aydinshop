@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Login{% endblock %}
@@ -11,6 +11,9 @@
 <section class="auth-form-shell">
     <form class="form" method="post">
         {% csrf_token %}
+        {% if error %}
+        <div class="form-error">{{ error }}</div>
+        {% endif %}
         <span class="input-span">
             <label for="email" class="label">Email</label>
             <input type="text" name="username" id="email" autocomplete="username" required>

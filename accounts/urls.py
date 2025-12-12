@@ -1,14 +1,10 @@
 from django.urls import path
-from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(
-        template_name='accounts/login.html'
-    ), name='login'),
-
-    # اینجا دیگه از LogoutView استفاده نمی‌کنیم
+    path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-
     path('signup/', views.signup, name='signup'),
+    path('profile/', views.profile_view, name='profile'),
+    path('verify-phone/', views.verify_phone_view, name='verify_phone'),
 ]

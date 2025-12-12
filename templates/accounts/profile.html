@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}???????{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="profile-shell">
+  <div class="container profile-grid">
+    <aside class="profile-card">
+      <div class="profile-header">
+        <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
+        <div>
+          <h2 class="profile-name">{{ request.user.get_full_name|default:request.user.username }}</h2>
+          <p class="profile-sub">{{ request.user.email|default:'-' }}</p>
+        </div>
+      </div>
+
+      <div class="profile-badges">
+        {% if profile.phone_verified %}
+          <span class="badge ok">????? ?????? ????? ???</span>
+        {% else %}
+          <span class="badge warn">????? ?????? ????? ????</span>
+        {% endif %}
+      </div>
+
+      <form method="post" class="profile-form">
+        {% csrf_token %}
+        <label>???</label>
+        <input name="first_name" value="{{ request.user.first_name }}" placeholder="???">
+        <label>??? ????????</label>
+        <input name="last_name" value="{{ request.user.last_name }}" placeholder="??? ????????">
+        <label>?????</label>
+        <input name="email" value="{{ request.user.email }}" placeholder="Email" type="email">
+        <label>????? ??????</label>
+        <input name="phone" value="{{ profile.phone }}" placeholder="09xxxxxxxxx" inputmode="numeric">
+
+        <div class="profile-actions">
+          <button class="btn btn-primary" type="submit">????? ???????</button>
+          {% if profile.phone and not profile.phone_verified %}
+            <a class="btn btn-outline" href="{% url 'verify_phone' %}">????? ?????</a>
+          {% endif %}
+        </div>
+      </form>
+    </aside>
+
+    <main class="orders-card">
+      <div class="orders-header">
+        <h2>????????? ????</h2>
+        <p class="muted">?? ?????? ????? ???? ????? ????? ???.</p>
+      </div>
+
+      {% if orders %}
+        <div class="orders-list">
+          {% for o in orders %}
+            <div class="order-item">
+              <div class="order-top">
+                <div>
+                  <div class="order-title">????? #{{ o.id }}</div>
+                  <div class="order-meta">?????: {{ o.created_at|date:"Y/m/d" }} | ?????: {{ o.get_status_display }}</div>
+                </div>
+                <div class="order-price">{{ o.total_price }} ?????</div>
+              </div>
+
+              <div class="tracking">
+                <span>?? ??????:</span>
+                <code>{{ o.id }}</code>
+              </div>
+
+              {% if o.items.all %}
+              <ul class="order-lines">
+                {% for it in o.items.all %}
+                  <li>{{ it.product.name }} ? {{ it.quantity }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty">???? ?????? ??? ?????????.</p>
+      {% endif %}
+    </main>
+  </div>
+</section>
+{% endblock %}
