@@ -3387,7 +3387,7 @@ select {
     box-shadow: var(--shadow-soft);
     padding: 0.35rem;
     display: none;
-    z-index: 100;
+    z-index: 400;
 }
 
 .user-menu:focus-within .user-menu-dropdown {
@@ -3410,8 +3410,4 @@ select {
 
 .user-menu.open .user-menu-dropdown {
     display: block;
-}
-
-.user-menu:focus-within .user-menu-dropdown {
-    display: none;
 }
