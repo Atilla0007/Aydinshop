@@ -49,8 +49,9 @@ SMS_BACKEND = os.getenv('SMS_BACKEND', 'console')  # console | kavenegar
 KAVENEGAR_API_KEY = os.getenv('KAVENEGAR_API_KEY', '')
 KAVENEGAR_SENDER = os.getenv('KAVENEGAR_SENDER', '')
 
-# Email settings (dev defaults to console backend)
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+# Email settings (dev defaults to file backend to avoid console issues on some Windows terminals)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.filebased.EmailBackend')
+EMAIL_FILE_PATH = os.getenv('EMAIL_FILE_PATH', str(BASE_DIR / 'tmp' / 'emails'))
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@example.com')
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.example.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
