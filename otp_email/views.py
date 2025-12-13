@@ -60,7 +60,13 @@ def request_otp(request):
                 payload["retry_after_seconds"] = retry_after
             return JsonResponse(payload, status=429)
 
-        device.send_challenge()
+        try:
+            device.send_challenge()
+        except OSError:
+            return JsonResponse(
+                {"detail": "در ارسال ایمیل مشکلی پیش آمد. لطفاً دوباره تلاش کنید."},
+                status=500,
+            )
 
     return JsonResponse({"detail": "در صورت مجاز بودن، کد برای شما ارسال شد."}, status=200)
 
@@ -122,6 +128,8 @@ def verify_page(request):
             status=400,
         )
 
+    send_error = None
+
     with transaction.atomic():
         device = (
             EmailOTPDevice.objects.select_for_update()
@@ -168,9 +176,11 @@ def verify_page(request):
                 device.send_challenge()
             except PermissionError:
                 pass
+            except OSError:
+                send_error = "در ارسال ایمیل مشکلی پیش آمد. لطفاً بعداً دوباره تلاش کنید."
 
     return render(
         request,
         "otp_email/verify.html",
-        {"email": email, "next": next_url},
+        {"email": email, "next": next_url, "send_error": send_error},
     )

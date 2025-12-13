@@ -21,6 +21,10 @@
       <div class="otp-error">{{ error }}</div>
     {% endif %}
 
+    {% if send_error %}
+      <div class="otp-error">{{ send_error }}</div>
+    {% endif %}
+
     <div class="inputs" data-otp-inputs>
       <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" name="d1" aria-label="Digit 1">
       <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" name="d2" aria-label="Digit 2">
