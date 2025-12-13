@@ -202,22 +202,20 @@ class EmailOTPDevice(Device):
         try:
             message.send(fail_silently=False)
         except OSError:
-            if (
-                getattr(settings, "DEBUG", False)
-                and getattr(settings, "EMAIL_BACKEND", "")
-                == "django.core.mail.backends.console.EmailBackend"
-            ):
-                base_dir = Path(getattr(settings, "BASE_DIR", Path.cwd()))
-                file_path = base_dir / "tmp" / "emails"
-                file_path.mkdir(parents=True, exist_ok=True)
-                connection = get_connection(
-                    "django.core.mail.backends.filebased.EmailBackend",
-                    fail_silently=False,
-                    file_path=str(file_path),
-                )
-                message.send(fail_silently=False, connection=connection)
-                return
-            raise
+            if not getattr(settings, "DEBUG", False):
+                raise
+
+            base_dir = Path(getattr(settings, "BASE_DIR", Path.cwd()))
+            file_path = base_dir / "tmp" / "emails"
+            file_path.mkdir(parents=True, exist_ok=True)
+            connection = get_connection(
+                "django.core.mail.backends.filebased.EmailBackend",
+                fail_silently=False,
+                file_path=str(file_path),
+            )
+            message.connection = connection
+            message.send(fail_silently=False)
+            return
 
     def generate_challenge(self):
         self.send_challenge()
