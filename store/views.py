@@ -1,7 +1,10 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from urllib.parse import quote
 from .models import Product, CartItem, Order, OrderItem, Category
+from accounts.models import UserProfile
 
 
 def _get_compare_list(request):
@@ -45,6 +48,11 @@ def product_detail(request, pk):
 
 @login_required
 def add_to_cart(request, pk):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    if not profile.email_verified:
+        verify_url = reverse("email_otp_verify_page")
+        return redirect(f"{verify_url}?next={quote(request.get_full_path())}")
+
     product = get_object_or_404(Product, pk=pk)
     item, created = CartItem.objects.get_or_create(user=request.user, product=product)
     if not created:

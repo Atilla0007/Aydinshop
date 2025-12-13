@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ویرایش پروفایل{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="profile-shell">
+  <div class="container" style="max-width: 720px;">
+    <div class="profile-card">
+      <h2 style="margin:0 0 0.8rem;">ویرایش اطلاعات کاربری</h2>
+      <p class="section-subtitle" style="text-align:right;">پس از ارسال، در صفحه‌ی بعد از شما تایید نهایی می‌گیریم.</p>
+
+      <form method="post" class="profile-form">
+        {% csrf_token %}
+
+        <label>نام</label>
+        <input name="first_name" value="{{ values.first_name }}" placeholder="نام">
+
+        <label>نام خانوادگی</label>
+        <input name="last_name" value="{{ values.last_name }}" placeholder="نام خانوادگی">
+
+        <label>ایمیل</label>
+        <input name="email" value="{{ values.email }}" placeholder="ایمیل" type="email">
+
+        <label>شماره موبایل</label>
+        <input name="phone" value="{{ values.phone }}" placeholder="09xxxxxxxxx" inputmode="numeric">
+
+        <div class="profile-actions">
+          <button class="btn btn-primary" type="submit">ادامه</button>
+          <a class="btn btn-outline" href="{% url 'profile' %}">انصراف</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

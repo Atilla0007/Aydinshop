@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from django_otp import DEVICE_ID_SESSION_KEY
 
+from accounts.models import UserProfile
 from otp_email.models import EmailOTPDevice
 
 
@@ -137,3 +138,5 @@ class EmailOTPViewsTests(TestCase):
         self.assertEqual(resp.status_code, 200, resp.content.decode("utf-8", "ignore"))
         session = self.client.session
         self.assertIn(DEVICE_ID_SESSION_KEY, session)
+        profile = UserProfile.objects.get(user=self.user)
+        self.assertTrue(profile.email_verified)

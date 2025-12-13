@@ -1,7 +1,7 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sign up{% endblock %}
+{% block title %}ثبت نام{% endblock %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
@@ -15,23 +15,23 @@
         <div class="form-error">{{ form.errors.as_ul }}</div>
         {% endif %}
         <span class="input-span">
-            <label for="email" class="label">Email</label>
+            <label for="email" class="label">ایمیل</label>
             <input type="email" name="email" id="email" autocomplete="email" required>
         </span>
         <span class="input-span">
-            <label for="username" class="label">Username</label>
+            <label for="username" class="label">نام کاربری</label>
             <input type="text" name="username" id="username" autocomplete="username" required>
         </span>
         <span class="input-span">
-            <label for="password1" class="label">Password</label>
+            <label for="password1" class="label">رمز عبور</label>
             <input type="password" name="password1" id="password1" autocomplete="new-password" required>
         </span>
         <span class="input-span">
-            <label for="password2" class="label">Confirm Password</label>
+            <label for="password2" class="label">تکرار رمز عبور</label>
             <input type="password" name="password2" id="password2" autocomplete="new-password" required>
         </span>
-        <input class="submit" type="submit" value="Sign up" />
-        <span class="span">Already have an account? <a href="{% url 'login' %}">Log in</a></span>
+        <input class="submit" type="submit" value="ثبت نام" />
+        <span class="span">حساب دارید؟ <a href="{% url 'login' %}">ورود</a></span>
     </form>
 </section>
 {% endblock %}

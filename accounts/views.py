@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password, make_password
 from django.shortcuts import redirect, render
 from django.utils import timezone
@@ -32,7 +31,7 @@ def login_view(request):
         if user:
             login(request, user)
             return redirect('home')
-        return render(request, 'accounts/login.html', {'error': 'Invalid username or password.'})
+        return render(request, 'accounts/login.html', {'error': 'نام کاربری یا رمز عبور اشتباه است.'})
 
     return render(request, 'accounts/login.html')
 
@@ -58,34 +57,68 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     profile = _get_profile(request.user)
-
-    if request.method == 'POST':
-        # Basic account updates
-        request.user.first_name = (request.POST.get('first_name') or '').strip()
-        request.user.last_name = (request.POST.get('last_name') or '').strip()
-        request.user.email = (request.POST.get('email') or '').strip()
-
-        new_phone = (request.POST.get('phone') or '').strip()
-        if new_phone != profile.phone:
-            profile.phone = new_phone
-            profile.phone_verified = False
-            profile.phone_verified_at = None
-            profile.save(update_fields=['phone', 'phone_verified', 'phone_verified_at'])
-
-        request.user.save(update_fields=['first_name', 'last_name', 'email'])
-        return redirect('profile')
-
     orders = (
         Order.objects.filter(user=request.user)
         .prefetch_related('items', 'items__product')
         .order_by('-created_at')
     )
+    return render(request, 'accounts/profile.html', {'profile': profile, 'orders': orders})
 
-    context = {
-        'profile': profile,
-        'orders': orders,
+
+@login_required
+def profile_edit_view(request):
+    profile = _get_profile(request.user)
+
+    def current_values():
+        return {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+            'phone': profile.phone,
+        }
+
+    if request.method != 'POST':
+        return render(request, 'accounts/profile_edit.html', {'values': current_values()})
+
+    values = {
+        'first_name': (request.POST.get('first_name') or '').strip(),
+        'last_name': (request.POST.get('last_name') or '').strip(),
+        'email': (request.POST.get('email') or '').strip(),
+        'phone': (request.POST.get('phone') or '').strip(),
     }
-    return render(request, 'accounts/profile.html', context)
+
+    if request.POST.get('confirm') != '1':
+        return render(request, 'accounts/profile_confirm.html', {'values': values})
+
+    request.user.first_name = values['first_name']
+    request.user.last_name = values['last_name']
+    old_email = (request.user.email or '').strip()
+    request.user.email = values['email']
+    request.user.save(update_fields=['first_name', 'last_name', 'email'])
+
+    email_changed = (values['email'] or '').strip() != old_email
+
+    if email_changed:
+        profile.email_verified = False
+        profile.email_verified_at = None
+
+    if values['phone'] != profile.phone:
+        profile.phone = values['phone']
+        profile.phone_verified = False
+        profile.phone_verified_at = None
+
+    if email_changed or values['phone'] != profile.phone:
+        profile.save(
+            update_fields=[
+                'email_verified',
+                'email_verified_at',
+                'phone',
+                'phone_verified',
+                'phone_verified_at',
+            ]
+        )
+
+    return redirect('profile')
 
 
 def _can_resend(otp: PhoneOTP) -> bool:
@@ -150,7 +183,6 @@ def verify_phone_view(request):
         otp.delete()
         return redirect('profile')
 
-    # initial page: send code if none exists
     if not hasattr(profile, 'otp'):
         _send_phone_otp(profile)
 

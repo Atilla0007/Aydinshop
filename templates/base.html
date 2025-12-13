@@ -3,7 +3,7 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}?????? | ??????? ??????{% endblock %}</title>
+  <title>{% block title %}استیرا | فروشگاه آنلاین{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="icon" href="{% static 'img/logo-styra.png' %}" type="image/png">
@@ -18,32 +18,32 @@
 
 <header class="main-header">
   <div class="container nav-container">
-    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="??? ???? ???">
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="باز کردن منو">
       <span></span><span></span><span></span>
     </button>
 
     <a href="{% url 'home' %}" class="logo">
-      <img src="{% static 'img/logo-styra.png' %}" alt="????? ??????" class="logo-img" />
-      <span class="logo-text light">??????</span>
+      <img src="{% static 'img/logo-styra.png' %}" alt="لوگوی استیرا" class="logo-img" />
+      <span class="logo-text light">استیرا</span>
     </a>
 
     <div class="nav-actions">
-      <a href="{% url 'cart' %}" class="btn btn-light small">??? ????</a>
+      <a href="{% url 'cart' %}" class="btn btn-light small">سبد خرید</a>
 
       {% if user.is_authenticated %}
-        <div class="user-menu">
-          <button type="button" class="user-menu-trigger" aria-haspopup="menu">
+        <div class="user-menu" data-user-menu>
+          <button type="button" class="user-menu-trigger" aria-haspopup="menu" aria-expanded="false">
             <span class="user-name">{{ user.username }}</span>
             <i class='bx bx-chevron-down'></i>
           </button>
           <div class="user-menu-dropdown" role="menu">
-            <a href="{% url 'profile' %}" role="menuitem"><i class='bx bx-user'></i> ???????</a>
-            <a href="{% url 'logout' %}" role="menuitem"><i class='bx bx-log-out'></i> ????</a>
+            <a href="{% url 'profile' %}" role="menuitem"><i class='bx bx-user'></i> پروفایل</a>
+            <a href="{% url 'logout' %}" role="menuitem"><i class='bx bx-log-out'></i> خروج</a>
           </div>
         </div>
       {% else %}
-        <a href="{% url 'login' %}" class="btn btn-primary small">????</a>
-        <a href="{% url 'signup' %}" class="btn btn-outline small">??? ???</a>
+        <a href="{% url 'login' %}" class="btn btn-primary small">ورود</a>
+        <a href="{% url 'signup' %}" class="btn btn-outline small">ثبت نام</a>
       {% endif %}
     </div>
   </div>
@@ -52,44 +52,44 @@
 <div id="sidebar-overlay" class="sidebar-overlay"></div>
 <aside id="app-sidebar" class="sidebar">
   <header class="sidebar-header">
-    <button id="sidebar-close" class="sidebar-close-btn" aria-label="???? ???">?</button>
+    <button id="sidebar-close" class="sidebar-close-btn" aria-label="بستن منو">?</button>
   </header>
   <ul>
     <li>
       <button type="button" onclick="gotoPage(this)" data-url="{% url 'home' %}" class="active">
         <i class="ai-home"></i>
-        <p>????</p>
+        <p>خانه</p>
       </button>
     </li>
     <li>
       <button type="button" onclick="gotoPage(this)" data-url="{% url 'shop' %}">
         <i class="ai-cart"></i>
-        <p>???????</p>
+        <p>فروشگاه</p>
       </button>
     </li>
     <li>
       <button type="button" onclick="gotoPage(this)" data-url="{% url 'news_list' %}">
         <i class="bx bx-news"></i>
-        <p>?????</p>
+        <p>اخبار</p>
       </button>
     </li>
     <li>
       <button type="button" onclick="gotoPage(this)" data-url="{% url 'faq' %}">
         <i class="ai-question"></i>
-        <p>?????? ??????</p>
+        <p>سوالات متداول</p>
       </button>
     </li>
     <li>
       <button type="button" onclick="gotoPage(this)" data-url="{% url 'contact' %}">
         <i class="ai-phone"></i>
-        <p>?????? ?? ??</p>
+        <p>ارتباط با ما</p>
       </button>
     </li>
     {% if user.is_staff %}
     <li>
       <button type="button" onclick="gotoPage(this)" data-url="{% url 'admin_chat' %}">
         <i class="ai-chat"></i>
-        <p>?? ?????</p>
+        <p>چت ادمین</p>
       </button>
     </li>
     {% endif %}
@@ -104,46 +104,45 @@
 <footer class="main-footer">
   <div class="container footer-top">
     <div class="footer-brand">
-      <h4>??????</h4>
-      <p>????? ???? ???? ?? ???????? ????? ???????? ??????? ? ????? ?????.</p>
+      <h4>استیرا</h4>
+      <p>تجربه خرید آسان با پشتیبانی سریع، قیمت‌های منصفانه و ارسال مطمئن.</p>
     </div>
     <div class="footer-column">
-      <h4>???????? ????</h4>
-      <a href="{% url 'shop' %}">???????</a>
-      <a href="{% url 'news_list' %}">?????</a>
-      <a href="{% url 'faq' %}">?????? ??????</a>
+      <h4>لینک‌های مفید</h4>
+      <a href="{% url 'shop' %}">فروشگاه</a>
+      <a href="{% url 'news_list' %}">اخبار</a>
+      <a href="{% url 'faq' %}">سوالات متداول</a>
     </div>
     <div class="footer-column">
-      <h4>?????? ?? ??</h4>
-      <a href="{% url 'contact' %}">??? ????</a>
-      <a href="{% url 'contact' %}">???????? ???????</a>
+      <h4>ارتباط با ما</h4>
+      <a href="{% url 'contact' %}">فرم تماس</a>
+      <a href="{% url 'contact' %}">پشتیبانی مشتریان</a>
     </div>
     <div class="footer-column">
-      <h4>??????? ????</h4>
-      <p>????: ???-XXXXXXX</p>
-      <p>?????: info@example.com</p>
+      <h4>اطلاعات تماس</h4>
+      <p>تلفن: ۰۲۱-XXXXXXX</p>
+      <p>ایمیل: info@example.com</p>
     </div>
   </div>
   <div class="container footer-bottom">
-    <p>???? ???? ???? ?????? ????? ???.</p>
+    <p>تمام حقوق برای استیرا محفوظ است.</p>
   </div>
 </footer>
 
-<!-- Global chat -->
-<div id="global-chat-toggle" class="floating-chat-btn icon-only" aria-label="??">
+<div id="global-chat-toggle" class="floating-chat-btn icon-only" aria-label="چت">
   <i class="bx bxs-chat"></i>
 </div>
 
 <div id="global-chat-widget" class="global-chat hidden">
   <div class="global-chat-header">
-    <span>?? ?? ???????</span>
+    <span>چت با پشتیبان</span>
     <button type="button" id="global-chat-close" class="close-btn">?</button>
   </div>
   <div id="global-chat-messages" class="global-chat-messages"></div>
   <form id="global-chat-form" class="global-chat-form">
     {% csrf_token %}
-    <input id="global-chat-input" type="text" placeholder="???? ??? ?? ???????..." autocomplete="off">
-    <button type="submit">?????</button>
+    <input id="global-chat-input" type="text" placeholder="پیام خود را بنویسید..." autocomplete="off">
+    <button type="submit">ارسال</button>
   </form>
 </div>
 
@@ -151,6 +150,7 @@
 <script src="{% static 'js/chat.js' %}"></script>
 <script src="{% static 'js/sidebar.js' %}"></script>
 <script src="{% static 'js/theme.js' %}"></script>
+<script src="{% static 'js/user-menu.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

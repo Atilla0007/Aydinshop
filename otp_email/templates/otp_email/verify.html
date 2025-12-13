@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}OTP Verification{% endblock %}
+{% block title %}تایید ایمیل{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/email-otp.css' %}">
@@ -13,8 +13,8 @@
     {% csrf_token %}
     <a class="close" href="{% url 'home' %}">X</a>
     <div class="info">
-      <span class="title">OTP Verification</span>
-      <p class="description">Please enter the code we have sent you.</p>
+      <span class="title">تایید ایمیل</span>
+      <p class="description">کد ارسال‌شده به ایمیل را وارد کنید.</p>
     </div>
 
     {% if error %}
@@ -34,11 +34,11 @@
       <input type="hidden" name="next" value="{{ next }}">
     {% endif %}
 
-    <button class="validate" type="submit">Verify</button>
+    <button class="validate" type="submit">تایید</button>
 
     <p class="resend">
-      You don't receive the code ?
-      <a class="resend-action" href="?resend=1{% if next %}&next={{ next|urlencode }}{% endif %}">resend</a>
+      کد را دریافت نکردید؟
+      <a class="resend-action" href="?resend=1{% if next %}&next={{ next|urlencode }}{% endif %}">ارسال مجدد</a>
     </p>
   </form>
 </section>
@@ -47,4 +47,3 @@
 {% block extra_js %}
   <script src="{% static 'js/email-otp.js' %}"></script>
 {% endblock %}
-
