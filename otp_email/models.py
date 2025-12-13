@@ -1,9 +1,10 @@
 import hashlib
 import secrets
 from datetime import timedelta
+from pathlib import Path
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, get_connection
 from django.db import models
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare
@@ -191,15 +192,33 @@ class EmailOTPDevice(Device):
             "Your verification code is {token}. It expires in {minutes} minutes.",
         ).format(token=token, minutes=minutes)
 
-        send_mail(
+        message = EmailMessage(
             subject=subject,
-            message=body,
+            body=body,
             from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
-            recipient_list=[self.email],
-            fail_silently=False,
+            to=[self.email],
         )
+
+        try:
+            message.send(fail_silently=False)
+        except OSError:
+            if (
+                getattr(settings, "DEBUG", False)
+                and getattr(settings, "EMAIL_BACKEND", "")
+                == "django.core.mail.backends.console.EmailBackend"
+            ):
+                base_dir = Path(getattr(settings, "BASE_DIR", Path.cwd()))
+                file_path = base_dir / "tmp" / "emails"
+                file_path.mkdir(parents=True, exist_ok=True)
+                connection = get_connection(
+                    "django.core.mail.backends.filebased.EmailBackend",
+                    fail_silently=False,
+                    file_path=str(file_path),
+                )
+                message.send(fail_silently=False, connection=connection)
+                return
+            raise
 
     def generate_challenge(self):
         self.send_challenge()
         return "Email OTP sent"
-
