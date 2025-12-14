@@ -1,14 +1,15 @@
 /* Theme tokens */
 :root {
+    /* Palette: 000000, 2F4550, 586F7C, F4F4F9 */
     --bg: #000000;
     --bg-alt: #2F4550;
     --surface: #2F4550;
     --surface-2: #586F7C;
     --text: #F4F4F9;
-    --muted: #586F7C;
-    --accent: #586F7C;
-    --accent-2: #2F4550;
-    --accent-green: #2F4550;
+    --muted: #D8DCE5;
+    --accent: #F4F4F9;
+    --accent-2: #586F7C;
+    --accent-green: #586F7C;
     --danger: #B40023;
     --border: #2F4550;
     --navy: #2F4550;
@@ -19,7 +20,7 @@
 body.theme-light {
     --bg: #F4F4F9;
     --bg-alt: #586F7C;
-    --surface: #F4F4F9;
+    --surface: #FFFFFF;
     --surface-2: #DDE1E7;
     --text: #000000;
     --muted: #586F7C;
@@ -39,10 +40,10 @@ body.theme-dark {
     --surface: #2F4550;
     --surface-2: #586F7C;
     --text: #F4F4F9;
-    --muted: #586F7C;
-    --accent: #586F7C;
-    --accent-2: #2F4550;
-    --accent-green: #2F4550;
+    --muted: #D8DCE5;
+    --accent: #F4F4F9;
+    --accent-2: #586F7C;
+    --accent-green: #586F7C;
     --danger: #B40023;
     --border: #2F4550;
     --navy: #2F4550;
