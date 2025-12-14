@@ -1,50 +1,53 @@
 /* Theme tokens */
 :root {
-    --bg: #0E2632;
-    --bg-alt: #05334A;
-    --surface: #0E2632;
-    --surface-2: #05334A;
-    --text: #FCF0D6;
-    --muted: #6B9EBD;
-    --accent: #B40023;
-    --accent-2: #6B9EBD;
-    --danger: #710004;
-    --border: #05334A;
-    --navy: #B40023;
-    --navy-dark: #710004;
-    --shadow-soft: 0 16px 48px rgba(5, 51, 74, 0.35);
+    --bg: #000000;
+    --bg-alt: #2F4550;
+    --surface: #2F4550;
+    --surface-2: #586F7C;
+    --text: #F4F4F9;
+    --muted: #586F7C;
+    --accent: #586F7C;
+    --accent-2: #2F4550;
+    --accent-green: #2F4550;
+    --danger: #B40023;
+    --border: #2F4550;
+    --navy: #2F4550;
+    --navy-dark: #000000;
+    --shadow-soft: 0 16px 48px rgba(0, 0, 0, 0.25);
 }
 
 body.theme-light {
-    --bg: #FCF0D6;
-    --bg-alt: #6B9EBD;
-    --surface: #FCF0D6;
-    --surface-2: #6B9EBD;
-    --text: #0E2632;
-    --muted: #05334A;
-    --accent: #B40023;
-    --accent-2: #6B9EBD;
-    --danger: #710004;
-    --border: #6B9EBD;
-    --navy: #B40023;
-    --navy-dark: #710004;
-    --shadow-soft: 0 14px 36px rgba(11, 38, 50, 0.22);
+    --bg: #F4F4F9;
+    --bg-alt: #586F7C;
+    --surface: #F4F4F9;
+    --surface-2: #DDE1E7;
+    --text: #000000;
+    --muted: #586F7C;
+    --accent: #2F4550;
+    --accent-2: #586F7C;
+    --accent-green: #2F4550;
+    --danger: #B40023;
+    --border: #586F7C;
+    --navy: #2F4550;
+    --navy-dark: #000000;
+    --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.2);
 }
 
 body.theme-dark {
-    --bg: #0E2632;
-    --bg-alt: #05334A;
-    --surface: #0E2632;
-    --surface-2: #05334A;
-    --text: #FCF0D6;
-    --muted: #6B9EBD;
-    --accent: #B40023;
-    --accent-2: #6B9EBD;
-    --danger: #710004;
-    --border: #05334A;
-    --navy: #B40023;
-    --navy-dark: #710004;
-    --shadow-soft: 0 16px 48px rgba(5, 51, 74, 0.35);
+    --bg: #000000;
+    --bg-alt: #2F4550;
+    --surface: #2F4550;
+    --surface-2: #586F7C;
+    --text: #F4F4F9;
+    --muted: #586F7C;
+    --accent: #586F7C;
+    --accent-2: #2F4550;
+    --accent-green: #2F4550;
+    --danger: #B40023;
+    --border: #2F4550;
+    --navy: #2F4550;
+    --navy-dark: #000000;
+    --shadow-soft: 0 16px 48px rgba(0, 0, 0, 0.25);
 }
 
 /* ظ¾ط§غŒظ‡ */
@@ -804,18 +807,23 @@ input::placeholder {
     position: absolute;
     left: 1.4rem;
     bottom: 1.4rem;
-    background: rgba(255, 255, 255, 0.96);
+    background: #F4F4F9;
     border-radius: 18px;
     padding: 0.6rem 0.9rem;
     box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
     display: flex;
     flex-direction: column;
     font-size: 0.78rem;
+    color: #000000;
+}
+
+.hero-floating-card .card-label {
+    color: #000000;
 }
 
 .hero-floating-card strong {
     font-size: 1.1rem;
-    color: var(--accent-green);
+    color: #000000;
 }
 
 /* Why us */
