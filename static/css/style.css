@@ -7,9 +7,9 @@
     --surface-2: #586F7C;
     --text: #F4F4F9;
     --muted: #D8DCE5;
-    --accent: #F4F4F9;
-    --accent-2: #586F7C;
-    --accent-green: #586F7C;
+    --accent: #586F7C;
+    --accent-2: #2F4550;
+    --accent-green: #2F4550;
     --danger: #B40023;
     --border: #2F4550;
     --navy: #2F4550;
@@ -19,16 +19,16 @@
 
 body.theme-light {
     --bg: #F4F4F9;
-    --bg-alt: #586F7C;
+    --bg-alt: #2F4550;
     --surface: #FFFFFF;
-    --surface-2: #DDE1E7;
+    --surface-2: #586F7C;
     --text: #000000;
     --muted: #586F7C;
     --accent: #2F4550;
     --accent-2: #586F7C;
     --accent-green: #2F4550;
     --danger: #B40023;
-    --border: #586F7C;
+    --border: #2F4550;
     --navy: #2F4550;
     --navy-dark: #000000;
     --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.2);
@@ -41,9 +41,9 @@ body.theme-dark {
     --surface-2: #586F7C;
     --text: #F4F4F9;
     --muted: #D8DCE5;
-    --accent: #F4F4F9;
-    --accent-2: #586F7C;
-    --accent-green: #586F7C;
+    --accent: #586F7C;
+    --accent-2: #2F4550;
+    --accent-green: #2F4550;
     --danger: #B40023;
     --border: #2F4550;
     --navy: #2F4550;
@@ -721,8 +721,7 @@ input::placeholder {
 /* Hero */
 .hero-section {
     padding: 3rem 0 3.5rem;
-    background: radial-gradient(circle at top left, rgba(255, 201, 74, 0.22), transparent 60%),
-                radial-gradient(circle at bottom right, rgba(60, 179, 115, 0.18), transparent 55%);
+    background: linear-gradient(135deg, #000000 0%, #2F4550 60%, #586F7C 100%);
 }
 
 .hero-container {
@@ -756,7 +755,7 @@ input::placeholder {
 
 .hero-subtitle {
     font-size: 0.98rem;
-    color: #647196;
+    color: #6FAE9F;
     max-width: 32rem;
 }
 
