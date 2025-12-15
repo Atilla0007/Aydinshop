@@ -69,6 +69,7 @@ class CheckoutTests(TestCase):
                 "phone": "09120000000",
                 "province": "تهران",
                 "city": "تهران",
+                "address": "تهران، خیابان مثال، پلاک ۱",
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -92,6 +93,7 @@ class CheckoutTests(TestCase):
                 "phone": "09120000000",
                 "province": "تهران",
                 "city": "تهران",
+                "address": "تهران، خیابان مثال، پلاک ۱",
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -116,6 +118,7 @@ class CheckoutTests(TestCase):
                 "phone": "09120000000",
                 "province": "تهران",
                 "city": "تهران",
+                "address": "تهران، خیابان مثال، پلاک ۱",
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -139,6 +142,7 @@ class CheckoutTests(TestCase):
                 "phone": "09120000000",
                 "province": "تهران",
                 "city": "تهران",
+                "address": "تهران، خیابان مثال، پلاک ۱",
             },
         )
         self.assertEqual(response.status_code, 200)
@@ -166,6 +170,8 @@ class CheckoutTests(TestCase):
                 "province": "تهران",
                 "city": "تهران",
                 "discount_code": "OFF10",
+                "discount_code_applied": "OFF10",
+                "address": "تهران، خیابان مثال، پلاک ۱",
             },
         )
         self.assertEqual(response.status_code, 302)

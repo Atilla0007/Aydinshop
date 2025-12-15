@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_POST
 from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
 from .models import Product, CartItem, Order, OrderItem, Category
 from accounts.models import UserProfile
@@ -191,6 +192,52 @@ def cart(request):
 
     return render(request, 'store/cart.html', {'items': items, 'total': total})
 
+@login_required
+@require_POST
+def discount_preview(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    if not profile.email_verified:
+        return JsonResponse({'ok': False, 'message': 'ابتدا ایمیل خود را تایید کنید.'}, status=403)
+
+    _merge_session_cart_into_user(request)
+    cart_items = CartItem.objects.filter(user=request.user).select_related('product')
+    items_subtotal = int(sum(item.total_price() for item in cart_items))
+    if not cart_items.exists():
+        return JsonResponse({'ok': False, 'message': 'سبد خرید شما خالی است.'}, status=400)
+
+    code = (request.POST.get('code') or '').strip().upper().replace(' ', '')
+    if not code:
+        return JsonResponse({
+            'ok': True,
+            'code': '',
+            'percent': 0,
+            'amount': 0,
+            'items_subtotal': items_subtotal,
+            'subtotal': items_subtotal,
+            'message': 'کد تخفیف حذف شد.',
+        })
+
+    discount = (
+        DiscountCode.objects.filter(code=code, is_active=True)
+        .order_by('-updated_at')
+        .first()
+    )
+    if not discount:
+        return JsonResponse({'ok': False, 'message': 'کد تخفیف نامعتبر است.'})
+
+    percent = int(discount.percent)
+    amount = int(items_subtotal) * percent // 100
+    subtotal = int(items_subtotal) - int(amount)
+    return JsonResponse({
+        'ok': True,
+        'code': code,
+        'percent': percent,
+        'amount': amount,
+        'items_subtotal': items_subtotal,
+        'subtotal': subtotal,
+        'message': f'کد {code} اعمال شد ({percent}٪).',
+    })
+
 
 @login_required
 def checkout(request):
@@ -242,6 +289,7 @@ def checkout(request):
             'address': (request.POST.get('address') or '').strip(),
             'note': (request.POST.get('note') or '').strip(),
             'discount_code': _normalize_discount_code(request.POST.get('discount_code') or ''),
+            'discount_code_applied': _normalize_discount_code(request.POST.get('discount_code_applied') or ''),
         }
 
         errors: dict[str, str] = {}
@@ -255,6 +303,8 @@ def checkout(request):
             errors['province'] = 'استان را انتخاب کنید.'
         if not values['city']:
             errors['city'] = 'شهر را انتخاب کنید.'
+        if not values['address']:
+            errors['address'] = 'آدرس دقیق را وارد کنید.'
 
         if values['phone']:
             new_phone = values['phone'].replace(' ', '').replace('-', '')
@@ -268,7 +318,7 @@ def checkout(request):
         if values['phone'] and not profile.phone_verified:
             errors['phone_verified'] = 'شماره موبایل شما تایید نشده است.'
 
-        discount_code = values.get('discount_code') or ""
+        discount_code = values.get('discount_code_applied') or ""
         if discount_code:
             discount = (
                 DiscountCode.objects.filter(code=discount_code, is_active=True)

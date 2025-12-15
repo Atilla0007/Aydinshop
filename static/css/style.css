@@ -1555,6 +1555,39 @@ textarea:focus {
     font-weight: 700;
 }
 
+.discount-inline {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.discount-inline input {
+    flex: 1;
+    min-width: 0;
+}
+
+.discount-feedback {
+    margin-top: 0.45rem;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(47, 69, 80, 0.08);
+    color: var(--text);
+}
+
+.discount-feedback.ok {
+    background: rgba(2, 122, 72, 0.12);
+    border-color: rgba(2, 122, 72, 0.5);
+    color: #067647;
+}
+
+.discount-feedback.error {
+    background: rgba(180, 0, 35, 0.1);
+    border-color: rgba(180, 0, 35, 0.55);
+    color: #b42318;
+}
+
 .field-tag {
     font-size: 0.72rem;
     padding: 0.12rem 0.55rem;

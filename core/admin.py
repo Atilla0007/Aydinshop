@@ -10,7 +10,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'created_at')
+    list_display = ('id', 'name', 'email', 'created_at')
     search_fields = ('name', 'email')
 
 
@@ -53,7 +53,7 @@ class DiscountCodeAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentSettings)
 class PaymentSettingsAdmin(admin.ModelAdmin):
-    list_display = ("card_number", "telegram_username", "whatsapp_number", "updated_at")
+    list_display = ("id", "card_number", "telegram_username", "whatsapp_number", "updated_at")
 
     def has_add_permission(self, request):
         return not PaymentSettings.objects.exists()

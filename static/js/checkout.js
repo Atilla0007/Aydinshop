@@ -8,8 +8,33 @@
   const shippingFreeBadgeEl = document.getElementById('shipping-free-badge');
   const shippingHintEl = document.getElementById('shipping-hint');
   const finalTotalEl = document.getElementById('final-total');
+  const subtotalEl = document.getElementById('checkout-subtotal');
+
+  const discountInput = document.getElementById('discount_code');
+  const discountApplyBtn = document.getElementById('discount-apply-btn');
+  const discountAppliedInput = document.getElementById('discount_code_applied');
+  const discountFeedbackEl = document.getElementById('discount-feedback');
+  const discountRowEl = document.getElementById('discount-row');
+  const discountAmountEl = document.getElementById('discount-amount');
+  const discountPercentEl = document.getElementById('discount-percent');
+  const subtotalLabelEl = document.getElementById('subtotal-label');
 
   const modal = document.getElementById('phone-verify-modal');
+
+  const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + '=') {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  };
 
   const formatNumber = (value) => {
     const numberValue = Number(value);
@@ -119,6 +144,7 @@
 
     const finalTotal = subtotal + shippingApplied;
 
+    if (subtotalEl) subtotalEl.textContent = formatNumber(subtotal);
     shippingFeeEl.textContent = formatNumber(shippingApplied);
     finalTotalEl.textContent = formatNumber(finalTotal);
 
@@ -133,6 +159,88 @@
     }
   };
 
+  const setDiscountFeedback = (message, type) => {
+    if (!discountFeedbackEl) return;
+    if (!message) {
+      discountFeedbackEl.textContent = '';
+      discountFeedbackEl.classList.add('hidden');
+      discountFeedbackEl.classList.remove('ok', 'error');
+      return;
+    }
+    discountFeedbackEl.textContent = message;
+    discountFeedbackEl.classList.remove('hidden');
+    discountFeedbackEl.classList.toggle('ok', type === 'ok');
+    discountFeedbackEl.classList.toggle('error', type === 'error');
+  };
+
+  const updateDiscountUI = ({ percent, amount }) => {
+    const p = Number(percent || 0);
+    const a = Number(amount || 0);
+
+    if (discountRowEl) discountRowEl.classList.toggle('hidden', !(a > 0 && p > 0));
+    if (discountPercentEl) discountPercentEl.textContent = String(p || 0);
+    if (discountAmountEl) discountAmountEl.textContent = `-${formatNumber(a)}`;
+    if (subtotalLabelEl) subtotalLabelEl.textContent = a > 0 ? 'جمع بعد از تخفیف' : 'جمع قابل پرداخت کالاها';
+  };
+
+  const normalizeCode = (raw) => String(raw || '').trim().toUpperCase().replace(/\s+/g, '');
+
+  const applyDiscount = async () => {
+    if (!summaryEl || !discountInput || !discountApplyBtn || !discountAppliedInput) return;
+    const previewUrl = summaryEl.dataset.discountPreviewUrl;
+    if (!previewUrl) return;
+
+    const code = normalizeCode(discountInput.value);
+    const csrftoken = getCookie('csrftoken');
+
+    const originalText = discountApplyBtn.textContent;
+    discountApplyBtn.disabled = true;
+    discountApplyBtn.textContent = '...';
+
+    try {
+      const body = new URLSearchParams();
+      body.set('code', code);
+
+      const response = await fetch(previewUrl, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken || '',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+        credentials: 'same-origin',
+        body: body.toString(),
+      });
+
+      const data = await response.json().catch(() => null);
+      if (!data || data.ok !== true) {
+        const msg = (data && data.message) || 'کد تخفیف نامعتبر است.';
+        setDiscountFeedback(msg, 'error');
+        return;
+      }
+
+      const itemsSubtotal = parseNumber(data.items_subtotal ?? summaryEl.dataset.itemsSubtotal);
+      const discountPercent = parseNumber(data.percent || 0);
+      const discountAmount = parseNumber(data.amount || 0);
+      const subtotal = parseNumber(data.subtotal ?? itemsSubtotal);
+      const appliedCode = String(data.code || '');
+
+      summaryEl.dataset.itemsSubtotal = String(itemsSubtotal);
+      summaryEl.dataset.subtotal = String(subtotal);
+      discountAppliedInput.value = appliedCode;
+      discountInput.value = appliedCode;
+
+      updateDiscountUI({ percent: discountPercent, amount: discountAmount });
+      updateTotals();
+      setDiscountFeedback(String(data.message || 'کد تخفیف اعمال شد.'), 'ok');
+    } catch {
+      setDiscountFeedback('خطا در بررسی کد تخفیف. لطفاً دوباره تلاش کنید.', 'error');
+    } finally {
+      discountApplyBtn.disabled = false;
+      discountApplyBtn.textContent = originalText;
+    }
+  };
+
   populateProvinces();
   populateCounties();
   updateTotals();
@@ -142,6 +250,18 @@
       citySelect && (citySelect.dataset.selected = '');
       populateCounties();
       updateTotals();
+    });
+  }
+
+  if (discountApplyBtn) {
+    discountApplyBtn.addEventListener('click', applyDiscount);
+  }
+  if (discountInput) {
+    discountInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyDiscount();
+      }
     });
   }
 })();

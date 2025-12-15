@@ -63,8 +63,9 @@
             </div>
 
             <div class="checkout-field full">
-              <label for="address">آدرس دقیق <span class="field-tag optional">اختیاری</span></label>
-              <textarea id="address" name="address" rows="3">{{ values.address }}</textarea>
+              <label for="address">آدرس دقیق <span class="field-tag required">اجباری</span></label>
+              <textarea id="address" name="address" rows="3" required>{{ values.address }}</textarea>
+              {% if errors.address %}<div class="field-error">{{ errors.address }}</div>{% endif %}
             </div>
 
             <div class="checkout-field full">
@@ -74,10 +75,17 @@
 
             <div class="checkout-field full">
               <label for="discount_code">کد تخفیف <span class="field-tag optional">اختیاری</span></label>
-              <input id="discount_code" type="text" name="discount_code" value="{{ values.discount_code }}" autocomplete="off">
-              {% if errors.discount_code %}<div class="field-error">{{ errors.discount_code }}</div>{% endif %}
-              {% if discount_code and discount_percent %}
-                <div class="shipping-hint">کد <strong dir="ltr">{{ discount_code }}</strong> اعمال شد ({{ discount_percent }}٪).</div>
+              <div class="discount-inline">
+                <input id="discount_code" type="text" name="discount_code" value="{{ values.discount_code }}" autocomplete="off">
+                <button type="button" id="discount-apply-btn" class="btn btn-outline small">ثبت کد</button>
+              </div>
+              <input type="hidden" id="discount_code_applied" name="discount_code_applied" value="{{ discount_code }}">
+              {% if errors.discount_code %}
+                <div id="discount-feedback" class="discount-feedback error">{{ errors.discount_code }}</div>
+              {% elif discount_code and discount_percent %}
+                <div id="discount-feedback" class="discount-feedback ok">کد <strong dir="ltr">{{ discount_code }}</strong> اعمال شد ({{ discount_percent }}٪).</div>
+              {% else %}
+                <div id="discount-feedback" class="discount-feedback hidden"></div>
               {% endif %}
             </div>
           </div>
@@ -90,9 +98,11 @@
         class="checkout-summary"
         id="checkout-summary"
         data-subtotal="{{ subtotal }}"
+        data-items-subtotal="{{ items_subtotal }}"
         data-shipping-fee-per-item="{{ shipping_fee_per_item }}"
         data-item-count="{{ shipping_item_count }}"
         data-free-threshold="{{ free_shipping_min_total }}"
+        data-discount-preview-url="{% url 'discount_preview' %}"
       >
         <h2>خلاصه سفارش</h2>
 
@@ -117,24 +127,17 @@
             <span>تومان</span>
           </div>
 
-          {% if discount_amount %}
-            <div class="summary-row">
-              <span>تخفیف{% if discount_percent %} ({{ discount_percent }}٪){% endif %}</span>
-              <strong dir="ltr">-{{ discount_amount|floatformat:0 }}</strong>
-              <span>تومان</span>
-            </div>
-            <div class="summary-row">
-              <span>جمع بعد از تخفیف</span>
-              <strong id="checkout-subtotal">{{ subtotal|floatformat:0 }}</strong>
-              <span>تومان</span>
-            </div>
-          {% else %}
-            <div class="summary-row">
-              <span>جمع قابل پرداخت کالاها</span>
-              <strong id="checkout-subtotal">{{ subtotal|floatformat:0 }}</strong>
-              <span>تومان</span>
-            </div>
-          {% endif %}
+          <div id="discount-row" class="summary-row {% if not discount_amount %}hidden{% endif %}">
+            <span>تخفیف (<span id="discount-percent">{{ discount_percent|default_if_none:0 }}</span>٪)</span>
+            <strong id="discount-amount" dir="ltr">-{{ discount_amount|floatformat:0 }}</strong>
+            <span>تومان</span>
+          </div>
+
+          <div class="summary-row">
+            <span id="subtotal-label">{% if discount_amount %}جمع بعد از تخفیف{% else %}جمع قابل پرداخت کالاها{% endif %}</span>
+            <strong id="checkout-subtotal">{{ subtotal|floatformat:0 }}</strong>
+            <span>تومان</span>
+          </div>
 
           <div class="summary-row">
             <span>هزینه ارسال ({{ shipping_item_count }} کالا × {{ shipping_fee_per_item|floatformat:0 }} تومان)</span>

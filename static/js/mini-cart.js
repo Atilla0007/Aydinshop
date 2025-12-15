@@ -9,6 +9,8 @@
     return;
   }
 
+  const SCROLL_KEY = 'styra_scroll_y_before_cart';
+
   const previewUrl = drawer.dataset.previewUrl;
 
   const escapeHtml = (text) =>
@@ -91,6 +93,23 @@
     overlay.setAttribute('aria-hidden', 'true');
   };
 
+  // Keep scroll position when adding to cart (opening drawer after redirect).
+  document.addEventListener(
+    'click',
+    (event) => {
+      const link = event.target && event.target.closest ? event.target.closest('a') : null;
+      if (!link) return;
+      const href = link.getAttribute('href') || '';
+      if (!href.includes('add-to-cart')) return;
+      try {
+        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY || 0));
+      } catch {
+        // ignore
+      }
+    },
+    true,
+  );
+
   overlay.addEventListener('click', closeDrawer);
   closeButton.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', (event) => {
@@ -99,9 +118,18 @@
 
   const url = new URL(window.location.href);
   if (url.searchParams.get('cart_open') === '1') {
+    try {
+      const saved = sessionStorage.getItem(SCROLL_KEY);
+      if (saved != null) {
+        const y = Number(saved);
+        if (Number.isFinite(y)) window.scrollTo(0, y);
+        sessionStorage.removeItem(SCROLL_KEY);
+      }
+    } catch {
+      // ignore
+    }
     openDrawer();
     url.searchParams.delete('cart_open');
     window.history.replaceState({}, '', url.toString());
   }
 })();
-
