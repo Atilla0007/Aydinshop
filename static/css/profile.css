@@ -47,6 +47,35 @@
   font-size: 0.9rem;
 }
 
+.profile-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(244, 244, 249, 0.12);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.profile-info .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(244, 244, 249, 0.1);
+}
+
+.profile-info .row span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.profile-info .row strong {
+  font-weight: 700;
+}
+
 .profile-badges {
   display: flex;
   flex-wrap: wrap;
@@ -71,10 +100,65 @@
   background: rgba(180, 0, 35, 0.12);
 }
 
+.badge.info {
+  background: rgba(88, 111, 124, 0.25);
+}
+
+.phone-verify-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  background: rgba(47, 69, 80, 0.35);
+  border: 1px solid rgba(88, 111, 124, 0.6);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  margin-top: 0.65rem;
+}
+
+.phone-verify-cta:hover {
+  background: rgba(47, 69, 80, 0.45);
+}
+
+.phone-verify-done {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  background: rgba(107, 158, 189, 0.2);
+  border: 1px solid rgba(107, 158, 189, 0.35);
+  color: var(--text);
+  text-align: center;
+  font-weight: 700;
+  margin-top: 0.65rem;
+}
+
+.profile-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
 .profile-form label {
   display: block;
-  margin-top: 0.75rem;
-  margin-bottom: 0.35rem;
+  margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
 }
@@ -83,6 +167,9 @@
   width: 100%;
   border-radius: 12px;
   padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--text);
 }
 
 .profile-actions {
@@ -194,5 +281,8 @@
   }
   .profile-actions {
     flex-direction: column;
+  }
+  .fields-grid {
+    grid-template-columns: 1fr;
   }
 }

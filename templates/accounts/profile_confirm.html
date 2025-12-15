@@ -17,8 +17,8 @@
       <div class="profile-info">
         <div class="row"><span>نام</span><strong>{{ values.first_name|default:'-' }}</strong></div>
         <div class="row"><span>نام خانوادگی</span><strong>{{ values.last_name|default:'-' }}</strong></div>
-        <div class="row"><span>ایمیل</span><strong>{{ values.email|default:'-' }}</strong></div>
-        <div class="row"><span>شماره موبایل</span><strong>{{ values.phone|default:'-' }}</strong></div>
+        <div class="row"><span>ایمیل</span><strong dir="ltr">{{ values.email|default:'-' }}</strong></div>
+        <div class="row"><span>شماره موبایل</span><strong dir="ltr">{{ values.phone|default:'-' }}</strong></div>
       </div>
 
       <form method="post" class="profile-actions">

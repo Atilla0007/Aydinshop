@@ -8,4 +8,5 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.profile_edit_view, name='profile_edit'),
     path('verify-phone/', views.verify_phone_view, name='verify_phone'),
+    path('auth/phone-otp/', views.verify_phone_view, name='phone_otp_verify_page'),
 ]

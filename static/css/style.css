@@ -3436,3 +3436,8 @@ select {
     background: rgba(0, 0, 0, 0.16);
     color: var(--text);
 }
+
+/* Header gradient (black -> blue) */
+.main-header {
+    background: linear-gradient(to left, #000000 0%, #2F4550 100%);
+}

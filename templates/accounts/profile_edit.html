@@ -17,17 +17,27 @@
       <form method="post" class="profile-form">
         {% csrf_token %}
 
-        <label>نام</label>
-        <input name="first_name" value="{{ values.first_name }}" placeholder="نام">
+        <div class="fields-grid">
+          <div class="field">
+            <label for="first_name">نام</label>
+            <input id="first_name" name="first_name" value="{{ values.first_name }}" placeholder="نام" autocomplete="given-name">
+          </div>
 
-        <label>نام خانوادگی</label>
-        <input name="last_name" value="{{ values.last_name }}" placeholder="نام خانوادگی">
+          <div class="field">
+            <label for="last_name">نام خانوادگی</label>
+            <input id="last_name" name="last_name" value="{{ values.last_name }}" placeholder="نام خانوادگی" autocomplete="family-name">
+          </div>
 
-        <label>ایمیل</label>
-        <input name="email" value="{{ values.email }}" placeholder="ایمیل" type="email">
+          <div class="field full">
+            <label for="email">ایمیل</label>
+            <input id="email" name="email" value="{{ values.email }}" placeholder="ایمیل" type="email" dir="ltr" autocomplete="email">
+          </div>
 
-        <label>شماره موبایل</label>
-        <input name="phone" value="{{ values.phone }}" placeholder="09xxxxxxxxx" inputmode="numeric">
+          <div class="field full">
+            <label for="phone">شماره موبایل</label>
+            <input id="phone" name="phone" value="{{ values.phone }}" placeholder="09xxxxxxxxx" inputmode="numeric" dir="ltr" autocomplete="tel">
+          </div>
+        </div>
 
         <div class="profile-actions">
           <button class="btn btn-primary" type="submit">ادامه</button>

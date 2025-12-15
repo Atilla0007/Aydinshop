@@ -15,15 +15,19 @@
         <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
         <div>
           <h2 class="profile-name">{{ request.user.get_full_name|default:request.user.username }}</h2>
-          <p class="profile-sub">{{ request.user.email|default:'-' }}</p>
+          <p class="profile-sub" dir="ltr">{{ request.user.email|default:'-' }}</p>
         </div>
       </div>
 
       <div class="profile-badges">
-        {% if profile.phone_verified %}
-          <span class="badge ok">شماره موبایل تایید شده</span>
+        {% if profile.phone %}
+          {% if profile.phone_verified %}
+            <span class="badge ok">شماره موبایل تایید شده</span>
+          {% else %}
+            <span class="badge warn">شماره موبایل تایید نشده</span>
+          {% endif %}
         {% else %}
-          <span class="badge warn">شماره موبایل تایید نشده</span>
+          <span class="badge info">شماره موبایل وارد نشده</span>
         {% endif %}
 
         {% if profile.email_verified %}
@@ -41,18 +45,25 @@
         </a>
       {% endif %}
 
+      {% if profile.phone %}
+        {% if profile.phone_verified %}
+          <div class="phone-verify-done">شماره موبایل تایید شده است</div>
+        {% else %}
+          <a class="phone-verify-cta" href="{% url 'phone_otp_verify_page' %}?next={% url 'profile' %}">
+            برای تایید شماره موبایل کلیک کنید
+          </a>
+        {% endif %}
+      {% endif %}
+
       <div class="profile-info">
         <div class="row"><span>نام</span><strong>{{ request.user.first_name|default:'-' }}</strong></div>
         <div class="row"><span>نام خانوادگی</span><strong>{{ request.user.last_name|default:'-' }}</strong></div>
-        <div class="row"><span>ایمیل</span><strong>{{ request.user.email|default:'-' }}</strong></div>
-        <div class="row"><span>موبایل</span><strong>{{ profile.phone|default:'-' }}</strong></div>
+        <div class="row"><span>ایمیل</span><strong dir="ltr">{{ request.user.email|default:'-' }}</strong></div>
+        <div class="row"><span>موبایل</span><strong dir="ltr">{{ profile.phone|default:'-' }}</strong></div>
       </div>
 
       <div class="profile-actions">
         <a class="btn btn-primary" href="{% url 'profile_edit' %}">ویرایش اطلاعات</a>
-        {% if profile.phone and not profile.phone_verified %}
-          <a class="btn btn-outline" href="{% url 'verify_phone' %}">تایید شماره</a>
-        {% endif %}
       </div>
     </aside>
 
