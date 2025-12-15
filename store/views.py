@@ -226,6 +226,10 @@ def checkout(request):
             errors['last_name'] = 'نام خانوادگی را وارد کنید.'
         if not values['phone']:
             errors['phone'] = 'شماره موبایل را وارد کنید.'
+        if not values['province']:
+            errors['province'] = 'استان را انتخاب کنید.'
+        if not values['city']:
+            errors['city'] = 'شهر را انتخاب کنید.'
 
         if values['phone']:
             new_phone = values['phone'].replace(' ', '').replace('-', '')

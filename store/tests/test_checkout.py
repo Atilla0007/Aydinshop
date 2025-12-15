@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from accounts.models import UserProfile
 from core.models import ShippingSettings
-from store.models import CartItem, Category, Order, Product
+from store.models import CartItem, Category, Order, OrderItem, Product
 
 
 class CheckoutTests(TestCase):
@@ -43,6 +43,37 @@ class CheckoutTests(TestCase):
         content = response.content.decode("utf-8")
         self.assertIn("تسویه حساب", content)
         self.assertIn("محصول تست", content)
+
+    def test_checkout_creates_single_order_for_multiple_items(self):
+        self.profile.phone = "09120000000"
+        self.profile.phone_verified = True
+        self.profile.save(update_fields=["phone", "phone_verified"])
+        self.client.force_login(self.user)
+
+        product2 = Product.objects.create(
+            name="محصول دوم",
+            description="توضیحات",
+            price=50000,
+            domain="test",
+            category=self.category,
+        )
+        CartItem.objects.create(user=self.user, product=self.product, quantity=1)
+        CartItem.objects.create(user=self.user, product=product2, quantity=2)  # 100000
+
+        response = self.client.post(
+            reverse("checkout"),
+            data={
+                "first_name": "علی",
+                "last_name": "رضایی",
+                "phone": "09120000000",
+                "province": "تهران",
+                "city": "تهران",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Order.objects.filter(user=self.user).count(), 1)
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(OrderItem.objects.filter(order=order).count(), 2)
 
     def test_shipping_fee_applies_when_province_selected(self):
         self.profile.phone = "09120000000"
@@ -109,4 +140,3 @@ class CheckoutTests(TestCase):
         content = response.content.decode("utf-8")
         self.assertIn("شماره موبایل تایید نشده است", content)
         self.assertIn(reverse("phone_otp_verify_page"), content)
-

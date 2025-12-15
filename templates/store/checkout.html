@@ -47,17 +47,19 @@
 
           <div class="checkout-grid">
             <div class="checkout-field">
-              <label for="province-select">استان <span class="field-tag optional">اختیاری</span></label>
-              <select id="province-select" name="province" data-selected="{{ values.province }}">
+              <label for="province-select">استان <span class="field-tag required">اجباری</span></label>
+              <select id="province-select" name="province" data-selected="{{ values.province }}" required>
                 <option value="">انتخاب کنید</option>
               </select>
+              {% if errors.province %}<div class="field-error">{{ errors.province }}</div>{% endif %}
             </div>
 
             <div class="checkout-field">
-              <label for="city-select">شهرستان <span class="field-tag optional">اختیاری</span></label>
-              <select id="city-select" name="city" data-selected="{{ values.city }}" disabled>
+              <label for="city-select">شهر <span class="field-tag required">اجباری</span></label>
+              <select id="city-select" name="city" data-selected="{{ values.city }}" disabled required>
                 <option value="">ابتدا استان را انتخاب کنید</option>
               </select>
+              {% if errors.city %}<div class="field-error">{{ errors.city }}</div>{% endif %}
             </div>
 
             <div class="checkout-field full">
@@ -115,7 +117,7 @@
             </div>
           </div>
 
-          <div id="shipping-hint" class="shipping-hint {% if shipping_applicable %}hidden{% endif %}">برای محاسبه هزینه ارسال، استان را انتخاب کنید.</div>
+          <div id="shipping-hint" class="shipping-hint {% if shipping_applicable %}hidden{% endif %}">لطفاً استان و شهر را انتخاب کنید.</div>
 
           <div class="summary-row total">
             <span>مبلغ قابل پرداخت</span>
