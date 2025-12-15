@@ -147,7 +147,7 @@
 {% block extra_js %}
 <script>
   (() => {
-    const input = document.getElementById('receipt');
+    let input = document.getElementById('receipt');
     const label = document.getElementById('receipt-file-name');
     const clearBtn = document.getElementById('receipt-clear-btn');
     if (!input || !label) return;
@@ -158,14 +158,34 @@
       label.textContent = file ? file.name : emptyText;
     };
 
+    const bindInput = (el) => {
+      el.addEventListener('change', update);
+    };
+
+    bindInput(input);
+
     if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        input.value = '';
+      clearBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        try {
+          input.value = '';
+        } catch (_err) {
+          // Ignore and fall back to replacing the node below.
+        }
+
+        if (input.value) {
+          const next = input.cloneNode(true);
+          input.parentNode.replaceChild(next, input);
+          input = next;
+          bindInput(input);
+        }
+
         update();
       });
     }
 
-    input.addEventListener('change', update);
     update();
   })();
 </script>

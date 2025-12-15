@@ -1295,11 +1295,13 @@ textarea:focus {
 }
 
 .chip-label {
-    opacity: 0.85;
+    opacity: 1;
+    color: var(--muted);
 }
 
 .chip-value {
     font-weight: 700;
+    color: var(--muted);
 }
 
 .product-actions-row {
