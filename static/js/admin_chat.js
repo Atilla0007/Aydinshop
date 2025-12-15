@@ -116,9 +116,9 @@ function sendMessage() {
     const text = (input.value || '').trim();
     if (!text || !userId) return;
     const submitBtn = form.querySelector('button[type=\"submit\"]');
-    const original = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.textContent = '...';
+    submitBtn.classList.add('is-loading');
+    submitBtn.setAttribute('aria-busy', 'true');
 
     const formData = new FormData();
     formData.append('message', text);
@@ -143,7 +143,8 @@ function sendMessage() {
         })
         .finally(() => {
             submitBtn.disabled = false;
-            submitBtn.textContent = original;
+            submitBtn.classList.remove('is-loading');
+            submitBtn.setAttribute('aria-busy', 'false');
         });
 }
 

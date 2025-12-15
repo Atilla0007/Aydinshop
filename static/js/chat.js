@@ -129,9 +129,9 @@ function startRealtimeUpdates() {
 
 function sendMessage(text, btnElement, inputElement) {
     if (!text) return;
-    const originalText = btnElement.textContent;
     btnElement.disabled = true;
-    btnElement.textContent = '...';
+    btnElement.classList.add('is-loading');
+    btnElement.setAttribute('aria-busy', 'true');
 
     const sendData = new FormData();
     sendData.append('message', text);
@@ -156,7 +156,8 @@ function sendMessage(text, btnElement, inputElement) {
 
             loadMessages();
             btnElement.disabled = false;
-            btnElement.textContent = originalText;
+            btnElement.classList.remove('is-loading');
+            btnElement.setAttribute('aria-busy', 'false');
             inputElement.value = '';
             inputElement.focus();
 
@@ -194,7 +195,8 @@ function sendMessage(text, btnElement, inputElement) {
         })
         .finally(() => {
             btnElement.disabled = false;
-            btnElement.textContent = originalText;
+            btnElement.classList.remove('is-loading');
+            btnElement.setAttribute('aria-busy', 'false');
             inputElement && inputElement.focus();
         });
 }

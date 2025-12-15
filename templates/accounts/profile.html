@@ -93,7 +93,7 @@
               {% if o.items.all %}
               <ul class="order-lines">
                 {% for it in o.items.all %}
-                  <li>{{ it.product.name }} ? {{ it.quantity }}</li>
+                  <li>{{ it.product.name }} | تعداد: {{ it.quantity }}</li>
                 {% endfor %}
               </ul>
               {% endif %}
