@@ -1593,6 +1593,21 @@ textarea:focus {
     font-weight: 700;
 }
 
+/* Checkout province/city dropdowns: black background + white text */
+#province-select,
+#city-select {
+    background: #000000;
+    color: #F4F4F9;
+    border-color: rgba(244, 244, 249, 0.25);
+    color-scheme: dark;
+}
+
+#province-select option,
+#city-select option {
+    background: #000000;
+    color: #F4F4F9;
+}
+
 .discount-inline {
     display: flex;
     gap: 0.6rem;
