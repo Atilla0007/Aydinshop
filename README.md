@@ -39,3 +39,33 @@ B) استقرار واقعی روی هاست (مثلا VPS مثل DigitalOcean �
    - برای production: DEBUG=False، تنظیم ALLOWED_HOSTS، تنظیم سرویس وب مثل gunicorn و reverse-proxy با nginx.
    - تنظیم HTTPS با certbot (Let's Encrypt).
 اگر خواستی من فایل nginx و systemd unit آماده برات می‌سازم.
+
+---
+
+## ارسال ایمیل واقعی (SMTP) روی لوکال
+
+به صورت پیش‌فرض برای جلوگیری از خطا روی بعضی ویندوزها، ایمیل‌ها با `filebased backend` داخل `tmp/emails/` ذخیره می‌شوند و ایمیل واقعی ارسال نمی‌شود.
+
+برای ارسال ایمیل واقعی (مثلاً Gmail SMTP):
+
+1) فایل `.env.example` را کپی کنید و به نام `.env` کنار `manage.py` بسازید. (فایل `.env` در گیت ذخیره نمی‌شود.)
+2) داخل `.env` این مقادیر را تنظیم کنید:
+
+```
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=your_email@gmail.com
+EMAIL_HOST_PASSWORD=your_app_password
+DEFAULT_FROM_EMAIL=your_email@gmail.com
+```
+
+3) سرور را ری‌استارت کنید.
+4) تست ارسال:
+
+```
+python manage.py send_test_email --to your_email@gmail.com
+```
+
+نکته Gmail: حتماً باید **App Password** بسازید (نه پسورد اصلی اکانت).
