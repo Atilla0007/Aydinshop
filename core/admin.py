@@ -55,7 +55,9 @@ class DiscountCodeAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentSettings)
 class PaymentSettingsAdmin(admin.ModelAdmin):
-    list_display = ("id", "card_number", "telegram_username", "whatsapp_number", "updated_at")
+    list_display = ("id", "card_number", "card_holder", "telegram_username", "whatsapp_number", "updated_at")
+    list_display_links = ("id",)
+    list_editable = ("card_number", "card_holder", "telegram_username", "whatsapp_number")
 
     def has_add_permission(self, request):
         return not PaymentSettings.objects.exists()

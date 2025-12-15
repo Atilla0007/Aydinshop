@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.core.mail import send_mail
 from django.utils import timezone
+from django.utils.html import format_html
 
 from accounts.sms import send_sms
 from .models import CartItem, Category, Order, OrderItem, Product
@@ -74,10 +75,26 @@ def reject_payment(modeladmin, request, queryset):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "status", "payment_status", "payment_method", "total_price", "created_at")
+    list_display = ("id", "receipt_preview", "user", "status", "payment_status", "payment_method", "total_price", "created_at")
+    list_display_links = ("id",)
+    list_editable = ("status", "payment_status")
     list_filter = ("status", "payment_status", "payment_method", "created_at")
     search_fields = ("id", "user__username", "phone", "email")
     readonly_fields = ("created_at", "payment_submitted_at", "payment_reviewed_at")
     inlines = [OrderItemInline]
     actions = [approve_payment, reject_payment]
 
+    def receipt_preview(self, obj: Order):
+        if not obj.receipt_file:
+            return "—"
+        url = obj.receipt_file.url
+        lower = url.lower()
+        if lower.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif")):
+            return format_html(
+                '<a href="{}" target="_blank" rel="noopener"><img src="{}" alt="فیش" style="height:48px;width:48px;object-fit:cover;border-radius:10px;border:1px solid rgba(0,0,0,0.15)" /></a>',
+                url,
+                url,
+            )
+        return format_html('<a href="{}" target="_blank" rel="noopener">مشاهده فایل</a>', url)
+
+    receipt_preview.short_description = "فیش"
