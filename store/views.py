@@ -140,14 +140,26 @@ def product_detail(request, pk):
 
 def add_to_cart(request, pk):
     product = get_object_or_404(Product, pk=pk)
+    raw_qty = (request.POST.get('qty') or request.GET.get('qty') or '1').strip()
+    raw_qty = raw_qty.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789"))
+    try:
+        qty = int(raw_qty)
+    except (TypeError, ValueError):
+        qty = 1
+    qty = max(1, min(99, qty))
+
     if request.user.is_authenticated:
         _merge_session_cart_into_user(request)
-        item, created = CartItem.objects.get_or_create(user=request.user, product=product)
+        item, created = CartItem.objects.get_or_create(
+            user=request.user,
+            product=product,
+            defaults={'quantity': qty},
+        )
         if not created:
-            item.quantity += 1
+            item.quantity += qty
             item.save(update_fields=['quantity'])
     else:
-        _add_to_session_cart(request, product.id, 1)
+        _add_to_session_cart(request, product.id, qty)
 
     next_url = (
         _safe_next_url(request, request.GET.get('next'))

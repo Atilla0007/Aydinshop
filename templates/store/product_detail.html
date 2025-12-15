@@ -1,128 +1,182 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}{{ product.name }} - آیدین{% endblock %}
+{% block title %}{{ product.name }} | استیرا{% endblock %}
 
 {% block content %}
-<section class="section product-detail">
-    <div class="container product-detail-container">
-        <!-- ستون عکس -->
-        <div class="product-detail-image">
+<section class="section product-detail product-detail-modern">
+  <div class="container">
+    <nav class="product-breadcrumbs" aria-label="مسیر صفحه">
+      <a href="{% url 'home' %}">خانه</a>
+      <span class="sep">/</span>
+      <a href="{% url 'shop' %}">فروشگاه</a>
+      <span class="sep">/</span>
+      <span class="current">{{ product.name }}</span>
+    </nav>
+
+    <div class="product-detail-container">
+      <div class="product-detail-media">
+        <div class="product-media-card">
+          <div class="product-media-inner">
             <img src="{% static 'img/default.jpg' %}" alt="{{ product.name }}">
+          </div>
         </div>
 
-        <!-- ستون اطلاعات -->
-        <div class="product-detail-info">
+        <div class="product-content-card" id="description">
+          <div class="card-head">
+            <h2>توضیحات</h2>
+          </div>
+          <div class="product-description-text">
+            {{ product.description|linebreaksbr }}
+          </div>
+        </div>
 
-            <h1>{{ product.name }}</h1>
-
-            <!-- بلوک اطلاعات شبیه دیجی‌کالا (برند، دسته، شناسه، تگ‌ها، تاریخ) -->
-            <div class="product-meta-block">
-                <div class="meta-row">
-                    <span class="meta-label">برند:</span>
-                    <span class="meta-value">{{ product.brand|default:"-" }}</span>
-                </div>
-                <div class="meta-row">
-                    <span class="meta-label">شناسه محصول:</span>
-                    <span class="meta-value">{{ product.sku|default:product.id }}</span>
-                </div>
-                <div class="meta-row">
-                    <span class="meta-label">دسته‌بندی‌ها:</span>
-                    <span class="meta-value">{{ product.category.name }}</span>
-                </div>
-                <div class="meta-row">
-                    <span class="meta-label">برچسب‌ها:</span>
-                    <span class="meta-value">
-                        {% if product.tags %}
-                            {{ product.tags }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </span>
-                </div>
-                <div class="meta-row">
-                    <span class="meta-label">تاریخ به‌روزرسانی:</span>
-                    <span class="meta-value">{{ product.updated_at|date:"j F Y" }}</span>
-                </div>
+        {% if features %}
+          <div class="product-content-card" id="specs">
+            <div class="card-head">
+              <h2>مشخصات فنی</h2>
             </div>
-
-            <!-- توضیحات کوتاه -->
-            <p class="product-description">
-                {{ product.description }}
-            </p>
-
-            <!-- دکمه‌های بالای باکس خرید: علاقه‌مندی، مقایسه، اشتراک‌گذاری -->
-            <div class="detail-actions-top">
-                <button type="button" class="btn btn-outline small">افزودن به علاقه‌مندی‌ها</button>
-
-                <!-- این همونیه که می‌خواستی: دکمه افزودن به مقایسه -->
-                <a href="{% url 'add_to_compare' product.id %}"
-                   class="btn btn-outline small">
-                    افزودن به مقایسه
-                </a>
-
-                <a class="btn btn-outline small"
-                   href="https://t.me/share/url?url={{ absolute_url|urlencode }}&text={{ product.name|urlencode }}"
-                   target="_blank">
-                    اشتراک‌گذاری
-                </a>
-            </div>
-
-            <!-- باکس قیمت + تعداد + دکمه افزودن به سبد خرید -->
-            <div class="detail-buy-box">
-                <div class="price-block">
-                    <div class="price-label">قیمت:</div>
-                    <div class="price-value">
-                        {{ product.price|floatformat:0 }}
-                        <span>تومان</span>
-                    </div>
+            <dl class="specs-grid">
+              {% for f in features %}
+                <div class="spec-row">
+                  <dt>{{ f.name }}</dt>
+                  <dd>{{ f.value }}</dd>
                 </div>
+              {% endfor %}
+            </dl>
+          </div>
+        {% endif %}
+      </div>
 
-                <div class="qty-block">
-                    <button type="button" class="qty-btn" data-dir="plus">+</button>
-                    <input type="text" value="1" id="qty-input">
-                    <button type="button" class="qty-btn" data-dir="minus">−</button>
-                </div>
+      <div class="product-detail-aside">
+        <div class="product-info-card">
+          <h1 class="product-title">{{ product.name }}</h1>
 
-                <a href="{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary">
-                    افزودن به سبد خرید
-                </a>
-            </div>
-
-            <!-- جدول مشخصات فنی -->
-            {% if features %}
-            <div class="product-features">
-                <h2>مشخصات فنی</h2>
-                <table>
-                    <tbody>
-                    {% for f in features %}
-                        <tr>
-                            <th>{{ f.name }}</th>
-                            <td>{{ f.value }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+          <div class="product-meta-chips">
+            <span class="chip">
+              <span class="chip-label">دسته:</span>
+              <span class="chip-value">{{ product.category.name }}</span>
+            </span>
+            <span class="chip">
+              <span class="chip-label">برند:</span>
+              <span class="chip-value">{{ product.brand|default:"-" }}</span>
+            </span>
+            <span class="chip" dir="ltr">
+              <span class="chip-label">SKU:</span>
+              <span class="chip-value">{{ product.sku|default:product.id }}</span>
+            </span>
+            {% if product.tags %}
+              <span class="chip chip-wide">
+                <span class="chip-label">برچسب‌ها:</span>
+                <span class="chip-value">{{ product.tags }}</span>
+              </span>
             {% endif %}
+            <span class="chip">
+              <span class="chip-label">به‌روزرسانی:</span>
+              <span class="chip-value">{{ product.updated_at|date:"Y/m/d" }}</span>
+            </span>
+          </div>
 
-            <div class="detail-links-bottom">
-                <a href="{% url 'shop' %}" class="btn btn-outline small">بازگشت به فروشگاه</a>
-            </div>
+          <div class="product-actions-row">
+            <a href="#specs" class="btn btn-outline small">مشخصات فنی</a>
+            <a href="{% url 'add_to_compare' product.id %}" class="btn btn-outline small">افزودن به مقایسه</a>
+            <a
+              class="btn btn-outline small"
+              href="https://t.me/share/url?url={{ absolute_url|urlencode }}&text={{ product.name|urlencode }}"
+              target="_blank"
+              rel="noopener"
+            >اشتراک‌گذاری</a>
+          </div>
         </div>
+
+        <aside class="product-buy-card" aria-label="خرید">
+          <div class="buy-price">
+            <span class="buy-label">قیمت</span>
+            <div class="buy-value">
+              <strong dir="ltr">{{ product.price|floatformat:0 }}</strong>
+              <span>تومان</span>
+            </div>
+          </div>
+
+          <div class="qty-control" data-qty-control>
+            <button type="button" class="qty-btn" data-dir="plus" aria-label="افزایش تعداد">+</button>
+            <input
+              type="tel"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              value="1"
+              id="qty-input"
+              class="qty-input"
+              dir="ltr"
+              aria-label="تعداد"
+            >
+            <button type="button" class="qty-btn" data-dir="minus" aria-label="کاهش تعداد">−</button>
+          </div>
+
+          <a
+            id="add-to-cart-link"
+            href="{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}&qty=1"
+            class="btn btn-primary full"
+          >افزودن به سبد خرید</a>
+
+          <div class="buy-trust">
+            <div class="trust-item"><i class="bx bx-check-shield"></i> ضمانت اصالت کالا</div>
+            <div class="trust-item"><i class="bx bx-timer"></i> ارسال سریع</div>
+            <div class="trust-item"><i class="bx bx-support"></i> پشتیبانی</div>
+          </div>
+
+          <div class="buy-links">
+            <a href="{% url 'shop' %}">بازگشت به فروشگاه</a>
+          </div>
+        </aside>
+      </div>
     </div>
+  </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+  (() => {
     const qtyInput = document.getElementById('qty-input');
-    document.querySelectorAll('.qty-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            let value = parseInt(qtyInput.value || '1');
-            if (btn.dataset.dir === 'plus') value++;
-            if (btn.dataset.dir === 'minus' && value > 1) value--;
-            qtyInput.value = value;
-        });
+    const addToCartLink = document.getElementById('add-to-cart-link');
+    const buttons = document.querySelectorAll('.qty-btn');
+
+    if (!qtyInput || !addToCartLink) return;
+
+    const baseUrl = new URL(addToCartLink.getAttribute('href'), window.location.origin);
+    baseUrl.searchParams.delete('qty');
+
+    const clampQty = (value) => {
+      const num = Number(String(value ?? '').replace(/\D/g, ''));
+      if (!Number.isFinite(num) || num < 1) return 1;
+      return Math.min(99, Math.floor(num));
+    };
+
+    const updateLink = (qty) => {
+      const nextUrl = new URL(baseUrl.toString());
+      nextUrl.searchParams.set('qty', String(qty));
+      addToCartLink.setAttribute('href', nextUrl.pathname + nextUrl.search);
+    };
+
+    const setQty = (qty) => {
+      const safeQty = clampQty(qty);
+      qtyInput.value = String(safeQty);
+      updateLink(safeQty);
+    };
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const current = clampQty(qtyInput.value);
+        const dir = btn.dataset.dir;
+        if (dir === 'plus') setQty(current + 1);
+        if (dir === 'minus') setQty(Math.max(1, current - 1));
+      });
     });
+
+    qtyInput.addEventListener('input', () => setQty(qtyInput.value));
+    qtyInput.addEventListener('blur', () => setQty(qtyInput.value));
+
+    setQty(qtyInput.value);
+  })();
 </script>
 {% endblock %}

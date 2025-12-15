@@ -1150,9 +1150,9 @@ textarea:focus {
 /* ط¬ط²ط¦غŒط§طھ ظ…ط­طµظˆظ„ */
 .product-detail-container {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
     gap: 2.5rem;
-    align-items: center;
+    align-items: start;
 }
 
 .product-price.big {
@@ -1164,6 +1164,315 @@ textarea:focus {
     margin-top: 1.5rem;
     display: flex;
     gap: 0.9rem;
+}
+
+/* Product detail (modern) */
+.product-detail-modern {
+    padding-top: 1.6rem;
+}
+
+.product-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+}
+
+.product-breadcrumbs a {
+    color: var(--muted);
+    opacity: 0.92;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.product-breadcrumbs a:hover {
+    color: var(--text);
+    opacity: 1;
+}
+
+.product-breadcrumbs .sep {
+    opacity: 0.55;
+}
+
+.product-breadcrumbs .current {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.product-detail-media,
+.product-detail-aside {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.product-media-card {
+    border-radius: 22px;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(88, 111, 124, 0.22), rgba(47, 69, 80, 0.55));
+    border: 1px solid rgba(244, 244, 249, 0.16);
+    box-shadow: var(--shadow-soft);
+}
+
+.product-media-inner {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(244, 244, 249, 0.12);
+    border-radius: 18px;
+    padding: 0.9rem;
+}
+
+.product-info-card,
+.product-content-card,
+.product-buy-card {
+    border-radius: 22px;
+    padding: 1.15rem 1.2rem;
+    background: rgba(47, 69, 80, 0.55);
+    border: 1px solid rgba(244, 244, 249, 0.14);
+    box-shadow: var(--shadow-soft);
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.card-head h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.product-title {
+    margin: 0;
+    font-size: 1.65rem;
+    line-height: 2.05rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.product-meta-chips {
+    margin-top: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.42rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(244, 244, 249, 0.08);
+    border: 1px solid rgba(244, 244, 249, 0.14);
+    font-size: 0.82rem;
+    color: var(--text);
+}
+
+.chip-wide {
+    flex-basis: 100%;
+    justify-content: flex-start;
+}
+
+.chip-label {
+    opacity: 0.85;
+}
+
+.chip-value {
+    font-weight: 700;
+}
+
+.product-actions-row {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.product-description-text {
+    color: var(--muted);
+    line-height: 2rem;
+    font-size: 0.95rem;
+}
+
+.product-description-text p {
+    margin: 0.6rem 0 0;
+}
+
+.product-description-text p:first-child {
+    margin-top: 0;
+}
+
+.specs-grid {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 16px;
+    background: rgba(244, 244, 249, 0.06);
+    border: 1px solid rgba(244, 244, 249, 0.12);
+}
+
+.spec-row dt {
+    margin: 0;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.spec-row dd {
+    margin: 0;
+    font-weight: 800;
+    color: var(--text);
+    text-align: left;
+}
+
+.product-buy-card {
+    position: sticky;
+    top: 96px;
+}
+
+.buy-price {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.buy-label {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.buy-value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+}
+
+.buy-value strong {
+    font-size: 1.7rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+
+.qty-control {
+    margin: 0.95rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.35rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(244, 244, 249, 0.14);
+}
+
+.qty-input {
+    width: 4rem;
+    text-align: center;
+    background: transparent !important;
+    border: none !important;
+    padding: 0.55rem 0.2rem;
+    font-weight: 900;
+    color: var(--text) !important;
+    outline: none;
+}
+
+.qty-btn {
+    height: 2.4rem;
+    width: 2.4rem;
+    border-radius: 999px;
+    border: 1px solid rgba(244, 244, 249, 0.14);
+    background: rgba(244, 244, 249, 0.06);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1.15rem;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.qty-btn:hover {
+    background: rgba(244, 244, 249, 0.12);
+    border-color: rgba(244, 244, 249, 0.22);
+    transform: translateY(-1px);
+}
+
+.qty-btn:active {
+    transform: translateY(0);
+}
+
+.product-buy-card .btn.full {
+    width: 100%;
+}
+
+.buy-trust {
+    margin-top: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding-top: 0.95rem;
+    border-top: 1px solid rgba(244, 244, 249, 0.12);
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.trust-item i {
+    font-size: 1.1rem;
+    color: var(--text);
+    opacity: 0.9;
+}
+
+.buy-links {
+    margin-top: 0.9rem;
+    text-align: center;
+}
+
+.buy-links a {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.buy-links a:hover {
+    color: var(--text);
+    text-decoration: underline;
+}
+
+@media (max-width: 960px) {
+    .product-buy-card {
+        position: static;
+    }
+
+    .product-title {
+        font-size: 1.45rem;
+        line-height: 1.85rem;
+    }
+
+    .chip-wide {
+        flex-basis: auto;
+    }
 }
 
 /* ط¬ط¯ظˆظ„ ط³ط¨ط¯ ط®ط±غŒط¯ */
