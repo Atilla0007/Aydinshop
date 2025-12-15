@@ -1,4 +1,4 @@
-// Admin chat polling + send
+// Admin chat realtime (SSE) + send
 
 function getCookie(name) {
     let cookieValue = null;
@@ -22,7 +22,8 @@ const input = document.getElementById('admin-chat-input');
 const quickReplies = document.querySelectorAll('.quick-reply');
 const userId = box ? parseInt(box.getAttribute('data-user-id') || '', 10) : null;
 
-let pollTimer = null;
+let updatesSource = null;
+let fallbackTimer = null;
 let messagesCache = [];
 
 function escapeHtml(text) {
@@ -70,10 +71,45 @@ function loadAdminMessages() {
         .catch((err) => console.error('خطا در دریافت پیام‌ها:', err));
 }
 
-function startPolling() {
+function stopRealtimeUpdates() {
+    if (updatesSource) {
+        updatesSource.close();
+        updatesSource = null;
+    }
+    if (fallbackTimer) {
+        clearInterval(fallbackTimer);
+        fallbackTimer = null;
+    }
+}
+
+function startRealtimeUpdates() {
+    if (!userId) return;
     loadAdminMessages();
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(loadAdminMessages, 3000);
+    stopRealtimeUpdates();
+
+    if ('EventSource' in window) {
+        updatesSource = new EventSource(`/admin-chat/${userId}/stream/`);
+        updatesSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data || '{}');
+                if (data && data.type === 'new_message') loadAdminMessages();
+            } catch (e) {
+                loadAdminMessages();
+            }
+        };
+        updatesSource.onerror = () => {
+            if (updatesSource) {
+                updatesSource.close();
+                updatesSource = null;
+            }
+            if (!fallbackTimer) {
+                fallbackTimer = setInterval(loadAdminMessages, 10000);
+            }
+        };
+        return;
+    }
+
+    fallbackTimer = setInterval(loadAdminMessages, 10000);
 }
 
 function sendMessage() {
@@ -112,7 +148,7 @@ function sendMessage() {
 }
 
 if (userId) {
-    startPolling();
+    startRealtimeUpdates();
     if (form) {
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -128,5 +164,5 @@ if (userId) {
 }
 
 window.addEventListener('beforeunload', () => {
-    if (pollTimer) clearInterval(pollTimer);
+    stopRealtimeUpdates();
 });

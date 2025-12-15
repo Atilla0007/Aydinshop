@@ -1,4 +1,4 @@
-// Simple polling-based chatbot client
+// Simple realtime chat client (SSE)
 
 function getCookie(name) {
     let cookieValue = null;
@@ -26,10 +26,12 @@ const widgetMessagesBox = document.getElementById('global-chat-messages');
 const pageChatBox = document.getElementById('chat-box');
 const pageChatForm = document.getElementById('chat-form');
 const pageChatInput = document.getElementById('chat-input');
+const isPageChat = Boolean(pageChatBox || pageChatForm);
 
 const isAuth = document.body.dataset.userAuthenticated === 'true';
 
-let pollTimer = null;
+let updatesSource = null;
+let fallbackTimer = null;
 let messagesCache = [];
 
 function escapeHtml(text) {
@@ -82,11 +84,47 @@ function loadMessages() {
         .catch((err) => console.error('خطا در دریافت پیام‌ها:', err));
 }
 
-function startPolling() {
+function stopRealtimeUpdates() {
+    if (updatesSource) {
+        updatesSource.close();
+        updatesSource = null;
+    }
+    if (fallbackTimer) {
+        clearInterval(fallbackTimer);
+        fallbackTimer = null;
+    }
+}
+
+function startRealtimeUpdates() {
     if (!isAuth) return;
     loadMessages();
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(loadMessages, 3000);
+    stopRealtimeUpdates();
+
+    if ('EventSource' in window) {
+        updatesSource = new EventSource('/chat/stream/');
+        updatesSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data || '{}');
+                if (data && data.type === 'new_message') loadMessages();
+            } catch (e) {
+                loadMessages();
+            }
+        };
+        updatesSource.onerror = () => {
+            // If SSE fails, fall back to a slower polling to keep chat usable.
+            if (updatesSource) {
+                updatesSource.close();
+                updatesSource = null;
+            }
+            if (!fallbackTimer) {
+                fallbackTimer = setInterval(loadMessages, 10000);
+            }
+        };
+        return;
+    }
+
+    // Older browsers fallback
+    fallbackTimer = setInterval(loadMessages, 10000);
 }
 
 function sendMessage(text, btnElement, inputElement) {
@@ -203,7 +241,7 @@ if (widgetToggleBtn) {
         widgetContainer.classList.remove('hidden');
         widgetToggleBtn.classList.add('hidden');
         widgetToggleBtn.style.display = 'none';
-        startPolling();
+        startRealtimeUpdates();
         widgetInput && widgetInput.focus();
     });
 }
@@ -213,15 +251,15 @@ if (widgetCloseBtn) {
         widgetContainer.classList.add('hidden');
         widgetToggleBtn.classList.remove('hidden');
         widgetToggleBtn.style.display = '';
-        if (pollTimer) clearInterval(pollTimer);
+        if (!isPageChat) stopRealtimeUpdates();
     });
 }
 
-// Start polling only when chat is visible/needed.
-if (isAuth && (pageChatBox || pageChatForm)) {
-    startPolling();
+// Start realtime updates only when chat is visible/needed.
+if (isAuth && isPageChat) {
+    startRealtimeUpdates();
 }
 
 window.addEventListener('beforeunload', () => {
-    if (pollTimer) clearInterval(pollTimer);
+    stopRealtimeUpdates();
 });

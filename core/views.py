@@ -203,24 +203,20 @@ def chat_stream(request):
     """Server-Sent Events stream for user chat notifications."""
     def event_stream():
         thread, _ = ChatThread.objects.get_or_create(user=request.user)
-        last_check_time = timezone.now()
+        last_seen_id = thread.messages.order_by("-id").values_list("id", flat=True).first() or 0
 
         while True:
-            # Check if new admin messages exist since last check
-            new_messages = thread.messages.filter(
-                created_at__gt=last_check_time,
-                is_admin=True  # only notify admin messages
-            ).exists()
-
-            if new_messages:
+            latest_id = thread.messages.order_by("-id").values_list("id", flat=True).first() or 0
+            if latest_id > last_seen_id:
+                last_seen_id = latest_id
                 data = json.dumps({
-                    'type': 'new_message',
-                    'timestamp': timezone.now().isoformat()
+                    "type": "new_message",
+                    "latest_id": latest_id,
+                    "timestamp": timezone.now().isoformat(),
                 })
                 yield f"data: {data}\n\n"
 
-            last_check_time = timezone.now()
-            time.sleep(2)  # polling interval
+            time.sleep(1)
     
     response = StreamingHttpResponse(
         event_stream(),
@@ -326,23 +322,20 @@ def admin_chat_stream(request, user_id):
     """SSE stream for admin chat notifications."""
     def event_stream():
         thread = get_object_or_404(ChatThread, user_id=user_id)
-        last_check_time = timezone.now()
+        last_seen_id = thread.messages.order_by("-id").values_list("id", flat=True).first() or 0
         
         while True:
-            new_messages = thread.messages.filter(
-                created_at__gt=last_check_time,
-                is_admin=False  # only notify admin about user messages
-            ).exists()
-            
-            if new_messages:
+            latest_id = thread.messages.order_by("-id").values_list("id", flat=True).first() or 0
+            if latest_id > last_seen_id:
+                last_seen_id = latest_id
                 data = json.dumps({
-                    'type': 'new_message',
-                    'timestamp': timezone.now().isoformat()
+                    "type": "new_message",
+                    "latest_id": latest_id,
+                    "timestamp": timezone.now().isoformat(),
                 })
                 yield f"data: {data}\n\n"
-            
-            last_check_time = timezone.now()
-            time.sleep(2)  # polling interval
+
+            time.sleep(1)
     
     response = StreamingHttpResponse(
         event_stream(),
