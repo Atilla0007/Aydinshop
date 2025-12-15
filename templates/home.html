@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load jalali %}
 
 {% block title %}استیرا | فروشگاه آنلاین{% endblock %}
 
@@ -192,7 +193,7 @@
                 <a href="{% url 'news_detail' item.pk %}">
                     <h3>{{ item.title }}</h3>
                     <p>{{ item.text|truncatechars:120 }}</p>
-                    <span class="news-date">{{ item.created_at|date:"Y/m/d" }}</span>
+                    <span class="news-date">{{ item.created_at|jalali:"Y/m/d" }}</span>
                 </a>
             </article>
             {% empty %}

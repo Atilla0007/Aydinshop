@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load jalali %}
 {% block title %}{{ product.name }} | استیرا{% endblock %}
 
 {% block content %}
@@ -72,7 +73,7 @@
             {% endif %}
             <span class="chip">
               <span class="chip-label">به‌روزرسانی:</span>
-              <span class="chip-value">{{ product.updated_at|date:"Y/m/d" }}</span>
+              <span class="chip-value">{{ product.updated_at|jalali:"Y/m/d" }}</span>
             </span>
           </div>
 

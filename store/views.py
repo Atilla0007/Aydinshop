@@ -503,6 +503,7 @@ def proforma_pdf(request, order_id: int):
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
     from reportlab.pdfgen import canvas
+    from core.utils.jalali import format_jalali
 
     order = get_object_or_404(Order, pk=order_id, user=request.user)
 
@@ -528,7 +529,7 @@ def proforma_pdf(request, order_id: int):
     c.drawRightString(width - 40, height - 60, rtl("پیش‌فاکتور"))
     c.setFont("Vazirmatn", 11)
     c.drawRightString(width - 40, height - 85, rtl(f"شماره سفارش: {order.id}"))
-    c.drawRightString(width - 40, height - 105, rtl(f"تاریخ: {timezone.localtime(order.created_at).strftime('%Y/%m/%d %H:%M')}"))
+    c.drawRightString(width - 40, height - 105, rtl(f"تاریخ: {format_jalali(order.created_at, 'Y/m/d H:i')}"))
 
     y = height - 140
     c.setFont("Vazirmatn", 11)

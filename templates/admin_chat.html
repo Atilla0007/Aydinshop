@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load jalali %}
 {% block title %}پنل چت ادمین{% endblock %}
 
 {% block content %}
@@ -16,7 +17,7 @@
                             <span class="thread-user">{{ t.user.username }}</span>
                             <span class="thread-time">
                                 {% if t.last_time %}
-                                    {{ t.last_time|date:"H:i" }}
+                                    {{ t.last_time|jalali:"H:i" }}
                                 {% endif %}
                             </span>
                         </div>
@@ -105,7 +106,7 @@
                     </div>
                     <div class="user-info-row">
                         <span>تاریخ عضویت:</span>
-                        <strong>{{ active_thread.user.date_joined|date:"j F Y" }}</strong>
+                        <strong>{{ active_thread.user.date_joined|jalali:"j F Y" }}</strong>
                     </div>
                 </div>
 
@@ -119,7 +120,7 @@
                                     <span class="order-status">{{ order.get_status_display }}</span>
                                 </div>
                                 <div class="order-meta">
-                                    <span>{{ order.created_at|date:"j F Y - H:i" }}</span>
+                                    <span>{{ order.created_at|jalali:"j F Y - H:i" }}</span>
                                     <span>{{ order.total_price|floatformat:0 }} تومان</span>
                                 </div>
                             </div>
