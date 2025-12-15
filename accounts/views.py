@@ -27,29 +27,37 @@ def _get_profile(user):
 
 
 def login_view(request):
+    next_url = _safe_next_url(request, request.GET.get('next') or request.POST.get('next'))
+    if request.user.is_authenticated:
+        return redirect(next_url or 'home')
+
     if request.method == 'POST':
         username = request.POST.get('username') or request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect('home')
-        return render(request, 'accounts/login.html', {'error': 'نام کاربری یا رمز عبور اشتباه است.'})
+            return redirect(next_url or 'home')
+        return render(request, 'accounts/login.html', {'error': 'نام کاربری یا رمز عبور اشتباه است.', 'next': next_url})
 
-    return render(request, 'accounts/login.html')
+    return render(request, 'accounts/login.html', {'next': next_url})
 
 
 def signup(request):
+    next_url = _safe_next_url(request, request.GET.get('next') or request.POST.get('next'))
+    if request.user.is_authenticated:
+        return redirect(next_url or 'home')
+
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')
-        return render(request, 'accounts/signup.html', {'form': form})
+            return redirect(next_url or 'home')
+        return render(request, 'accounts/signup.html', {'form': form, 'next': next_url})
 
     form = SignupForm()
-    return render(request, 'accounts/signup.html', {'form': form})
+    return render(request, 'accounts/signup.html', {'form': form, 'next': next_url})
 
 
 def logout_view(request):

@@ -11,6 +11,9 @@
 <section class="auth-form-shell">
     <form class="form" method="post">
         {% csrf_token %}
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
         {% if error %}
         <div class="form-error">{{ error }}</div>
         {% endif %}
@@ -24,7 +27,7 @@
         </span>
         <span class="span"><a href="#">فراموشی رمز عبور</a></span>
         <input class="submit" type="submit" value="ورود" />
-        <span class="span">حساب کاربری ندارید؟ <a href="{% url 'signup' %}">ثبت نام</a></span>
+        <span class="span">حساب کاربری ندارید؟ <a href="{% url 'signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}">ثبت نام</a></span>
     </form>
 </section>
 {% endblock %}

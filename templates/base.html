@@ -125,6 +125,38 @@
   </div>
 </footer>
 
+<div id="mini-cart-overlay" class="mini-cart-overlay" aria-hidden="true"></div>
+<aside
+  id="mini-cart-drawer"
+  class="mini-cart-drawer"
+  data-preview-url="{% url 'cart_preview' %}"
+  aria-label="سبد خرید"
+  aria-hidden="true"
+>
+  <div class="mini-cart-header">
+    <span class="mini-cart-title">سبد خرید</span>
+    <button type="button" id="mini-cart-close" class="close-btn mini-cart-close-btn" aria-label="بستن">×</button>
+  </div>
+  <div id="mini-cart-items" class="mini-cart-items">
+    <p class="mini-cart-empty">سبد خرید شما خالی است.</p>
+  </div>
+  <div class="mini-cart-footer">
+    <div class="mini-cart-total-row">
+      <span>مجموع:</span>
+      <strong id="mini-cart-total">0</strong>
+      <span>تومان</span>
+    </div>
+    <div class="mini-cart-actions">
+      <a href="{% url 'cart' %}" class="btn btn-outline small">دیدن سبد خرید</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'checkout' %}" class="btn btn-primary small">تسویه حساب</a>
+      {% else %}
+        <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-primary small">تسویه حساب</a>
+      {% endif %}
+    </div>
+  </div>
+</aside>
+
 <div id="global-chat-toggle" class="floating-chat-btn icon-only" aria-label="چت">
   <i class="bx bxs-chat"></i>
 </div>
@@ -143,6 +175,7 @@
 </div>
 
 <script src="{% static 'js/chat.js' %}"></script>
+<script src="{% static 'js/mini-cart.js' %}"></script>
 <script src="{% static 'js/sidebar.js' %}"></script>
 <script src="{% static 'js/theme.js' %}"></script>
 <script src="{% static 'js/user-menu.js' %}"></script>

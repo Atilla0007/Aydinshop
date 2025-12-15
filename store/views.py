@@ -1,10 +1,100 @@
 
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from urllib.parse import quote
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_GET
+from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
 from .models import Product, CartItem, Order, OrderItem, Category
 from accounts.models import UserProfile
+
+
+SESSION_CART_KEY = 'cart'
+
+
+def _get_session_cart(request) -> dict[str, int]:
+    cart = request.session.get(SESSION_CART_KEY) or {}
+    if not isinstance(cart, dict):
+        cart = {}
+
+    normalized: dict[str, int] = {}
+    for key, value in cart.items():
+        try:
+            product_id = int(key)
+        except (TypeError, ValueError):
+            continue
+        try:
+            quantity = int(value)
+        except (TypeError, ValueError):
+            continue
+
+        if quantity <= 0:
+            continue
+        normalized[str(product_id)] = quantity
+
+    if normalized != cart:
+        request.session[SESSION_CART_KEY] = normalized
+        request.session.modified = True
+
+    return normalized
+
+
+def _set_session_cart(request, cart: dict[str, int]) -> None:
+    request.session[SESSION_CART_KEY] = cart
+    request.session.modified = True
+
+
+def _add_to_session_cart(request, product_id: int, quantity_delta: int = 1) -> None:
+    cart = _get_session_cart(request)
+    key = str(product_id)
+    cart[key] = max(1, int(cart.get(key, 0)) + int(quantity_delta))
+    _set_session_cart(request, cart)
+
+
+def _merge_session_cart_into_user(request) -> None:
+    if not request.user.is_authenticated:
+        return
+
+    cart = _get_session_cart(request)
+    if not cart:
+        return
+
+    products = Product.objects.filter(id__in=list(cart.keys()))
+    for product in products:
+        quantity = int(cart.get(str(product.id), 0))
+        if quantity <= 0:
+            continue
+        item, created = CartItem.objects.get_or_create(
+            user=request.user,
+            product=product,
+            defaults={'quantity': quantity},
+        )
+        if not created:
+            item.quantity += quantity
+            item.save(update_fields=['quantity'])
+
+    _set_session_cart(request, {})
+
+
+def _safe_next_url(request, next_url: str | None) -> str | None:
+    if not next_url:
+        return None
+    if url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return None
+
+
+def _add_query_param(url: str, key: str, value: str) -> str:
+    parsed = urlparse(url)
+    query = parse_qs(parsed.query)
+    query[key] = [value]
+    new_query = urlencode(query, doseq=True)
+    return urlunparse(parsed._replace(query=new_query))
 
 
 def _get_compare_list(request):
@@ -46,30 +136,56 @@ def product_detail(request, pk):
 
 
 
-@login_required
 def add_to_cart(request, pk):
-    profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    if not profile.email_verified:
-        verify_url = reverse("email_otp_verify_page")
-        return redirect(f"{verify_url}?next={quote(request.get_full_path())}")
-
     product = get_object_or_404(Product, pk=pk)
-    item, created = CartItem.objects.get_or_create(user=request.user, product=product)
-    if not created:
-        item.quantity += 1
-        item.save()
-    return redirect('cart')
+    if request.user.is_authenticated:
+        _merge_session_cart_into_user(request)
+        item, created = CartItem.objects.get_or_create(user=request.user, product=product)
+        if not created:
+            item.quantity += 1
+            item.save(update_fields=['quantity'])
+    else:
+        _add_to_session_cart(request, product.id, 1)
+
+    next_url = (
+        _safe_next_url(request, request.GET.get('next'))
+        or _safe_next_url(request, request.META.get('HTTP_REFERER'))
+        or reverse('cart')
+    )
+    return redirect(_add_query_param(next_url, 'cart_open', '1'))
 
 
-@login_required
 def cart(request):
-    items = CartItem.objects.filter(user=request.user)
-    total = sum(i.total_price() for i in items)
+    if request.user.is_authenticated:
+        _merge_session_cart_into_user(request)
+        items_qs = CartItem.objects.filter(user=request.user).select_related('product')
+        total = sum(i.total_price() for i in items_qs)
+        return render(request, 'store/cart.html', {'items': items_qs, 'total': total})
+
+    session_cart = _get_session_cart(request)
+    products = list(Product.objects.filter(id__in=list(session_cart.keys())))
+    products_by_id = {str(p.id): p for p in products}
+    items = []
+    total = 0
+    for product_id, quantity in session_cart.items():
+        product = products_by_id.get(product_id)
+        if not product:
+            continue
+        item_total = int(product.price) * int(quantity)
+        items.append({'product': product, 'quantity': int(quantity), 'total_price': item_total})
+        total += item_total
+
     return render(request, 'store/cart.html', {'items': items, 'total': total})
 
 
 @login_required
 def checkout(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    if not profile.email_verified:
+        verify_url = reverse("email_otp_verify_page")
+        return redirect(f"{verify_url}?next={quote(request.get_full_path())}")
+
+    _merge_session_cart_into_user(request)
     cart_items = CartItem.objects.filter(user=request.user)
     total = sum(item.total_price() for item in cart_items)
 
@@ -95,6 +211,45 @@ def checkout(request):
         'total': total
     })
 
+
+@require_GET
+def cart_preview(request):
+    if request.user.is_authenticated:
+        _merge_session_cart_into_user(request)
+        cart_items = list(CartItem.objects.filter(user=request.user).select_related('product'))
+        items = []
+        total = 0
+        for item in cart_items:
+            item_total = int(item.total_price())
+            items.append({
+                'id': item.product_id,
+                'name': item.product.name,
+                'quantity': int(item.quantity),
+                'unit_price': int(item.product.price),
+                'total_price': item_total,
+            })
+            total += item_total
+        return JsonResponse({'items': items, 'total': total})
+
+    session_cart = _get_session_cart(request)
+    products = list(Product.objects.filter(id__in=list(session_cart.keys())))
+    products_by_id = {str(p.id): p for p in products}
+    items = []
+    total = 0
+    for product_id, quantity in session_cart.items():
+        product = products_by_id.get(product_id)
+        if not product:
+            continue
+        item_total = int(product.price) * int(quantity)
+        items.append({
+            'id': int(product_id),
+            'name': product.name,
+            'quantity': int(quantity),
+            'unit_price': int(product.price),
+            'total_price': item_total,
+        })
+        total += item_total
+    return JsonResponse({'items': items, 'total': total})
 
 def add_to_compare(request, pk):
     ids = _get_compare_list(request)
