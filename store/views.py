@@ -447,19 +447,50 @@ def checkout(request):
 @login_required
 def payment(request, order_id: int):
     from core.models import PaymentSettings
-    from store.emails import send_order_payment_submitted_email
 
     order = get_object_or_404(Order, pk=order_id, user=request.user)
-    settings = PaymentSettings.get_solo()
+    payment_settings = PaymentSettings.get_solo()
     items_after_discount = int(order.items_subtotal) - int(order.discount_amount or 0)
 
     telegram_link = ''
-    if settings.telegram_username:
-        telegram_link = f"https://t.me/{settings.telegram_username.lstrip('@')}"
+    if payment_settings.telegram_username:
+        telegram_link = f"https://t.me/{payment_settings.telegram_username.lstrip('@')}"
 
     whatsapp_link = ''
-    if settings.whatsapp_number:
-        number = ''.join(ch for ch in settings.whatsapp_number if ch.isdigit() or ch == '+')
+    if payment_settings.whatsapp_number:
+        number = ''.join(ch for ch in payment_settings.whatsapp_number if ch.isdigit() or ch == '+')
+        number = number.lstrip('+')
+        if number:
+            whatsapp_link = f"https://wa.me/{number}"
+
+    can_submit = order.status != 'canceled' and order.payment_status not in ('approved',)
+
+    return render(request, 'store/payment_choose.html', {
+        'order': order,
+        'items_after_discount': items_after_discount,
+        'payment_settings': payment_settings,
+        'telegram_link': telegram_link,
+        'whatsapp_link': whatsapp_link,
+        'can_submit': can_submit,
+    })
+
+
+@login_required
+def payment_card_to_card(request, order_id: int):
+    from core.models import PaymentSettings
+    from store.emails import send_order_payment_submitted_email
+
+    order = get_object_or_404(Order, pk=order_id, user=request.user)
+    payment_settings = PaymentSettings.get_solo()
+    items_after_discount = int(order.items_subtotal) - int(order.discount_amount or 0)
+
+    telegram_link = ''
+    if payment_settings.telegram_username:
+        telegram_link = f"https://t.me/{payment_settings.telegram_username.lstrip('@')}"
+
+    whatsapp_link = ''
+    if payment_settings.whatsapp_number:
+        number = ''.join(ch for ch in payment_settings.whatsapp_number if ch.isdigit() or ch == '+')
         number = number.lstrip('+')
         if number:
             whatsapp_link = f"https://wa.me/{number}"
@@ -469,21 +500,17 @@ def payment(request, order_id: int):
 
     if request.method == 'POST' and order.status != 'canceled' and order.payment_status not in ('approved',):
         already_submitted = order.payment_status == 'submitted'
-        method = (request.POST.get('method') or '').strip()
-        if method not in ('card_to_card', 'contact_admin'):
-            error = 'لطفاً روش پرداخت را انتخاب کنید.'
+        if not payment_settings.card_number:
+            error = 'شماره کارت هنوز توسط ادمین تنظیم نشده است.'
         else:
-            if method == 'card_to_card':
-                receipt = request.FILES.get('receipt')
-                if not receipt:
-                    error = 'لطفاً تصویر فیش واریزی را بارگذاری کنید.'
-                else:
-                    order.receipt_file = receipt
-
-            if not error:
-                order.payment_method = method
+            receipt = request.FILES.get('receipt')
+            if not receipt:
+                error = 'لطفاً تصویر فیش واریزی را بارگذاری کنید.'
+            else:
+                order.payment_method = 'card_to_card'
                 order.payment_status = 'submitted'
                 order.payment_submitted_at = timezone.now()
+                order.receipt_file = receipt
                 order.save(update_fields=['payment_method', 'payment_status', 'payment_submitted_at', 'receipt_file'])
 
                 if not already_submitted:
@@ -491,12 +518,65 @@ def payment(request, order_id: int):
                         send_order_payment_submitted_email(order=order, request=request)
                     except Exception:
                         pass
-                return redirect(f"{reverse('payment', args=[order.id])}?submitted=1")
 
-    return render(request, 'store/payment.html', {
+                return redirect(f"{reverse('payment_card_to_card', args=[order.id])}?submitted=1")
+
+    return render(request, 'store/payment_card_to_card.html', {
         'order': order,
         'items_after_discount': items_after_discount,
-        'payment_settings': settings,
+        'payment_settings': payment_settings,
+        'telegram_link': telegram_link,
+        'whatsapp_link': whatsapp_link,
+        'submitted': submitted,
+        'error': error,
+    })
+
+
+@login_required
+def payment_contact_admin(request, order_id: int):
+    from core.models import PaymentSettings
+    from store.emails import send_order_payment_submitted_email
+
+    order = get_object_or_404(Order, pk=order_id, user=request.user)
+    payment_settings = PaymentSettings.get_solo()
+    items_after_discount = int(order.items_subtotal) - int(order.discount_amount or 0)
+
+    telegram_link = ''
+    if payment_settings.telegram_username:
+        telegram_link = f"https://t.me/{payment_settings.telegram_username.lstrip('@')}"
+
+    whatsapp_link = ''
+    if payment_settings.whatsapp_number:
+        number = ''.join(ch for ch in payment_settings.whatsapp_number if ch.isdigit() or ch == '+')
+        number = number.lstrip('+')
+        if number:
+            whatsapp_link = f"https://wa.me/{number}"
+
+    error = None
+    submitted = request.GET.get('submitted') == '1'
+
+    if request.method == 'POST' and order.status != 'canceled' and order.payment_status not in ('approved',):
+        already_submitted = order.payment_status == 'submitted'
+
+        order.payment_method = 'contact_admin'
+        order.payment_status = 'submitted'
+        order.payment_submitted_at = timezone.now()
+        # If user switches to contact_admin, the receipt is not required.
+        order.receipt_file = None
+        order.save(update_fields=['payment_method', 'payment_status', 'payment_submitted_at', 'receipt_file'])
+
+        if not already_submitted:
+            try:
+                send_order_payment_submitted_email(order=order, request=request)
+            except Exception:
+                pass
+
+        return redirect(f"{reverse('payment_contact_admin', args=[order.id])}?submitted=1")
+
+    return render(request, 'store/payment_contact_admin.html', {
+        'order': order,
+        'items_after_discount': items_after_discount,
+        'payment_settings': payment_settings,
         'telegram_link': telegram_link,
         'whatsapp_link': whatsapp_link,
         'submitted': submitted,
@@ -511,94 +591,6 @@ def proforma_pdf(request, order_id: int):
     pdf_bytes = render_order_invoice_pdf(order=order, title="پیش‌فاکتور استیرا")
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="proforma-{order.id}.pdf"'
-    return response
-
-    def rtl(text: str) -> str:
-        text = text or ''
-        return get_display(arabic_reshaper.reshape(text))
-
-    font_path = str(django_settings.BASE_DIR / 'static' / 'fonts' / 'Vazirmatn-Regular.ttf')
-    try:
-        pdfmetrics.registerFont(TTFont("Vazirmatn", font_path))
-    except Exception:
-        # Font already registered or missing; fall back to default.
-        pass
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="proforma-{order.id}.pdf"'
-
-    c = canvas.Canvas(response, pagesize=A4)
-    width, height = A4
-    c.setTitle(f"proforma-{order.id}")
-
-    c.setFont("Vazirmatn", 16)
-    c.drawRightString(width - 40, height - 60, rtl("پیش‌فاکتور"))
-    c.setFont("Vazirmatn", 11)
-    c.drawRightString(width - 40, height - 85, rtl(f"شماره سفارش: {order.id}"))
-    c.drawRightString(width - 40, height - 105, rtl(f"تاریخ: {format_jalali(order.created_at, 'Y/m/d H:i')}"))
-
-    y = height - 140
-    c.setFont("Vazirmatn", 11)
-    c.drawRightString(width - 40, y, rtl(f"نام: {order.first_name} {order.last_name}".strip()))
-    y -= 18
-    c.drawRightString(width - 40, y, rtl(f"موبایل: {order.phone}"))
-    y -= 18
-    c.drawRightString(width - 40, y, rtl(f"استان/شهر: {order.province} - {order.city}"))
-    y -= 18
-    if order.address:
-        c.drawRightString(width - 40, y, rtl(f"آدرس: {order.address}"))
-        y -= 18
-
-    y -= 10
-    c.setFont("Vazirmatn", 12)
-    c.drawRightString(width - 40, y, rtl("اقلام سفارش"))
-    y -= 22
-
-    c.setFont("Vazirmatn", 10)
-    for it in order.items.all():
-        line_total = int(it.unit_price) * int(it.quantity)
-        c.drawRightString(
-            width - 40,
-            y,
-            rtl(f"{it.product.name} | تعداد: {it.quantity} | مبلغ: {format_money(line_total)} تومان"),
-        )
-        y -= 16
-        if y < 120:
-            c.showPage()
-            c.setFont("Vazirmatn", 10)
-            y = height - 60
-
-    y -= 10
-    c.setFont("Vazirmatn", 11)
-    c.drawRightString(width - 40, y, rtl(f"جمع کالاها: {format_money(order.items_subtotal)} تومان"))
-    y -= 16
-    if order.discount_amount:
-        c.drawRightString(
-            width - 40,
-            y,
-            rtl(f"تخفیف ({order.discount_percent}٪): -{format_money(order.discount_amount)} تومان"),
-        )
-        y -= 16
-        after_discount = int(order.items_subtotal) - int(order.discount_amount)
-        c.drawRightString(width - 40, y, rtl(f"جمع بعد از تخفیف: {format_money(after_discount)} تومان"))
-        y -= 16
-
-    if order.shipping_item_count and order.shipping_fee_per_item:
-        if order.shipping_is_free and order.shipping_total_full:
-            c.drawRightString(
-                width - 40,
-                y,
-                rtl(f"هزینه ارسال: {format_money(order.shipping_total_full)} تومان (رایگان شد)"),
-            )
-        else:
-            c.drawRightString(width - 40, y, rtl(f"هزینه ارسال: {format_money(order.shipping_total)} تومان"))
-        y -= 16
-
-    c.setFont("Vazirmatn", 12)
-    c.drawRightString(width - 40, y, rtl(f"مبلغ قابل پرداخت: {format_money(order.total_price)} تومان"))
-
-    c.showPage()
-    c.save()
     return response
 
 

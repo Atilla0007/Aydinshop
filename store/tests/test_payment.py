@@ -7,6 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
+from core.models import PaymentSettings
 from store.models import Order
 
 
@@ -20,6 +21,16 @@ class PaymentFlowTests(TestCase):
         self.client = Client()
         self.user = User.objects.create_user(username="u1", password="pass12345", email="u1@example.com")
         self.client.force_login(self.user)
+
+        PaymentSettings.objects.update_or_create(
+            pk=1,
+            defaults={
+                "card_number": "6037991234567890",
+                "card_holder": "استیرا",
+                "telegram_username": "@styra_support",
+                "whatsapp_number": "+989111111111",
+            },
+        )
 
         self.order = Order.objects.create(
             user=self.user,
@@ -40,8 +51,8 @@ class PaymentFlowTests(TestCase):
 
     def test_contact_admin_payment_sets_submitted(self):
         response = self.client.post(
-            reverse("payment", args=[self.order.id]),
-            data={"method": "contact_admin"},
+            reverse("payment_contact_admin", args=[self.order.id]),
+            data={},
         )
         self.assertEqual(response.status_code, 302)
         self.order.refresh_from_db()
@@ -55,8 +66,8 @@ class PaymentFlowTests(TestCase):
 
     def test_card_to_card_requires_receipt(self):
         response = self.client.post(
-            reverse("payment", args=[self.order.id]),
-            data={"method": "card_to_card"},
+            reverse("payment_card_to_card", args=[self.order.id]),
+            data={},
         )
         self.assertEqual(response.status_code, 200)
         self.order.refresh_from_db()
@@ -66,8 +77,8 @@ class PaymentFlowTests(TestCase):
     def test_card_to_card_upload_sets_receipt(self):
         receipt = SimpleUploadedFile("receipt.png", b"fakepng", content_type="image/png")
         response = self.client.post(
-            reverse("payment", args=[self.order.id]),
-            data={"method": "card_to_card", "receipt": receipt},
+            reverse("payment_card_to_card", args=[self.order.id]),
+            data={"receipt": receipt},
         )
         self.assertEqual(response.status_code, 302)
         self.order.refresh_from_db()

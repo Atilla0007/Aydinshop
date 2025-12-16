@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load jalali %}
+
+{% block title %}انتخاب روش پرداخت{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1>پرداخت سفارش #{{ order.id }}</h1>
+
+    {% if order.status == 'canceled' %}
+      <div class="form-error">این سفارش لغو شده است.</div>
+    {% elif order.payment_status == 'approved' %}
+      <div class="form-success">پرداخت این سفارش قبلاً تایید شده است.</div>
+    {% elif order.payment_status == 'submitted' %}
+      <div class="form-success">درخواست پرداخت شما ثبت شده و در انتظار بررسی است.</div>
+    {% elif order.payment_status == 'rejected' %}
+      <div class="form-error">پرداخت قبلی رد شده است؛ لطفاً دوباره روش پرداخت را انتخاب و ثبت کنید.</div>
+    {% endif %}
+
+    <div class="checkout-layout">
+      <div class="checkout-form">
+        <h2>انتخاب روش پرداخت</h2>
+        <p class="muted">ابتدا روش پرداخت را انتخاب کنید، سپس به صفحه همان روش هدایت می‌شوید.</p>
+
+        <div class="payment-cards">
+          <div class="payment-card">
+            <h3>کارت به کارت</h3>
+            <p class="muted">مبلغ را واریز کنید و تصویر فیش واریزی را در سایت بارگذاری کنید.</p>
+
+            {% if payment_settings.card_number %}
+              <p class="muted">شماره کارت: <strong dir="ltr">{{ payment_settings.card_number }}</strong></p>
+              {% if payment_settings.card_holder %}
+                <p class="muted">به نام: <strong>{{ payment_settings.card_holder }}</strong></p>
+              {% endif %}
+            {% else %}
+              <p class="muted">شماره کارت هنوز توسط ادمین تنظیم نشده است.</p>
+            {% endif %}
+
+            {% if can_submit %}
+              <a href="{% url 'payment_card_to_card' order.id %}" class="btn btn-primary">ادامه</a>
+            {% else %}
+              <button type="button" class="btn btn-primary" disabled>ادامه</button>
+            {% endif %}
+          </div>
+
+          <div class="payment-card">
+            <h3>ارتباط با ادمین</h3>
+            <p class="muted">پیش‌فاکتور را دانلود کنید و برای هماهنگی پرداخت با ادمین تماس بگیرید.</p>
+
+            {% if can_submit %}
+              <a href="{% url 'payment_contact_admin' order.id %}" class="btn btn-primary">ادامه</a>
+            {% else %}
+              <button type="button" class="btn btn-primary" disabled>ادامه</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="checkout-summary">
+        <h2>خلاصه سفارش</h2>
+        <div class="summary-row">
+          <span>جمع کالاها</span>
+          <strong>{{ order.items_subtotal|money }}</strong>
+          <span>تومان</span>
+        </div>
+        {% if order.discount_amount %}
+        <div class="summary-row">
+          <span>تخفیف{% if order.discount_percent %} ({{ order.discount_percent }}٪){% endif %}</span>
+          <strong dir="ltr">-{{ order.discount_amount|money }}</strong>
+          <span>تومان</span>
+        </div>
+        <div class="summary-row">
+          <span>جمع بعد از تخفیف</span>
+          <strong>{{ items_after_discount|money }}</strong>
+          <span>تومان</span>
+        </div>
+        {% endif %}
+        <div class="summary-row">
+          <span>هزینه ارسال</span>
+          {% if order.shipping_is_free and order.shipping_total_full %}
+          <div class="summary-price">
+            <span class="summary-strike">{{ order.shipping_total_full|money }}</span>
+            <strong>۰</strong>
+            <span class="summary-currency">تومان</span>
+            <span class="summary-badge">ارسال رایگان شد</span>
+          </div>
+          {% else %}
+          <strong>{{ order.shipping_total|money }}</strong>
+          <span>تومان</span>
+          {% endif %}
+        </div>
+        <div class="summary-row total">
+          <span>مبلغ قابل پرداخت</span>
+          <strong>{{ order.total_price|money }}</strong>
+          <span>تومان</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
