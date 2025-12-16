@@ -90,14 +90,6 @@
         <p>ارتباط با ما</p>
       </button>
     </li>
-    {% if user.is_staff %}
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'admin_chat' %}">
-        <i class="bx bx-chat"></i>
-        <p>چت ادمین</p>
-      </button>
-    </li>
-    {% endif %}
   </ul>
   <div class="sidebar-spacer" aria-hidden="true"></div>
 </aside>
@@ -166,25 +158,6 @@
     </div>
   </div>
 </aside>
-
-<div id="global-chat-toggle" class="floating-chat-btn icon-only" aria-label="چت">
-  <i class="bx bxs-chat"></i>
-</div>
-
-<div id="global-chat-widget" class="global-chat hidden">
-  <div class="global-chat-header">
-    <span>چت با پشتیبانی</span>
-    <button type="button" id="global-chat-close" class="close-btn" aria-label="بستن">×</button>
-  </div>
-  <div id="global-chat-messages" class="global-chat-messages"></div>
-  <form id="global-chat-form" class="global-chat-form">
-    {% csrf_token %}
-    <input id="global-chat-input" type="text" placeholder="پیام خود را بنویسید..." autocomplete="off">
-    <button type="submit">ارسال</button>
-  </form>
-</div>
-
-<script src="{% static 'js/chat.js' %}"></script>
 <script src="{% static 'js/mini-cart.js' %}"></script>
 <script src="{% static 'js/banner.js' %}"></script>
 <script src="{% static 'js/sidebar.js' %}"></script>
