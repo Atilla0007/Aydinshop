@@ -925,6 +925,95 @@ input::placeholder {
     overflow: hidden;
 }
 
+.products-grid .product-card {
+    cursor: pointer;
+}
+
+.products-grid .product-card-cart {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 3;
+}
+
+.products-grid .checkbox-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.products-grid .checkbox {
+    display: none;
+}
+
+.products-grid .checkbox-label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.products-grid .checkbox-flip {
+    width: 56px;
+    height: 56px;
+    perspective: 1000px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition: transform 0.4s ease;
+}
+
+.products-grid .checkbox-front,
+.products-grid .checkbox-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 14px;
+    backface-visibility: hidden;
+    transition: transform 0.3s ease;
+}
+
+.products-grid .checkbox-front {
+    background: linear-gradient(135deg, #586F7C, #2F4550);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+    transform: rotateY(0deg);
+}
+
+.products-grid .checkbox-back {
+    background: linear-gradient(135deg, #2F4550, #000000);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+    transform: rotateY(180deg);
+}
+
+.products-grid .checkbox-wrapper:hover .checkbox-flip {
+    transform: scale(1.06);
+    transition: transform 0.4s ease-out;
+}
+
+.products-grid .checkbox:checked + .checkbox-label .checkbox-front {
+    transform: rotateY(180deg);
+}
+
+.products-grid .checkbox:checked + .checkbox-label .checkbox-back {
+    transform: rotateY(0deg);
+}
+
+.products-grid .checkbox:focus + .checkbox-label .checkbox-flip {
+    box-shadow: 0 0 18px rgba(88, 111, 124, 0.65), 0 0 26px rgba(47, 69, 80, 0.35);
+    transition: box-shadow 0.3s ease;
+}
+
+.products-grid .icon-path {
+    stroke: #F4F4F9;
+    stroke-width: 2;
+    fill: transparent;
+}
+
 .product-badge {
     position: absolute;
     right: 0.9rem;

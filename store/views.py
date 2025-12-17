@@ -115,6 +115,13 @@ def shop(request):
     products = Product.objects.all()
     categories = Category.objects.all()
 
+    if request.user.is_authenticated:
+        _merge_session_cart_into_user(request)
+        cart_product_ids = set(CartItem.objects.filter(user=request.user).values_list('product_id', flat=True))
+    else:
+        session_cart = _get_session_cart(request)
+        cart_product_ids = {int(k) for k in session_cart.keys() if str(k).isdigit()}
+
     category_id = request.GET.get('category')
     domain = request.GET.get('domain')
 
@@ -126,6 +133,7 @@ def shop(request):
     return render(request, 'store/shop.html', {
         'products': products,
         'categories': categories,
+        'cart_product_ids': cart_product_ids,
     })
 
 
