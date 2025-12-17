@@ -180,3 +180,69 @@ class CheckoutTests(TestCase):
         self.assertEqual(order.items_subtotal, 150000)
         self.assertEqual(order.discount_amount, 15000)
         self.assertEqual(order.shipping_total, 10000)
+
+    def test_checkout_does_not_update_account_profile_fields(self):
+        self.user.first_name = "Account"
+        self.user.last_name = "Owner"
+        self.user.save(update_fields=["first_name", "last_name"])
+
+        self.profile.phone = "09120000000"
+        self.profile.phone_verified = True
+        self.profile.save(update_fields=["phone", "phone_verified"])
+
+        self._login_and_seed_cart(quantity=1)
+
+        response = self.client.post(
+            reverse("checkout"),
+            data={
+                "recipient_is_other": "1",
+                "first_name": "Receiver",
+                "last_name": "Person",
+                "phone": "09129999999",
+                "province": "تهران",
+                "city": "تهران",
+                "address": "تهران، خیابان مثال، پلاک ۱",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        self.user.refresh_from_db()
+        self.profile.refresh_from_db()
+        self.assertEqual(self.user.first_name, "Account")
+        self.assertEqual(self.user.last_name, "Owner")
+        self.assertEqual(self.profile.phone, "09120000000")
+        self.assertTrue(self.profile.phone_verified)
+
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.first_name, "Receiver")
+        self.assertEqual(order.last_name, "Person")
+        self.assertEqual(order.phone, "09129999999")
+
+    def test_checkout_uses_account_fields_when_recipient_toggle_off(self):
+        self.user.first_name = "Account"
+        self.user.last_name = "Owner"
+        self.user.save(update_fields=["first_name", "last_name"])
+
+        self.profile.phone = "09120000000"
+        self.profile.phone_verified = True
+        self.profile.save(update_fields=["phone", "phone_verified"])
+
+        self._login_and_seed_cart(quantity=1)
+
+        response = self.client.post(
+            reverse("checkout"),
+            data={
+                "first_name": "Receiver",
+                "last_name": "Person",
+                "phone": "09129999999",
+                "province": "تهران",
+                "city": "تهران",
+                "address": "تهران، خیابان مثال، پلاک ۱",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.first_name, "Account")
+        self.assertEqual(order.last_name, "Owner")
+        self.assertEqual(order.phone, "09120000000")

@@ -294,6 +294,9 @@ def checkout(request):
     shipping_fee_per_item = int(shipping_settings.shipping_fee or 0)
     free_shipping_min_total = int(shipping_settings.free_shipping_min_total or 0)
 
+    account_first_name = (request.user.first_name or "").strip()
+    account_last_name = (request.user.last_name or "").strip()
+
     def normalize_digits(value: str) -> str:
         if not value:
             return value
@@ -317,6 +320,12 @@ def checkout(request):
         return (raw or "").strip().upper().replace(" ", "")
 
     if request.method == 'POST':
+        recipient_is_other = bool(request.POST.get('recipient_is_other'))
+        if not account_first_name or not account_last_name:
+            recipient_is_other = True
+
+        account_phone = normalize_digits((profile.phone or '').strip()).replace(' ', '').replace('-', '')
+
         values = {
             'first_name': (request.POST.get('first_name') or '').strip(),
             'last_name': (request.POST.get('last_name') or '').strip(),
@@ -328,7 +337,13 @@ def checkout(request):
             'note': (request.POST.get('note') or '').strip(),
             'discount_code': _normalize_discount_code(request.POST.get('discount_code') or ''),
             'discount_code_applied': _normalize_discount_code(request.POST.get('discount_code_applied') or ''),
+            'recipient_is_other': recipient_is_other,
         }
+
+        if not recipient_is_other:
+            values['first_name'] = account_first_name
+            values['last_name'] = account_last_name
+            values['phone'] = account_phone
 
         errors: dict[str, str] = {}
         if not values['first_name']:
@@ -347,13 +362,8 @@ def checkout(request):
         if values['phone']:
             new_phone = values['phone'].replace(' ', '').replace('-', '')
             values['phone'] = new_phone
-            if new_phone != (profile.phone or ''):
-                profile.phone = new_phone
-                profile.phone_verified = False
-                profile.phone_verified_at = None
-                profile.save(update_fields=['phone', 'phone_verified', 'phone_verified_at'])
 
-        if values['phone'] and not profile.phone_verified:
+        if not profile.phone_verified:
             errors['phone_verified'] = 'شماره موبایل شما تایید نشده است.'
 
         discount_code = values.get('discount_code_applied') or ""
@@ -370,13 +380,6 @@ def checkout(request):
                 discount_percent = int(discount.percent)
                 discount_amount = int(items_subtotal) * discount_percent // 100
                 subtotal = int(items_subtotal) - int(discount_amount)
-
-        if not errors:
-            if values['first_name'] != (request.user.first_name or ''):
-                request.user.first_name = values['first_name']
-            if values['last_name'] != (request.user.last_name or ''):
-                request.user.last_name = values['last_name']
-            request.user.save(update_fields=['first_name', 'last_name'])
 
         shipping_applied, shipping_applicable, shipping_is_free, shipping_total_full = compute_shipping(
             values['province'],
@@ -443,15 +446,16 @@ def checkout(request):
         return redirect(reverse('payment', args=[order.id]))
 
     values = {
-        'first_name': (request.user.first_name or '').strip(),
-        'last_name': (request.user.last_name or '').strip(),
-        'phone': (profile.phone or '').strip(),
+        'first_name': account_first_name,
+        'last_name': account_last_name,
+        'phone': normalize_digits((profile.phone or '').strip()).replace(' ', '').replace('-', ''),
         'email': (request.user.email or '').strip(),
         'province': '',
         'city': '',
         'address': '',
         'note': '',
         'discount_code': '',
+        'recipient_is_other': bool(not account_first_name or not account_last_name),
     }
     shipping_applied, shipping_applicable, shipping_is_free, shipping_total_full = compute_shipping(
         values['province'],

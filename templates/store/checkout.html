@@ -20,21 +20,34 @@
           {% csrf_token %}
 
           <div class="checkout-grid">
+            <div class="checkout-field full">
+              <label for="recipient_is_other">
+                <input
+                  id="recipient_is_other"
+                  type="checkbox"
+                  name="recipient_is_other"
+                  value="1"
+                  {% if values.recipient_is_other %}checked{% endif %}
+                >
+                <span>تحویل&zwnj;گیرنده شخص دیگری است</span>
+              </label>
+            </div>
+
             <div class="checkout-field">
               <label for="first_name">نام <span class="field-tag required">اجباری</span></label>
-              <input id="first_name" type="text" name="first_name" value="{{ values.first_name }}" required>
+              <input id="first_name" type="text" name="first_name" value="{{ values.first_name }}" {% if not values.recipient_is_other %}readonly{% endif %} required>
               {% if errors.first_name %}<div class="field-error">{{ errors.first_name }}</div>{% endif %}
             </div>
 
             <div class="checkout-field">
               <label for="last_name">نام خانوادگی <span class="field-tag required">اجباری</span></label>
-              <input id="last_name" type="text" name="last_name" value="{{ values.last_name }}" required>
+              <input id="last_name" type="text" name="last_name" value="{{ values.last_name }}" {% if not values.recipient_is_other %}readonly{% endif %} required>
               {% if errors.last_name %}<div class="field-error">{{ errors.last_name }}</div>{% endif %}
             </div>
 
             <div class="checkout-field">
               <label for="phone">شماره موبایل <span class="field-tag required">اجباری</span></label>
-              <input id="phone" type="tel" name="phone" value="{{ values.phone }}" inputmode="tel" required>
+              <input id="phone" type="tel" name="phone" value="{{ values.phone }}" inputmode="tel" {% if not values.recipient_is_other %}readonly{% endif %} required>
               {% if errors.phone %}<div class="field-error">{{ errors.phone }}</div>{% endif %}
             </div>
 

@@ -264,4 +264,24 @@
       }
     });
   }
+
+  const recipientToggle = document.getElementById('recipient_is_other');
+  const recipientFields = [
+    document.getElementById('first_name'),
+    document.getElementById('last_name'),
+    document.getElementById('phone'),
+  ].filter(Boolean);
+
+  const setRecipientEditable = (editable) => {
+    recipientFields.forEach((el) => {
+      el.readOnly = !editable;
+      el.classList.toggle('is-readonly', !editable);
+    });
+  };
+
+  if (recipientToggle) {
+    const updateRecipientEditable = () => setRecipientEditable(recipientToggle.checked);
+    recipientToggle.addEventListener('change', updateRecipientEditable);
+    updateRecipientEditable();
+  }
 })();
