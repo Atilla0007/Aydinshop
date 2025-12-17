@@ -1,26 +1,34 @@
-
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}سوالات متداول{% endblock %}
 
 {% block content %}
 <section class="section">
-    <div class="container">
-        <h1>سوالات متداول</h1>
-        <div class="faq-list">
-            <div class="faq-item">
-                <h3>چگونه سفارش خود را ثبت کنم؟</h3>
-                <p>پس از انتخاب محصولات، آن‌ها را به سبد خرید اضافه کرده و سپس از طریق صفحه سبد خرید، فرآیند پرداخت را تکمیل کنید.</p>
-            </div>
-            <div class="faq-item">
-                <h3>مدت زمان ارسال چقدر است؟</h3>
-                <p>معمولاً بین ۲ تا ۵ روز کاری بسته به شهر مقصد، سفارش به دست شما خواهد رسید.</p>
-            </div>
-            <div class="faq-item">
-                <h3>آیا امکان بازگشت کالا وجود دارد؟</h3>
-                <p>بله، تا ۷ روز پس از دریافت سفارش می‌توانید با شرایط مندرج در صفحه قوانین، کالا را مرجوع کنید.</p>
-            </div>
+  <div class="container">
+    <h1>سوالات متداول</h1>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>چگونه سفارش خود را ثبت کنم؟</summary>
+        <div class="faq-answer">
+          <p>پس از انتخاب محصولات، آن‌ها را به سبد خرید اضافه کرده و سپس از طریق صفحه سبد خرید، فرایند پرداخت را تکمیل کنید.</p>
         </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>مدت زمان ارسال چقدر است؟</summary>
+        <div class="faq-answer">
+          <p>معمولاً بین ۲ تا ۵ روز کاری (بسته به شهر مقصد)، سفارش به دست شما خواهد رسید.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>آیا امکان بازگشت کالا وجود دارد؟</summary>
+        <div class="faq-answer">
+          <p>بله، تا ۷ روز پس از دریافت سفارش می‌توانید طبق شرایط مندرج در صفحه قوانین و مقررات، کالا را مرجوع کنید.</p>
+        </div>
+      </details>
     </div>
+  </div>
 </section>
 {% endblock %}

@@ -2065,11 +2065,55 @@ body.modal-open {
     padding: 1.1rem 1rem;
     border-radius: 16px;
     box-shadow: 0 8px 22px rgba(15,23,42,0.04);
+    color: var(--navy);
 }
 
-.faq-item h3 {
-    margin: 0 0 0.4rem;
+.faq-item summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0;
     color: var(--navy-dark);
+    font-weight: 900;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: "+";
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(88, 111, 124, 0.14);
+    border: 1px solid rgba(47, 69, 80, 0.18);
+    color: var(--navy-dark);
+    font-weight: 900;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.faq-item[open] summary::after {
+    content: "×";
+    transform: rotate(90deg);
+    background: rgba(88, 111, 124, 0.22);
+}
+
+.faq-answer {
+    margin-top: 0.75rem;
+    color: #2F4550;
+    line-height: 1.9;
+}
+
+.faq-answer p {
+    margin: 0;
+    color: inherit;
 }
 
 /* Auth forms */
