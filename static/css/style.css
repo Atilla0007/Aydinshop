@@ -1390,13 +1390,14 @@ textarea:focus {
 }
 
 .chip-label {
-    opacity: 1;
-    color: var(--muted);
+    opacity: 0.9;
+    color: var(--text);
+    font-weight: 800;
 }
 
 .chip-value {
-    font-weight: 700;
-    color: var(--muted);
+    font-weight: 900;
+    color: var(--text);
 }
 
 .product-actions-row {

@@ -23,11 +23,27 @@ def home(request):
     products = Product.objects.all()[:8]
     news = News.objects.all()[:3]
     categories = Category.objects.all()
+    cart_product_ids: set[int] = set()
+    try:
+        from store.models import CartItem
+        from store.views import _get_session_cart, _merge_session_cart_into_user
+
+        if request.user.is_authenticated:
+            _merge_session_cart_into_user(request)
+            cart_product_ids = set(
+                CartItem.objects.filter(user=request.user).values_list("product_id", flat=True)
+            )
+        else:
+            session_cart = _get_session_cart(request)
+            cart_product_ids = {int(k) for k in session_cart.keys() if str(k).isdigit()}
+    except Exception:
+        cart_product_ids = set()
 
     context = {
         "products": products,
         "news": news,
         "categories": categories,
+        "cart_product_ids": cart_product_ids,
     }
     return render(request, "home.html", context)
 
