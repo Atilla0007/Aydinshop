@@ -117,8 +117,15 @@
     </div>
     <div class="footer-column">
       <h4>اطلاعات تماس</h4>
-      <p>تلفن: ۰۲۱-XXXXXXX</p>
-      <p>ایمیل: info@example.com</p>
+      {% if company_phone %}
+        <p>تلفن: <a href="tel:{{ company_phone }}" dir="ltr">{{ company_phone }}</a></p>
+      {% endif %}
+      {% if company_email %}
+        <p>ایمیل: <a href="mailto:{{ company_email }}">{{ company_email }}</a></p>
+      {% endif %}
+      {% if company_address %}
+        <p>آدرس: {{ company_address|linebreaksbr }}</p>
+      {% endif %}
     </div>
   </div>
   <div class="container footer-bottom">

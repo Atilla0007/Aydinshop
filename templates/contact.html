@@ -8,7 +8,10 @@
     <div class="container contact-container">
         <div class="contact-form-wrapper">
             <h1>تماس با ما</h1>
-            <p>برای هرگونه سوال، انتقاد یا پیشنهاد، فرم زیر را پر کنید.</p>
+            <p>اگر سوالی دارید یا نیاز به مشاوره دارید، فرم زیر را تکمیل کنید تا در کوتاه‌ترین زمان با شما در تماس باشیم.</p>
+            {% if success %}
+              <div class="form-success">پیام شما با موفقیت ارسال شد. به زودی با شما تماس می‌گیریم.</div>
+            {% endif %}
             <form method="post">
                 {% csrf_token %}
                 {{ form.non_field_errors }}
@@ -16,17 +19,22 @@
                 {{ form.name }}
                 <label>ایمیل</label>
                 {{ form.email }}
-                <label>پیام شما</label>
+                <label>متن پیام</label>
                 {{ form.message }}
                 <button type="submit" class="btn btn-primary">ارسال پیام</button>
             </form>
         </div>
         <div class="contact-info">
             <h2>اطلاعات تماس</h2>
-            <p>تلفن: ۰۲۱-۱۲۳۴۵۶۷۸</p>
-            <p>ایمیل: info@aydin.com</p>
-            <p>آدرس: تهران، خیابان مثال، پلاک ۱۲۳</p>
-            <p>ساعات کاری: همه روزه ۸ تا ۲۰</p>
+            {% if company_phone %}
+              <p>شماره تماس: <a href="tel:{{ company_phone }}" dir="ltr">{{ company_phone }}</a></p>
+            {% endif %}
+            {% if company_email %}
+              <p>ایمیل: <a href="mailto:{{ company_email }}">{{ company_email }}</a></p>
+            {% endif %}
+            {% if company_address %}
+              <p>آدرس: {{ company_address|linebreaksbr }}</p>
+            {% endif %}
         </div>
     </div>
 </section>

@@ -61,7 +61,7 @@ MIDDLEWARE=[
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 ROOT_URLCONF='shopproject.urls'
-TEMPLATES=[{'BACKEND':'django.template.backends.django.DjangoTemplates','DIRS':[BASE_DIR/'templates'],'APP_DIRS':True,'OPTIONS':{'context_processors':['django.template.context_processors.debug','django.template.context_processors.request','django.contrib.auth.context_processors.auth','django.contrib.messages.context_processors.messages','core.context_processors.public_promo']}}]
+TEMPLATES=[{'BACKEND':'django.template.backends.django.DjangoTemplates','DIRS':[BASE_DIR/'templates'],'APP_DIRS':True,'OPTIONS':{'context_processors':['django.template.context_processors.debug','django.template.context_processors.request','django.contrib.auth.context_processors.auth','django.contrib.messages.context_processors.messages','core.context_processors.site_info','core.context_processors.public_promo']}}]
 
 # تنظیم ASGI
 ASGI_APPLICATION = 'shopproject.asgi.application'
