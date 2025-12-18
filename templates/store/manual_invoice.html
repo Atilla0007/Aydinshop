@@ -519,6 +519,8 @@
 
         const computeTotals = () => {
           if (!itemsBody) return;
+          const discountEl = document.getElementById("footerDiscount");
+          const shippingEl = document.getElementById("footerShipping");
           const rows = Array.from(itemsBody.querySelectorAll("tr"));
           let itemsSubtotal = 0;
           let totalQty = 0;
@@ -535,16 +537,19 @@
           const perItemFee = root ? parseNumber(root.dataset.shippingFeePerItem) : 0;
           const freeThreshold = root ? parseNumber(root.dataset.freeShippingMinTotal) : 0;
           const shippingFull = perItemFee * totalQty;
-          const shippingApplied = freeThreshold > 0 && itemsSubtotal >= freeThreshold ? 0 : shippingFull;
+          const autoShipping = freeThreshold > 0 && itemsSubtotal >= freeThreshold ? 0 : shippingFull;
 
-          const discount = parseNumber(document.getElementById("footerDiscount")?.textContent || 0);
-          const grandTotal = Math.max(0, itemsSubtotal - discount) + shippingApplied;
+          const discount = parseNumber(discountEl?.textContent || 0);
+          const shippingManual = shippingEl ? parseNumber(shippingEl.textContent) : 0;
+          const shipping = shippingEl && shippingEl.dataset.userEdited === "1" ? Math.max(0, shippingManual) : autoShipping;
+          const grandTotal = Math.max(0, itemsSubtotal - discount) + shipping;
 
           setCell("summaryItemsSubtotal", formatMoneyToman(itemsSubtotal));
           setCell("summaryGrandTotal", formatMoneyToman(grandTotal));
           setCell("footerItemsSubtotal", formatMoneyToman(itemsSubtotal));
-          setCell("footerShipping", formatMoneyToman(shippingApplied));
           setCell("footerGrandTotal", formatMoneyToman(grandTotal));
+          if (discountEl) discountEl.textContent = formatMoneyToman(discount);
+          if (shippingEl) shippingEl.textContent = formatMoneyToman(shipping);
 
           // normalize numeric cells in rows
           for (const row of rows) {
@@ -593,6 +598,12 @@
           });
         }
 
+        const footerDiscountEl = document.getElementById("footerDiscount");
+        if (footerDiscountEl) footerDiscountEl.addEventListener("input", () => (footerDiscountEl.dataset.userEdited = "1"));
+
+        const footerShippingEl = document.getElementById("footerShipping");
+        if (footerShippingEl) footerShippingEl.addEventListener("input", () => (footerShippingEl.dataset.userEdited = "1"));
+
         const hideEmptyInPrint = () => {
           document.querySelectorAll("[data-hide-empty]").forEach((el) => {
             const text = (el.textContent || "").trim();
@@ -632,6 +643,7 @@
             if (el.matches && el.matches('[data-role="price"]')) normalizeMoneyCell(el);
             if (el.matches && el.matches('[data-role="qty"]')) normalizeQtyCell(el);
             if (el.id === "footerDiscount") normalizeMoneyCell(el);
+            if (el.id === "footerShipping") normalizeMoneyCell(el);
           },
           true,
         );

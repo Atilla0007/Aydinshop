@@ -156,20 +156,13 @@ def render_order_invoice_pdf(*, order, title: str = "فاکتور", include_vali
     details_right = x_details + details_w
 
     issue_dt = getattr(order, "payment_submitted_at", None) or getattr(order, "created_at", None)
-    issue_date = format_jalali(issue_dt, "Y/m/d - H:i") if issue_dt else ""
-    due_date = format_jalali(issue_dt + timedelta(days=1), "Y/m/d - H:i") if issue_dt else ""
+    issue_date = format_jalali(issue_dt, "Y/m/d") if issue_dt else ""
+    due_date = format_jalali(issue_dt + timedelta(days=1), "Y/m/d") if issue_dt else ""
 
-    summary_rows: list[tuple[str, str]] = [
-        ("تاریخ صدور", issue_date),
-    ]
+    # Keep the top summary focused on dates; totals appear in the footer box.
+    summary_rows: list[tuple[str, str]] = [("تاریخ صدور", issue_date)]
     if include_validity:
         summary_rows.append(("مدت اعتبار", due_date))
-    summary_rows.extend(
-        [
-            ("جمع کالاها", f"{format_money(getattr(order, 'items_subtotal', 0))} تومان"),
-            ("مبلغ نهایی", f"{format_money(getattr(order, 'total_price', 0))} تومان"),
-        ]
-    )
 
     row_h = 22
     table_h = row_h * len(summary_rows)
