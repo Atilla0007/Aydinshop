@@ -288,7 +288,7 @@
   <body>
     <div class="toolbar no-print">
       <a class="btn secondary" href="{% url 'home' %}">بازگشت به صفحه اصلی</a>
-      <button class="btn" type="button" id="printBtn">چاپ / خروجی PDF</button>
+      <button class="btn" type="button" id="printBtn">دانلود PDF</button>
       <button class="btn secondary" type="button" id="calcTotalsBtn">محاسبه جمع‌ها</button>
       <div class="toolbar-group">
         <select id="productSelect" aria-label="افزودن محصول از سایت">
@@ -430,8 +430,14 @@
         const productSelect = document.getElementById("productSelect");
         const addProductBtn = document.getElementById("addProductBtn");
 
-        const printBtn = document.getElementById("printBtn");
-        if (printBtn) printBtn.addEventListener("click", () => window.print());
+        const pdfEndpoint = "{% url 'manual_invoice_pdf' %}";
+
+        const getCookie = (name) => {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) return parts.pop().split(";").shift();
+          return "";
+        };
 
         const addRowBtn = document.getElementById("addRowBtn");
 
@@ -564,6 +570,86 @@
         if (calcTotalsBtn) {
           calcTotalsBtn.addEventListener("click", computeTotals);
         }
+
+        const downloadPdf = async () => {
+          try {
+            computeTotals();
+
+            const titleSpans = document.querySelectorAll(".inv-title h1 span[contenteditable]");
+            const titleText = (titleSpans?.[0]?.textContent || "").trim() || "پیش‌فاکتور";
+            const invoiceNumber = (titleSpans?.[1]?.textContent || "").trim() || "{{ invoice_number }}";
+
+            const issueDate = (document.querySelector(".inv-header table tr:nth-child(1) td")?.textContent || "").trim();
+            const dueDate = (document.querySelector(".inv-header table tr:nth-child(2) td")?.textContent || "").trim();
+
+            const buyerLines = Array.from(document.querySelectorAll(".inv-header ul li[contenteditable]"))
+              .map((li) => (li.textContent || "").trim())
+              .filter(Boolean);
+
+            const rows = Array.from(itemsBody ? itemsBody.querySelectorAll("tr") : []);
+            const items = rows
+              .map((row) => {
+                const name = (row.querySelector("h4[contenteditable]")?.textContent || "").trim();
+                const desc = (row.querySelector('[data-role="desc"]')?.textContent || "").trim();
+                const qty = Math.max(0, Math.round(parseNumber(row.querySelector('[data-role="qty"]')?.textContent || "")));
+                const price = Math.max(0, parseNumber(row.querySelector('[data-role="price"]')?.textContent || ""));
+                return { name, desc, qty, price };
+              })
+              .filter((it) => it.name || it.desc || it.qty > 0 || it.price > 0);
+
+            const payload = {
+              title: titleText,
+              invoice_number: invoiceNumber,
+              issue_date: issueDate,
+              due_date: dueDate,
+              buyer_lines: buyerLines,
+              items,
+              items_subtotal: parseNumber(document.getElementById("footerItemsSubtotal")?.textContent || 0),
+              discount: parseNumber(document.getElementById("footerDiscount")?.textContent || 0),
+              shipping: parseNumber(document.getElementById("footerShipping")?.textContent || 0),
+              grand_total: parseNumber(document.getElementById("footerGrandTotal")?.textContent || 0),
+            };
+
+            const btn = document.getElementById("printBtn");
+            if (btn) btn.setAttribute("disabled", "disabled");
+
+            const resp = await fetch(pdfEndpoint, {
+              method: "POST",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
+              },
+              body: JSON.stringify(payload),
+            });
+
+            if (!resp.ok) {
+              alert("خطا در تولید PDF.");
+              return;
+            }
+
+            const blob = await resp.blob();
+            const digits = String(invoiceNumber || "").replace(/\D/g, "");
+            const filename = digits ? digits.padStart(6, "0") : "manual-invoice";
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${filename}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          } catch (e) {
+            alert("خطا در تولید PDF.");
+          } finally {
+            const btn = document.getElementById("printBtn");
+            if (btn) btn.removeAttribute("disabled");
+          }
+        };
+
+        const printBtn = document.getElementById("printBtn");
+        if (printBtn) printBtn.addEventListener("click", downloadPdf);
 
         const addProductFromSelection = () => {
           if (!itemsBody || !productSelect) return;

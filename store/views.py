@@ -1,5 +1,6 @@
 
 from datetime import timedelta
+import json
 import re
 from threading import Thread
 
@@ -14,7 +15,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
-from .invoice import render_order_invoice_pdf
+from .invoice import render_manual_invoice_pdf, render_order_invoice_pdf
 from .models import Product, CartItem, Order, OrderItem, Category, ManualInvoiceSequence
 from accounts.models import UserProfile
 from core.models import DiscountCode, ShippingSettings
@@ -698,6 +699,85 @@ def manual_invoice(request):
     )
     if request.GET.get("download") == "1":
         response["Content-Disposition"] = 'attachment; filename="styra-invoice-template.html"'
+    return response
+
+
+@require_POST
+def manual_invoice_pdf(request):
+    """Generate a clean PDF for the manual invoice builder (avoids browser headers/footers)."""
+    if not request.user.is_staff:
+        raise Http404
+
+    try:
+        payload = json.loads((request.body or b"").decode("utf-8"))
+    except Exception:
+        return JsonResponse({"detail": "invalid payload"}, status=400)
+
+    invoice_number = str(payload.get("invoice_number") or "").strip() or "#000000"
+    title = str(payload.get("title") or "").strip() or "پیش‌فاکتور"
+    issue_date = str(payload.get("issue_date") or "").strip()
+    due_date = str(payload.get("due_date") or "").strip()
+
+    buyer_lines = payload.get("buyer_lines") or []
+    if not isinstance(buyer_lines, list):
+        buyer_lines = []
+    buyer_lines = [str(x).strip() for x in buyer_lines if str(x).strip()]
+
+    items_in = payload.get("items") or []
+    if not isinstance(items_in, list):
+        items_in = []
+    items: list[dict] = []
+    for it in items_in:
+        if not isinstance(it, dict):
+            continue
+        name = str(it.get("name") or "").strip()
+        desc = str(it.get("desc") or "").strip()
+        try:
+            qty = int(it.get("qty") or 0)
+        except Exception:
+            qty = 0
+        try:
+            price = int(it.get("price") or 0)
+        except Exception:
+            price = 0
+
+        if not name and not desc and qty <= 0 and price <= 0:
+            continue
+        if qty <= 0:
+            qty = 1
+        if price < 0:
+            price = 0
+        items.append({"name": name, "desc": desc, "qty": qty, "price": price})
+
+    def _safe_int(value, default=0) -> int:
+        try:
+            return int(value)
+        except Exception:
+            return default
+
+    items_subtotal = _safe_int(payload.get("items_subtotal"), 0)
+    discount = _safe_int(payload.get("discount"), 0)
+    shipping = _safe_int(payload.get("shipping"), 0)
+    grand_total = _safe_int(payload.get("grand_total"), max(0, items_subtotal - max(0, discount)) + max(0, shipping))
+
+    pdf_bytes = render_manual_invoice_pdf(
+        invoice_number=invoice_number,
+        title=title,
+        issue_date=issue_date,
+        due_date=due_date,
+        buyer_lines=buyer_lines,
+        items=items,
+        items_subtotal=items_subtotal,
+        discount=discount,
+        shipping=shipping,
+        grand_total=grand_total,
+    )
+
+    safe_filename_digits = re.sub(r"\D", "", invoice_number)
+    filename = safe_filename_digits.zfill(6) if safe_filename_digits else "manual-invoice"
+
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{filename}.pdf"'
     return response
 
 

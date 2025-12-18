@@ -331,3 +331,265 @@ def render_order_invoice_pdf(*, order, title: str = "فاکتور", include_vali
 
     c.save()
     return buffer.getvalue()
+
+
+def render_manual_invoice_pdf(
+    *,
+    invoice_number: str,
+    title: str = "پیش‌فاکتور",
+    issue_date: str = "",
+    due_date: str = "",
+    buyer_lines: list[str] | None = None,
+    items: list[dict] | None = None,
+    items_subtotal: int = 0,
+    discount: int = 0,
+    shipping: int = 0,
+    grand_total: int = 0,
+) -> bytes:
+    """Generate a PDF for the manual invoice builder (staff-only UI)."""
+    buyer_lines = [ln for ln in (buyer_lines or []) if (ln or "").strip()]
+    items = items or []
+
+    font_name = _register_invoice_font()
+
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    margin_x = 40
+    margin_y = 40
+    content_w = width - (2 * margin_x)
+    y = height - margin_y
+
+    safe_number = (invoice_number or "").strip() or "#000000"
+    invoice_title = f"{title} {safe_number}".strip()
+
+    # Title box
+    title_box_h = 34
+    y -= title_box_h
+    c.setStrokeColor(BORDER_COLOR)
+    c.setLineWidth(1)
+    c.rect(margin_x, y, content_w, title_box_h, stroke=1, fill=0)
+    c.setFillColor(TEXT_COLOR)
+    c.setFont(font_name, 16)
+    c.drawCentredString(width / 2, y + 10, _rtl(invoice_title))
+
+    # Logo (centered)
+    logo_path = Path(settings.BASE_DIR) / "static" / "img" / "logo-styra.png"
+    y -= 18
+    if logo_path.exists():
+        try:
+            logo_box = 90
+            c.drawImage(
+                str(logo_path),
+                (width - logo_box) / 2,
+                y - logo_box,
+                width=logo_box,
+                height=logo_box,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+            y -= logo_box
+        except Exception:
+            pass
+    y -= 18
+
+    # Header (seller/buyer + dates only)
+    gap = 18
+    summary_w = content_w * 0.38
+    details_w = content_w - summary_w - gap
+    x_summary = margin_x
+    x_details = margin_x + summary_w + gap
+    details_right = x_details + details_w
+
+    summary_rows: list[tuple[str, str]] = []
+    if (issue_date or "").strip():
+        summary_rows.append(("تاریخ صدور", (issue_date or "").strip()))
+    if (due_date or "").strip():
+        summary_rows.append(("مدت اعتبار", (due_date or "").strip()))
+    if not summary_rows:
+        summary_rows.append(("تاریخ صدور", ""))
+
+    row_h = 22
+    table_h = row_h * len(summary_rows)
+    c.setStrokeColor(BORDER_COLOR)
+    c.rect(x_summary, y - table_h, summary_w, table_h, stroke=1, fill=0)
+    split = summary_w * 0.46
+    c.line(x_summary + (summary_w - split), y, x_summary + (summary_w - split), y - table_h)
+    for i in range(1, len(summary_rows)):
+        c.line(x_summary, y - (row_h * i), x_summary + summary_w, y - (row_h * i))
+
+    c.setFont(font_name, 10)
+    c.setFillColor(TEXT_COLOR)
+    for idx, (label, value) in enumerate(summary_rows):
+        row_top = y - (row_h * idx)
+        row_mid_y = row_top - 15
+        c.drawRightString(x_summary + summary_w - 6, row_mid_y, _rtl(label))
+        c.drawRightString(x_summary + (summary_w - split) - 6, row_mid_y, _rtl(value))
+
+    # Details column: seller + buyer
+    cursor_y = y
+    seller_lines = _company_invoice_lines()
+    seller_name = seller_lines[0]
+    seller_rest = seller_lines[1:]
+
+    c.setFont(font_name, 13)
+    c.drawRightString(details_right, cursor_y - 2, _rtl(seller_name))
+    cursor_y -= 18
+    c.setFont(font_name, 10)
+    for line in seller_rest:
+        for wrapped in _wrap_rtl_lines(line, font_name=font_name, font_size=10, max_width=details_w):
+            c.drawRightString(details_right, cursor_y, _rtl(wrapped))
+            cursor_y -= 14
+    cursor_y -= 8
+
+    c.setFont(font_name, 13)
+    c.drawRightString(details_right, cursor_y, _rtl("خریدار / تحویل‌گیرنده"))
+    cursor_y -= 18
+    c.setFont(font_name, 10)
+
+    if buyer_lines:
+        for line in buyer_lines:
+            for wrapped in _wrap_rtl_lines(line, font_name=font_name, font_size=10, max_width=details_w)[:3]:
+                c.drawRightString(details_right, cursor_y, _rtl(wrapped))
+                cursor_y -= 14
+
+    header_bottom = min(y - table_h, cursor_y)
+    y = header_bottom - 24
+
+    # Items table
+    items = [it for it in items if isinstance(it, dict)]
+    if not items:
+        c.setFont(font_name, 11)
+        c.drawRightString(margin_x + content_w, y, _rtl("هیچ ردیفی برای نمایش ثبت نشده است."))
+        y -= 18
+    else:
+        col_price = content_w * 0.22
+        col_qty = content_w * 0.14
+        col_product = content_w - col_price - col_qty
+        product_right = margin_x + content_w - 6
+
+        def draw_items_header(at_y: float) -> float:
+            header_h = 26
+            c.setStrokeColor(BORDER_COLOR)
+            c.setFillColor(colors.HexColor("#F4F4F9"))
+            c.rect(margin_x, at_y - header_h, content_w, header_h, stroke=1, fill=1)
+            c.setFillColor(TEXT_COLOR)
+            c.line(margin_x + col_price, at_y, margin_x + col_price, at_y - header_h)
+            c.line(margin_x + col_price + col_qty, at_y, margin_x + col_price + col_qty, at_y - header_h)
+            c.setFont(font_name, 11)
+            c.drawRightString(product_right, at_y - 17, _rtl("کالا"))
+            c.drawRightString(margin_x + col_price + col_qty - 6, at_y - 17, _rtl("تعداد"))
+            c.drawRightString(margin_x + col_price - 6, at_y - 17, _rtl("قیمت واحد"))
+            return at_y - header_h
+
+        y = draw_items_header(y)
+
+        for it in items:
+            name = (it.get("name") or "").strip()
+            desc = (it.get("desc") or "").strip()
+            try:
+                qty = int(it.get("qty") or 0)
+            except Exception:
+                qty = 0
+            try:
+                price = int(it.get("price") or 0)
+            except Exception:
+                price = 0
+
+            if not name and not desc and qty <= 0 and price <= 0:
+                continue
+            qty = max(1, qty)
+            price = max(0, price)
+
+            max_text_w = col_product - 14
+            name_lines = _wrap_rtl_lines(name or "-", font_name=font_name, font_size=10, max_width=max_text_w)
+            desc_lines = _wrap_rtl_lines(desc, font_name=font_name, font_size=9, max_width=max_text_w) if desc else []
+
+            row_h_item = max(24, (14 * max(1, len(name_lines))) + (12 * len(desc_lines)) + 6)
+            if y - row_h_item < margin_y + 120:
+                c.showPage()
+                y = height - margin_y
+                y = draw_items_header(y)
+
+            c.setStrokeColor(BORDER_COLOR)
+            c.setFillColor(colors.white)
+            c.rect(margin_x, y - row_h_item, content_w, row_h_item, stroke=1, fill=1)
+            c.setFillColor(TEXT_COLOR)
+            c.line(margin_x + col_price, y, margin_x + col_price, y - row_h_item)
+            c.line(margin_x + col_price + col_qty, y, margin_x + col_price + col_qty, y - row_h_item)
+
+            line_y = y - 16
+            c.setFont(font_name, 10)
+            for line in name_lines[:3]:
+                c.setFillColor(TEXT_COLOR)
+                c.drawRightString(product_right, line_y, _rtl(line))
+                line_y -= 14
+
+            if desc_lines:
+                c.setFont(font_name, 9)
+                c.setFillColor(colors.HexColor("#475569"))
+                for line in desc_lines[:4]:
+                    c.drawRightString(product_right, line_y, _rtl(line))
+                    line_y -= 12
+
+            c.setFont(font_name, 10)
+            c.setFillColor(TEXT_COLOR)
+            qty_text = str(qty).translate(PERSIAN_DIGITS_TRANS)
+            price_text = f"{format_money(price)} تومان"
+            baseline_y = y - 16
+            c.drawRightString(margin_x + col_price + col_qty - 6, baseline_y, _rtl(qty_text))
+            c.drawRightString(margin_x + col_price - 6, baseline_y, _rtl(price_text))
+
+            y -= row_h_item
+
+    # Footer totals table (right aligned)
+    y -= 18
+    totals_w = min(280, content_w * 0.52)
+    x_totals = margin_x + content_w - totals_w
+
+    try:
+        items_subtotal = int(items_subtotal)
+    except Exception:
+        items_subtotal = 0
+    try:
+        discount = int(discount)
+    except Exception:
+        discount = 0
+    try:
+        shipping = int(shipping)
+    except Exception:
+        shipping = 0
+    try:
+        grand_total = int(grand_total)
+    except Exception:
+        grand_total = max(0, items_subtotal - max(0, discount)) + max(0, shipping)
+
+    totals_rows: list[tuple[str, str]] = [
+        ("جمع کالاها", f"{format_money(items_subtotal)} تومان"),
+    ]
+    if discount:
+        totals_rows.append(("تخفیف", f"-{format_money(abs(discount))} تومان"))
+    if shipping:
+        totals_rows.append(("هزینه ارسال", f"{format_money(shipping)} تومان"))
+    totals_rows.append(("مبلغ نهایی", f"{format_money(grand_total)} تومان"))
+
+    tot_row_h = 22
+    tot_h = tot_row_h * len(totals_rows)
+    c.setStrokeColor(BORDER_COLOR)
+    c.rect(x_totals, y - tot_h, totals_w, tot_h, stroke=1, fill=0)
+    split2 = totals_w * 0.56
+    c.line(x_totals + (totals_w - split2), y, x_totals + (totals_w - split2), y - tot_h)
+    for i in range(1, len(totals_rows)):
+        c.line(x_totals, y - (tot_row_h * i), x_totals + totals_w, y - (tot_row_h * i))
+
+    c.setFont(font_name, 10)
+    c.setFillColor(TEXT_COLOR)
+    for idx, (label, value) in enumerate(totals_rows):
+        row_top = y - (tot_row_h * idx)
+        row_mid_y = row_top - 15
+        c.drawRightString(x_totals + totals_w - 6, row_mid_y, _rtl(label))
+        c.drawRightString(x_totals + (totals_w - split2) - 6, row_mid_y, _rtl(value))
+
+    c.save()
+    return buffer.getvalue()
