@@ -15,6 +15,7 @@ urlpatterns = [
     path('payment/<int:order_id>/card-to-card/', views.payment_card_to_card, name='payment_card_to_card'),
     path('payment/<int:order_id>/contact-admin/', views.payment_contact_admin, name='payment_contact_admin'),
     path('payment/<int:order_id>/proforma.pdf', views.proforma_pdf, name='proforma_pdf'),
+    path('invoice/manual/', views.manual_invoice, name='manual_invoice'),
     path('compare/', views.compare, name='compare'),
     path('compare/add/<int:pk>/', views.add_to_compare, name='add_to_compare'),
     path('compare/remove/<int:pk>/', views.remove_from_compare, name='remove_from_compare'),

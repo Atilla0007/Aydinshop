@@ -1,9 +1,10 @@
 
+from datetime import timedelta
 from threading import Thread
 
 from django.conf import settings
 from django.db import close_old_connections
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
@@ -17,6 +18,7 @@ from .models import Product, CartItem, Order, OrderItem, Category
 from accounts.models import UserProfile
 from core.models import DiscountCode, ShippingSettings
 from core.utils.formatting import format_money
+from core.utils.jalali import format_jalali
 
 
 SESSION_CART_KEY = 'cart'
@@ -628,6 +630,43 @@ def proforma_pdf(request, order_id: int):
     pdf_bytes = render_order_invoice_pdf(order=order, title="پیش‌فاکتور استیرا")
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="proforma-{order.id}.pdf"'
+    return response
+
+
+@login_required
+def manual_invoice(request):
+    """Return an editable HTML invoice template for staff to manually issue invoices."""
+    if not request.user.is_staff:
+        raise Http404
+
+    company_name = getattr(settings, "SITE_NAME", "استیرا")
+    address = (getattr(settings, "COMPANY_ADDRESS", "") or "").strip()
+    phone = (getattr(settings, "COMPANY_PHONE", "") or "").strip()
+    email = (getattr(settings, "COMPANY_EMAIL", "") or "").strip()
+    if not email:
+        email = (getattr(settings, "DEFAULT_FROM_EMAIL", "") or "").strip()
+
+    company_address_lines = [ln.strip() for ln in address.splitlines() if ln.strip()]
+    company_contact = " | ".join([p for p in [phone, email] if p])
+
+    now = timezone.now()
+    issue_date = format_jalali(now, "Y/m/d - H:i")
+    due_date = format_jalali(now + timedelta(days=1), "Y/m/d - H:i")
+
+    response = render(
+        request,
+        "store/manual_invoice.html",
+        {
+            "company_name": company_name,
+            "company_address_lines": company_address_lines,
+            "company_contact": company_contact,
+            "issue_date": issue_date,
+            "due_date": due_date,
+            "invoice_number": "#000000",
+        },
+    )
+    if request.GET.get("download") == "1":
+        response["Content-Disposition"] = 'attachment; filename="styra-invoice-template.html"'
     return response
 
 
