@@ -1,71 +1,72 @@
-پروژه Django آماده (اسکلت) — شامل:
-- ثبت‌نام/ورود/خروج، فروشگاه ساده، سبد خرید، صفحه نهایی‌سازی، اخبار، تماس، FAQ
-- پنل ادمین برای مدیریت محصولات و فیلتر بر اساس domain
-- پشتیبانی آنلاین ساده با polling (AJAX)
-- رنگ‌بندی سایت بر اساس کدهای شما
+# Problem
+This project is a small e-commerce backend that must reliably handle user accounts, carts, checkout, and order/payment workflows. In production, authentication endpoints are a common target for brute-force and credential-stuffing attacks; without controls, attackers can degrade availability, enumerate accounts, and compromise users.
 
-فایل زیپ: shopproject.zip
+# Solution
+The application is built on Django with a server-rendered storefront and an admin panel for operations. It includes OTP-based verification flows and an authentication security layer that:
 
-راه‌اندازی محلی (گام به گام) — روی سیستم خود با VS Code و هاست محلی:
-1) فایل shopproject.zip را از اینجا دانلود و استخراج کنید.
-2) یک محیط مجازی بسازید و فعال کنید:
-   python -m venv venv
-   # روی ویندوز:
-   venv\Scripts\activate
-   # لینوکس/مک:
-   source venv/bin/activate
-3) نصب وابستگی‌ها:
-   pip install -r requirements.txt
-4) ایجاد مهاجرت‌ها و دیتابیس sqlite:
-   python manage.py makemigrations
-   python manage.py migrate
-5) ایجاد یک ادمین برای ورود به پنل مدیریتی:
-   python manage.py createsuperuser
-6) اجرای سرور توسعه:
-   python manage.py runserver
-   سپس در مرورگر به http://127.0.0.1:8000/ بروید
-   پنل ادمین: http://127.0.0.1:8000/admin/
+- Enforces rate limiting on login endpoints per IP address and per user identifier (username/email).
+- Temporarily blocks abusive IPs in a database-backed allow/deny store with an automatic cooldown-based unblock.
+- Logs failed login attempts and block/unblock events to database tables that are queryable in Django Admin.
+- Uses middleware for pre-auth throttling and Django’s `user_login_failed` signal for consistent failure logging across both `/login/` and `/admin/login/`.
 
-آپلود روی سرور/هاست (نمایش به کارفرما از طریق VS Code + سرویس هاست):
-A) اگر می‌خواهی سریع با Localtunnel / ngrok نمایش بدی (بدون خرید دامنه):
-   - راه اندازی سرور محلی (runserver) و سپس از ngrok استفاده کن:
-     ngrok http 8000
-   - یا از localtunnel: npx localtunnel --port 8000
-   یک URL عمومی بهت می‌دهد که می‌تونی به کارفرما نشان بدهی.
-B) استقرار واقعی روی هاست (مثلا VPS مثل DigitalOcean یا سرویس cPanel):
-   - اطمینان از Python و pip و git نصب است.
-   - کد را روی سرور کپی کن (git push یا scp).
-   - در سرور: ایجاد venv، نصب requirements، اجرای migrations.
-   - برای production: DEBUG=False، تنظیم ALLOWED_HOSTS، تنظیم سرویس وب مثل gunicorn و reverse-proxy با nginx.
-   - تنظیم HTTPS با certbot (Let's Encrypt).
-اگر خواستی من فایل nginx و systemd unit آماده برات می‌سازم.
+# Tech Stack
+- Python 3.12
+- Django 5.2
+- SQLite (development default)
+- Admin UI: `django-jazzmin`
+- OTP framework: `django-otp` (+ project OTP apps)
+- PDF generation: `reportlab`, `arabic-reshaper`, `python-bidi`
+- Excel import: `openpyxl`
 
----
+# Security Considerations
+- Brute-force and credential stuffing:
+  - `auth_security.middleware.LoginProtectionMiddleware` enforces per-IP and per-identifier limits and returns `429` with `Retry-After` when exceeded.
+  - `auth_security.models.AuthIPBlock` stores blocked IPs with timestamps; cooldown expiry auto-unblocks and is audited via events.
+- Auditability and monitoring:
+  - Failed attempts are stored in `auth_security.models.AuthLoginAttempt` with IP, identifier, timestamp, and reason.
+  - Block/unblock events are stored in `auth_security.models.AuthIPEvent` and exposed as separate admin views via proxy models.
+- Proxy/IP correctness:
+  - Client IP extraction can trust `X-Forwarded-For` only when `AUTH_SECURITY_TRUST_X_FORWARDED_FOR=true` (do not enable unless your reverse proxy strips/sets this header).
+- Secrets and credentials:
+  - SMTP and other secrets must be provided via `.env` and are not hardcoded in Python files.
 
-## ارسال ایمیل واقعی (SMTP) روی لوکال
+# How to Run
+1) Create a virtualenv and install dependencies:
+   - `python -m venv venv`
+   - Windows: `venv\\Scripts\\activate`
+   - `pip install -r requirements.txt`
 
-به صورت پیش‌فرض برای جلوگیری از خطا روی بعضی ویندوزها، ایمیل‌ها با `filebased backend` داخل `tmp/emails/` ذخیره می‌شوند و ایمیل واقعی ارسال نمی‌شود.
+2) Create `.env` next to `manage.py`:
+   - Copy `.env.example` to `.env`
+   - Configure SMTP (recommended for real emails):
+     - `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`
+     - `EMAIL_HOST=smtp.gmail.com`
+     - `EMAIL_PORT=587`
+     - `EMAIL_USE_TLS=true`
+     - `EMAIL_HOST_USER=your_email@gmail.com`
+     - `EMAIL_HOST_PASSWORD=your_app_password`
+     - `DEFAULT_FROM_EMAIL=Your App <your_email@gmail.com>`
 
-برای ارسال ایمیل واقعی (مثلاً Gmail SMTP):
+3) Apply migrations and create an admin user:
+   - `python manage.py migrate`
+   - `python manage.py createsuperuser`
 
-1) فایل `.env.example` را کپی کنید و به نام `.env` کنار `manage.py` بسازید. (فایل `.env` در گیت ذخیره نمی‌شود.)
-2) داخل `.env` این مقادیر را تنظیم کنید:
+4) Run the server:
+   - `python manage.py runserver`
+   - Site: `http://127.0.0.1:8000/`
+   - Admin: `http://127.0.0.1:8000/admin/`
 
-```
-EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your_email@gmail.com
-EMAIL_HOST_PASSWORD=your_app_password
-DEFAULT_FROM_EMAIL=your_email@gmail.com
-```
+5) Verify email sending (optional):
+   - `python manage.py send_test_email --to your_email@gmail.com`
 
-3) سرور را ری‌استارت کنید.
-4) تست ارسال:
+6) Authentication security tuning (optional):
+   - `AUTH_SECURITY_LOGIN_IP_MAX_ATTEMPTS=10`
+   - `AUTH_SECURITY_LOGIN_IP_WINDOW_SECONDS=600`
+   - `AUTH_SECURITY_LOGIN_IP_BLOCK_AFTER_ATTEMPTS=10`
+   - `AUTH_SECURITY_IP_BLOCK_SECONDS=1800`
+   - `AUTH_SECURITY_LOGIN_IDENTIFIER_MAX_ATTEMPTS=5`
+   - `AUTH_SECURITY_LOGIN_IDENTIFIER_WINDOW_SECONDS=600`
 
-```
-python manage.py send_test_email --to your_email@gmail.com
-```
+7) Run tests:
+   - `python manage.py test`
 
-نکته Gmail: حتماً باید **App Password** بسازید (نه پسورد اصلی اکانت).
