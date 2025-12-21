@@ -819,13 +819,13 @@ input::placeholder {
 
 .hero-image {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .hero-image-main {
     position: relative;
     max-width: 380px;
-    margin-left: auto;
+    margin: 0 auto;
     box-shadow: var(--shadow-soft);
     border-radius: 32px;
     overflow: hidden;
