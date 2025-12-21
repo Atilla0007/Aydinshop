@@ -5353,3 +5353,28 @@ hr,
 .divider {
     border-color: var(--border);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Hero pattern (palette-only)                                                */
+/* -------------------------------------------------------------------------- */
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    background-color: #000000;
+    background-image:
+        linear-gradient(to top, #182328 6%, transparent 6%),
+        linear-gradient(to bottom, #182328 30%, transparent 60%),
+        linear-gradient(to right, #2F4550 0%, #586F7C 6%, transparent 6%),
+        linear-gradient(to right, transparent 12%, #2F4550 12%, #586F7C 18%, transparent 18%),
+        linear-gradient(to right, transparent 28%, #2F4550 28%, #586F7C 36%, transparent 36%),
+        linear-gradient(to right, transparent 52%, #2F4550 52%, #586F7C 60%, transparent 60%),
+        linear-gradient(to bottom, #182328 40%, transparent 40%),
+        linear-gradient(to right, transparent 44%, #2F4550 44%, #586F7C 48%, transparent 48%),
+        linear-gradient(to right, transparent 64%, #2F4550 64%, #586F7C 68%, transparent 68%),
+        linear-gradient(to right, transparent 82%, #2F4550 82%, #586F7C 86%, transparent 86%),
+        linear-gradient(to bottom, #182328 55%, transparent 55%),
+        linear-gradient(to right, transparent 20%, #7B878E 20%, #9D9E9F 26%, transparent 26%),
+        linear-gradient(to right, transparent 72%, #7B878E 72%, #9D9E9F 78%, transparent 78%);
+    background-size: 320px 180px;
+    background-position: center bottom;
+}
