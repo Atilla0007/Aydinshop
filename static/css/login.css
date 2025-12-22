@@ -304,6 +304,27 @@
   color: var(--bg-dark);
 }
 
+.form .auth-submit {
+  width: 100%;
+  height: 56px;
+  border: none;
+  padding: 0;
+  background: none;
+}
+
+.form .auth-submit.user-profile {
+  border-radius: 18px;
+  justify-content: center;
+}
+
+.form .auth-submit .user-profile-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  justify-content: center;
+  gap: 12px;
+}
+
 .span {
   text-decoration: none;
   color: var(--bg-dark);

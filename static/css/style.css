@@ -214,6 +214,10 @@ img {
     color: var(--text);
 }
 
+.main-header .container {
+    width: min(1120px, 96vw);
+}
+
 .nav-container {
     display: flex;
     align-items: center;
