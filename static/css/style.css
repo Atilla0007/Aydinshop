@@ -3045,6 +3045,11 @@ body.modal-open {
     width: auto;
 }
 
+.filter-actions .filter-btn {
+    flex: 1 1 0;
+    justify-content: center;
+}
+
 .filter-tags {
     margin-top: 0.75rem;
     display: flex;
