@@ -3036,17 +3036,17 @@ body.modal-open {
 
 .filter-actions {
     display: flex;
-    align-items: flex-end;
+    align-items: stretch;
     gap: 0.6rem;
     flex: 0 0 auto;
 }
 
 .filter-actions .btn {
-    width: auto;
+    width: 100%;
 }
 
 .filter-actions .filter-btn {
-    flex: 1 1 0;
+    flex: 1 1 140px;
     justify-content: center;
 }
 
