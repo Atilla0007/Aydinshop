@@ -3041,7 +3041,7 @@ body.modal-open {
     flex: 0 0 auto;
 }
 
-.sidebar-toggle-button {
+.sidebar-toggle-btn {
     position: relative;
     width: 150px;
     height: 50px;
@@ -3062,19 +3062,12 @@ body.modal-open {
     direction: ltr;
 }
 
-.main-header .nav-container {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    padding-inline-start: 1.4rem;
-    padding-inline-end: 1.4rem;
+.sidebar-toggle-btn:hover {
+    box-shadow: 0 0 20px 0 #2e2e2e3a;
+    transform: none;
 }
 
-.sidebar-toggle-button:hover {
-    box-shadow: 0 0 20px 0 rgba(46, 46, 46, 0.23);
-}
-
-.sidebar-toggle-button .sidebar-toggle-icon {
+.sidebar-toggle-btn .icon {
     position: absolute;
     height: 40px;
     width: 70px;
@@ -3082,34 +3075,27 @@ body.modal-open {
     justify-content: center;
     align-items: center;
     transition: all 0.5s;
-    left: 0;
-    color: inherit;
-    z-index: 1;
 }
 
-.sidebar-toggle-button .sidebar-toggle-text {
+.sidebar-toggle-btn .text {
     transform: translateX(55px);
-    transition: all 0.5s ease;
 }
 
-.sidebar-toggle-button:hover .sidebar-toggle-icon {
+.sidebar-toggle-btn:hover .icon {
     width: 175px;
 }
 
-.sidebar-toggle-button:hover .sidebar-toggle-text {
+.sidebar-toggle-btn:hover .text {
+    transition: all 0.5s;
     opacity: 0;
 }
 
-.sidebar-toggle-button:focus {
+.sidebar-toggle-btn:focus {
     outline: none;
 }
 
-.sidebar-toggle-button:active .sidebar-toggle-icon {
-    transform: translateX(-50%) scale(0.85);
-}
-
-.sidebar-toggle-button svg rect {
-    fill: currentColor;
+.sidebar-toggle-btn:active .icon {
+    transform: scale(0.85);
 }
 
 .filter-actions .btn {
