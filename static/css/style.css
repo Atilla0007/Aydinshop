@@ -5194,6 +5194,19 @@ select {
     fill: var(--text);
 }
 
+.user-profile-inner i {
+    font-size: 27px;
+    color: var(--text);
+    line-height: 1;
+}
+
+.orders-filters .btn {
+    min-width: 140px;
+    height: 44px;
+    padding: 0 1.4rem;
+    justify-content: center;
+}
+
 /* Inputs: darker background when filled/idle (except submit buttons) */
 input[type="text"],
 input[type="email"],
