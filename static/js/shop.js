@@ -84,6 +84,7 @@
     const input = event.target;
     if (!(input instanceof HTMLInputElement)) return;
     if (!input.matches('[data-cart-toggle]')) return;
+    if (input.disabled) return;
 
     const addUrl = input.dataset.addUrl || '';
     const removeUrl = input.dataset.removeUrl || '';

@@ -11,6 +11,11 @@
     {% if errors and errors.phone_verified %}
       <div class="form-error">{{ errors.phone_verified }}</div>
     {% endif %}
+    {% if errors and errors.cart %}
+      <div class="form-error">{{ errors.cart }}</div>
+    {% elif has_unavailable %}
+      <div class="form-error">برخی از محصولات سبد خرید ناموجود شده‌اند. لطفا آن‌ها را حذف کنید.</div>
+    {% endif %}
 
     <div class="checkout-layout">
       <div class="checkout-form">
@@ -118,7 +123,7 @@
             </label>
           </div>
 
-          <button type="submit" class="btn btn-primary">ط§ط¯ط§ظ…ظ‡ ط¨ظ‡ ظ¾ط±ط¯ط§ط®طھ</button>
+          <button type="submit" class="btn btn-primary" {% if has_unavailable %}disabled aria-disabled="true"{% endif %}>ط§ط¯ط§ظ…ظ‡ ط¨ظ‡ ظ¾ط±ط¯ط§ط®طھ</button>
         </form>
       </div>
 
@@ -137,9 +142,14 @@
         {% if cart_items %}
           <ul class="checkout-items">
             {% for item in cart_items %}
-              <li class="checkout-item">
+              <li class="checkout-item{% if not item.product.is_available %} unavailable{% endif %}">
                 <div class="checkout-item-main">
-                  <div class="checkout-item-name">{{ item.product.name }}</div>
+                  <div class="checkout-item-name">
+                    {{ item.product.name }}
+                    {% if not item.product.is_available %}
+                      <span class="stock-badge out">ناموجود</span>
+                    {% endif %}
+                  </div>
                   <div class="checkout-item-meta">{{ item.quantity }} أ— {{ item.product.price|money }} طھظˆظ…ط§ظ†</div>
                 </div>
                 <div class="checkout-item-total">{{ item.total_price|money }} طھظˆظ…ط§ظ†</div>

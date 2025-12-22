@@ -10,8 +10,8 @@ from .models import CartItem, Category, ManualInvoiceSequence, Order, OrderItem,
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "domain", "price")
-    list_filter = ("category", "domain")
+    list_display = ("name", "category", "domain", "price", "is_available")
+    list_filter = ("category", "domain", "is_available")
     search_fields = ("name", "domain")
 
 

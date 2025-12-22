@@ -93,6 +93,13 @@
         </div>
 
         <aside class="product-buy-card" aria-label="خرید">
+          <div class="buy-status">
+            {% if product.is_available %}
+              <span class="stock-badge in-stock">موجود</span>
+            {% else %}
+              <span class="stock-badge out">ناموجود</span>
+            {% endif %}
+          </div>
           <div class="buy-price">
             <span class="buy-label">قیمت</span>
             <div class="buy-value">
@@ -101,8 +108,8 @@
             </div>
           </div>
 
-          <div class="qty-control" data-qty-control>
-            <button type="button" class="qty-btn" data-dir="plus" aria-label="افزایش تعداد">+</button>
+          <div class="qty-control{% if not product.is_available %} is-disabled{% endif %}" data-qty-control>
+            <button type="button" class="qty-btn" data-dir="plus" aria-label="افزایش تعداد" {% if not product.is_available %}disabled aria-disabled="true"{% endif %}>+</button>
             <input
               type="tel"
               inputmode="numeric"
@@ -112,15 +119,20 @@
               class="qty-input"
               dir="ltr"
               aria-label="تعداد"
+              {% if not product.is_available %}disabled aria-disabled="true"{% endif %}
             >
-            <button type="button" class="qty-btn" data-dir="minus" aria-label="کاهش تعداد">−</button>
+            <button type="button" class="qty-btn" data-dir="minus" aria-label="کاهش تعداد" {% if not product.is_available %}disabled aria-disabled="true"{% endif %}>−</button>
           </div>
 
-          <a
-            id="add-to-cart-link"
-            href="{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}&qty=1"
-            class="btn btn-primary full"
-          >افزودن به سبد خرید</a>
+          {% if product.is_available %}
+            <a
+              id="add-to-cart-link"
+              href="{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}&qty=1"
+              class="btn btn-primary full"
+            >افزودن به سبد خرید</a>
+          {% else %}
+            <button type="button" class="btn btn-primary full" disabled>ناموجود</button>
+          {% endif %}
 
           <div class="buy-trust">
             <div class="trust-item"><i class="bx bx-check-shield"></i> ضمانت اصالت کالا</div>

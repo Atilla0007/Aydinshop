@@ -83,12 +83,15 @@
 
         <div class="products-grid">
             {% for product in products %}
-            <div class="product-card" data-product-card data-href="{% url 'product_detail' product.id %}">
+            <div class="product-card{% if not product.is_available %} unavailable{% endif %}" data-product-card data-href="{% url 'product_detail' product.id %}">
                 <div class="product-image">
                     <picture>
                         <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
                         <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
                     </picture>
+                    {% if not product.is_available %}
+                        <span class="product-badge unavailable">ناموجود</span>
+                    {% endif %}
                     {% if forloop.first %}
                         <span class="product-badge new">جدید</span>
                     {% elif forloop.counter == 2 %}
@@ -110,9 +113,10 @@
                                 type="checkbox"
                                 data-cart-toggle
                                 data-product-id="{{ product.id }}"
-                                data-add-url="{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}&qty=1"
+                                data-add-url="{% if product.is_available %}{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}&qty=1{% endif %}"
                                 data-remove-url="{% url 'cart_remove' %}"
                                 {% if product.id in cart_product_ids %}checked{% endif %}
+                                {% if not product.is_available %}disabled aria-disabled="true"{% endif %}
                             />
                             <label class="checkbox-label" for="home-cart-toggle-{{ product.id }}">
                                 <div class="checkbox-flip">

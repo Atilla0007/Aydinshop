@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 def home(request):
     """Render home page with highlighted products and news."""
-    products = Product.objects.all()[:8]
+    products = Product.objects.filter(is_available=True)[:8]
     news = News.objects.all()[:3]
     categories = Category.objects.all()
     cart_product_ids: set[int] = set()

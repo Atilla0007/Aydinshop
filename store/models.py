@@ -41,6 +41,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     price = models.IntegerField()
+    is_available = models.BooleanField(default=True, db_index=True)
     domain = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
