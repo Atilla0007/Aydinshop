@@ -13,32 +13,79 @@
       <form method="get" class="filters">
         <div class="filter-row">
           <div class="filter-group">
-            <label>دسته‌بندی</label>
+            <label>?????????</label>
             <select name="category">
-              <option value="">همه دسته‌ها</option>
+              <option value="">??? ???????</option>
               {% for cat in categories %}
-                <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:'s' %}selected{% endif %}>
+                <option value="{{ cat.id }}" {% if filters.category == cat.id|stringformat:'s' %}selected{% endif %}>
                   {{ cat.name }}
                 </option>
               {% endfor %}
             </select>
           </div>
           <div class="filter-group">
-            <label>جستجو در دامنه / کلمات کلیدی</label>
-            <input type="text" name="domain" placeholder="مثال: یخچال، فر، ..." value="{{ request.GET.domain }}">
+            <label>????</label>
+            <select name="brand">
+              <option value="">??? ??????</option>
+              {% for brand_name in brands %}
+                <option value="{{ brand_name }}" {% if filters.brand == brand_name %}selected{% endif %}>
+                  {{ brand_name }}
+                </option>
+              {% endfor %}
+            </select>
           </div>
           <div class="filter-group">
-            <button class="btn btn-primary small" type="submit">اعمال فیلتر</button>
+            <label>???????</label>
+            <input
+              type="text"
+              name="domain"
+              placeholder="??? ????? ?? ???? ??????"
+              value="{{ filters.domain }}"
+              list="shop-suggestions"
+              data-suggest-url="{% url 'shop_suggest' %}"
+            >
+            <datalist id="shop-suggestions"></datalist>
+          </div>
+          <div class="filter-group">
+            <label>?????????</label>
+            <select name="sort">
+              <option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>????????</option>
+              <option value="cheapest" {% if filters.sort == 'cheapest' %}selected{% endif %}>??????????</option>
+              <option value="bestseller" {% if filters.sort == 'bestseller' %}selected{% endif %}>??????</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-row filter-row--compact">
+          <div class="filter-group filter-range">
+            <label>???? ???? (?????)</label>
+            <div class="range-inputs">
+              <input type="text" name="min_price" placeholder="?????" value="{{ filters.min_price }}">
+              <span class="range-separator">??</span>
+              <input type="text" name="max_price" placeholder="??????" value="{{ filters.max_price }}">
+            </div>
+          </div>
+          <div class="filter-group">
+            <label>??????</label>
+            <select name="availability">
+              <option value="">???</option>
+              <option value="in_stock" {% if filters.availability == 'in_stock' %}selected{% endif %}>?????</option>
+              <option value="out_of_stock" {% if filters.availability == 'out_of_stock' %}selected{% endif %}>???????</option>
+            </select>
+          </div>
+          <div class="filter-group filter-actions">
+            <button class="btn btn-primary small" type="submit">????? ?????</button>
+            <a class="btn btn-outline small" href="{% url 'shop' %}">??? ?????</a>
           </div>
         </div>
 
         <div class="filter-tags">
-          <span class="filter-label">پیشنهاد جستجو:</span>
-          <button type="button" class="filter-chip" data-tag="یخچال">یخچال</button>
-          <button type="button" class="filter-chip" data-tag="فر پیتزا">فر پیتزا</button>
-          <button type="button" class="filter-chip" data-tag="ویترین">ویترین</button>
-          <button type="button" class="filter-chip" data-tag="سینی">سینی</button>
-          <button type="button" class="filter-chip" data-tag="سرخ‌کن">سرخ‌کن</button>
+          <span class="filter-label">??????? ?????:</span>
+          <button type="button" class="filter-chip" data-tag="?????">?????</button>
+          <button type="button" class="filter-chip" data-tag="?? ?????">?? ?????</button>
+          <button type="button" class="filter-chip" data-tag="??????">??????</button>
+          <button type="button" class="filter-chip" data-tag="????">????</button>
+          <button type="button" class="filter-chip" data-tag="??????">??????</button>
         </div>
       </form>
     </div>
@@ -127,5 +174,6 @@
     });
   });
 </script>
+<script src="{% static 'js/shop-suggest.js' %}" defer></script>
 <script src="{% static 'js/shop.js' %}" defer></script>
 {% endblock %}

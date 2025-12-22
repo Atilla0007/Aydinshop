@@ -1274,8 +1274,8 @@ input::placeholder {
 .filters {
     margin-top: 1.4rem;
     display: flex;
-    gap: 0.7rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.9rem;
 }
 
 select,
@@ -2919,6 +2919,38 @@ body.modal-open {
     color: #6B7280;
     margin-bottom: 0.25rem;
     display: block;
+}
+
+.filter-row--compact {
+    align-items: flex-end;
+}
+
+.filter-range .range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.filter-range .range-inputs input {
+    flex: 1;
+    min-width: 0;
+}
+
+.range-separator {
+    font-size: 0.8rem;
+    color: var(--navy);
+    opacity: 0.7;
+}
+
+.filter-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.6rem;
+    flex: 0 0 auto;
+}
+
+.filter-actions .btn {
+    width: auto;
 }
 
 .filter-tags {

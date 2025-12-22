@@ -6,6 +6,8 @@ from threading import Thread
 
 from django.conf import settings
 from django.db import close_old_connections, transaction
+from django.db.models import Q, Sum, Value, IntegerField
+from django.db.models.functions import Coalesce
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -163,6 +165,12 @@ def _save_compare_list(request, ids):
 def shop(request):
     products = Product.objects.all()
     categories = Category.objects.all()
+    brands = list(
+        Product.objects.exclude(brand__isnull=True)
+        .exclude(brand="")
+        .values_list("brand", flat=True)
+        .distinct()
+    )
 
     if request.user.is_authenticated:
         _merge_session_cart_into_user(request)
@@ -173,19 +181,92 @@ def shop(request):
 
     category_id = request.GET.get('category')
     domain = request.GET.get('domain')
+    brand = request.GET.get('brand')
+    availability = request.GET.get('availability')
+    sort = request.GET.get('sort') or 'newest'
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+
+    def parse_price(value: str | None) -> int | None:
+        if not value:
+            return None
+        cleaned = str(value).strip()
+        if not cleaned:
+            return None
+        cleaned = cleaned.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789"))
+        cleaned = cleaned.replace(",", "").replace("٬", "").replace("،", "")
+        digits = "".join(ch for ch in cleaned if ch.isdigit())
+        if not digits:
+            return None
+        return int(digits)
 
     if category_id:
         products = products.filter(category_id=category_id)
     if domain:
         products = products.filter(domain__icontains=domain)
+    if brand:
+        products = products.filter(brand=brand)
+    if availability == "in_stock":
+        products = products.filter(is_available=True)
+    elif availability == "out_of_stock":
+        products = products.filter(is_available=False)
 
-    products = products.order_by("-is_available", "id")
+    min_price_value = parse_price(min_price)
+    if min_price_value is not None:
+        products = products.filter(price__gte=min_price_value)
+    max_price_value = parse_price(max_price)
+    if max_price_value is not None:
+        products = products.filter(price__lte=max_price_value)
+
+    order_fields: list[str] = []
+    if sort == "cheapest":
+        order_fields = ["price", "id"]
+    elif sort == "bestseller":
+        products = products.annotate(
+            sold_qty=Coalesce(
+                Sum(
+                    "orderitem__quantity",
+                    filter=Q(orderitem__order__status__in=["paid", "sent", "done"]),
+                ),
+                Value(0),
+                output_field=IntegerField(),
+            )
+        )
+        order_fields = ["-sold_qty", "-id"]
+    else:
+        order_fields = ["-created_at", "-id"]
+
+    products = products.order_by("-is_available", *order_fields)
 
     return render(request, 'store/shop.html', {
         'products': products,
         'categories': categories,
+        'brands': brands,
         'cart_product_ids': cart_product_ids,
+        'filters': {
+            'category': category_id or '',
+            'domain': domain or '',
+            'brand': brand or '',
+            'availability': availability or '',
+            'sort': sort,
+            'min_price': min_price or '',
+            'max_price': max_price or '',
+        },
     })
+
+
+@require_GET
+def shop_suggest(request):
+    query = (request.GET.get("q") or "").strip()
+    if len(query) < 2:
+        return JsonResponse({"suggestions": []})
+    query = query.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789"))
+    suggestions = list(
+        Product.objects.filter(Q(name__icontains=query) | Q(domain__icontains=query))
+        .values_list("name", flat=True)
+        .order_by("name")[:8]
+    )
+    return JsonResponse({"suggestions": suggestions})
 
 
 def product_detail(request, pk):
