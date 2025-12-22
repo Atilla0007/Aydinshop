@@ -57,22 +57,13 @@
               <a href="{% url 'manual_invoice' %}" role="menuitem"><i class='bx bxs-receipt'></i> ساخت پیش‌فاکتور</a>
               <a href="{% url 'admin:analytics-dashboard' %}" role="menuitem"><i class='bx bx-chart'></i> داشبورد تحلیل</a>
             {% endif %}
-          </div>
+                      <a href="{% url 'logout' %}" role="menuitem"><i class='bx bx-log-out'></i> ????</a>
+</div>
         </div>
-        <a href="{% url 'logout' %}" class="user-profile user-profile--logout" aria-label="User Logout Button">
-          <span class="user-profile-inner">
-            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <g data-name="Layer 2" id="Layer_2">
-                <path d="m15.626 11.769a6 6 0 1 0 -7.252 0 9.008 9.008 0 0 0 -5.374 8.231 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 9.008 9.008 0 0 0 -5.374-8.231zm-7.626-4.769a4 4 0 1 1 4 4 4 4 0 0 1 -4-4zm10 14h-12a1 1 0 0 1 -1-1 7 7 0 0 1 14 0 1 1 0 0 1 -1 1z"></path>
-              </g>
-            </svg>
-            <p>Log Out</p>
-          </span>
-        </a>
       {% else %}
         <a href="{% url 'login' %}" class="user-profile" aria-label="User Login Button">
           <span class="user-profile-inner">
-            <i class='bx bx-user-plus' aria-hidden="true"></i>
+            <i class='bx bx-user' aria-hidden="true"></i>
             <p>Log In</p>
           </span>
         </a>
