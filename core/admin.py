@@ -364,7 +364,7 @@ def _build_admin_analytics(period_days: int = 30) -> dict:
 
     sales_period = paid_period.aggregate(total=Coalesce(Sum("total_price"), 0))["total"] or 0
     sales_total = paid_orders.aggregate(total=Coalesce(Sum("total_price"), 0))["total"] or 0
-    avg_basket = paid_period.aggregate(avg=Coalesce(Avg("total_price"), 0))["avg"] or 0
+    avg_basket = paid_period.aggregate(avg=Avg("total_price"))["avg"] or 0
     orders_period = paid_period.count()
 
     visits_period = (
