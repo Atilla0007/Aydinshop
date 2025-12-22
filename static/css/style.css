@@ -3059,7 +3059,6 @@ body.modal-open {
     cursor: pointer;
     padding: 0;
     overflow: hidden;
-    margin-inline-end: auto;
     direction: ltr;
 }
 
@@ -3067,8 +3066,8 @@ body.modal-open {
     width: 100%;
     max-width: none;
     margin: 0;
-    padding-inline-start: 0;
-    padding-inline-end: 1.2rem;
+    padding-inline-start: 1.4rem;
+    padding-inline-end: 1.4rem;
 }
 
 .sidebar-toggle-button:hover {
