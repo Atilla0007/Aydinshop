@@ -34,7 +34,19 @@
     return cookieValue;
   };
 
-  const updateMiniCartPreview = (items, total) => {
+  const setMiniCartAlert = (messages) => {
+    const alertEl = document.getElementById('mini-cart-alert');
+    if (!alertEl) return;
+    if (!messages || !messages.length) {
+      alertEl.textContent = '';
+      alertEl.classList.remove('show');
+      return;
+    }
+    alertEl.textContent = `محصولات ناموجود از سبد حذف شدند: ${messages.join(', ')}`;
+    alertEl.classList.add('show');
+  };
+
+  const updateMiniCartPreview = (items, total, removedUnavailable = []) => {
     const itemsContainer = document.getElementById('mini-cart-items');
     const totalEl = document.getElementById('mini-cart-total');
     if (!itemsContainer || !totalEl) return;
@@ -45,15 +57,19 @@
     if (!safeItems.length) {
       itemsContainer.innerHTML = '<p class="mini-cart-empty">سبد خرید شما خالی است.</p>';
       totalEl.textContent = formatNumber(0);
+      setMiniCartAlert(removedUnavailable);
       return;
     }
 
     for (const item of safeItems) {
+      const unavailable = item.is_available === false;
+      const removed = item.removed === true;
       const wrapper = document.createElement('div');
-      wrapper.className = 'mini-cart-item';
+      wrapper.className = `mini-cart-item${unavailable ? ' unavailable' : ''}`;
       wrapper.innerHTML = `
         <div class="mini-cart-item-main">
           <div class="mini-cart-item-name">${escapeHtml(item.name)}</div>
+          ${unavailable ? `<div class="mini-cart-item-status">${removed ? 'ناموجود - از سبد حذف شد' : 'ناموجود'}</div>` : ''}
           <div class="mini-cart-item-meta">${formatNumber(item.quantity)} عدد ${formatNumber(item.unit_price)} تومان</div>
         </div>
         <div class="mini-cart-item-side">
@@ -65,6 +81,7 @@
     }
 
     totalEl.textContent = formatNumber(total || 0);
+    setMiniCartAlert(removedUnavailable);
   };
 
   document.addEventListener('click', (event) => {
@@ -119,7 +136,7 @@
       });
       const data = await response.json().catch(() => null);
       if (!response.ok || !data || !Array.isArray(data.items)) throw new Error('bad_response');
-      updateMiniCartPreview(data.items, data.total || 0);
+      updateMiniCartPreview(data.items, data.total || 0, data.removed_unavailable || []);
     } catch {
       input.checked = true;
     } finally {

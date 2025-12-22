@@ -4,6 +4,7 @@
   const closeButton = document.getElementById('mini-cart-close');
   const itemsContainer = document.getElementById('mini-cart-items');
   const totalEl = document.getElementById('mini-cart-total');
+  const alertEl = document.getElementById('mini-cart-alert');
 
   if (!drawer || !overlay || !closeButton || !itemsContainer || !totalEl) {
     return;
@@ -51,6 +52,17 @@
     itemsContainer.innerHTML = `<p class="mini-cart-empty">${escapeHtml(message)}</p>`;
   };
 
+  const setAlert = (messages) => {
+    if (!alertEl) return;
+    if (!messages || !messages.length) {
+      alertEl.textContent = '';
+      alertEl.classList.remove('show');
+      return;
+    }
+    alertEl.textContent = `محصولات ناموجود از سبد حذف شدند: ${messages.join(', ')}`;
+    alertEl.classList.add('show');
+  };
+
   const renderItems = (items) => {
     itemsContainer.innerHTML = '';
     if (!items.length) {
@@ -59,11 +71,14 @@
     }
 
     for (const item of items) {
+      const unavailable = item.is_available === false;
+      const removed = item.removed === true;
       const wrapper = document.createElement('div');
-      wrapper.className = 'mini-cart-item';
+      wrapper.className = `mini-cart-item${unavailable ? ' unavailable' : ''}`;
       wrapper.innerHTML = `
         <div class="mini-cart-item-main">
           <div class="mini-cart-item-name">${escapeHtml(item.name)}</div>
+          ${unavailable ? `<div class="mini-cart-item-status">${removed ? 'ناموجود - از سبد حذف شد' : 'ناموجود'}</div>` : ''}
           <div class="mini-cart-item-meta">${formatNumber(item.quantity)} × ${formatNumber(item.unit_price)} تومان</div>
         </div>
         <div class="mini-cart-item-side">
@@ -79,6 +94,7 @@
     if (!previewUrl) return;
 
     setEmpty('در حال بارگذاری...');
+    setAlert([]);
     try {
       const response = await fetch(previewUrl, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -89,9 +105,11 @@
       const items = Array.isArray(data.items) ? data.items : [];
       renderItems(items);
       totalEl.textContent = formatNumber(data.total || 0);
+      setAlert(Array.isArray(data.removed_unavailable) ? data.removed_unavailable : []);
     } catch {
       setEmpty('خطا در دریافت سبد خرید. لطفاً دوباره تلاش کنید.');
       totalEl.textContent = formatNumber(0);
+      setAlert([]);
     }
   };
 
@@ -148,8 +166,10 @@
       if (!data || !data.items) throw new Error('invalid_response');
       renderItems(Array.isArray(data.items) ? data.items : []);
       totalEl.textContent = formatNumber(data.total || 0);
+      setAlert(Array.isArray(data.removed_unavailable) ? data.removed_unavailable : []);
     } catch {
       setEmpty('خطا در حذف آیتم. لطفاً دوباره تلاش کنید.');
+      setAlert([]);
     }
   };
 

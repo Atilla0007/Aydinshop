@@ -239,16 +239,21 @@ def add_to_cart(request, pk):
 
 
 def cart(request):
+    removed_unavailable = []
     if request.user.is_authenticated:
         _merge_session_cart_into_user(request)
         items_qs = CartItem.objects.filter(user=request.user).select_related('product')
         items = list(items_qs)
+        unavailable_items = [item for item in items if not item.product.is_available]
+        if unavailable_items:
+            CartItem.objects.filter(id__in=[item.id for item in unavailable_items]).delete()
+            removed_unavailable = [item.product.name for item in unavailable_items]
+            items = [item for item in items if item.product.is_available]
         total = sum(i.total_price() for i in items)
-        has_unavailable = any(not i.product.is_available for i in items)
         return render(request, 'store/cart.html', {
             'items': items,
             'total': total,
-            'has_unavailable': has_unavailable,
+            'removed_unavailable': removed_unavailable,
         })
 
     session_cart = _get_session_cart(request)
@@ -256,21 +261,25 @@ def cart(request):
     products_by_id = {str(p.id): p for p in products}
     items = []
     total = 0
-    has_unavailable = False
-    for product_id, quantity in session_cart.items():
+    for product_id, quantity in list(session_cart.items()):
         product = products_by_id.get(product_id)
         if not product:
+            continue
+        if not product.is_available:
+            removed_unavailable.append(product.name)
+            session_cart.pop(str(product_id), None)
             continue
         item_total = int(product.price) * int(quantity)
         items.append({'product': product, 'quantity': int(quantity), 'total_price': item_total})
         total += item_total
-        if not product.is_available:
-            has_unavailable = True
+
+    if removed_unavailable:
+        _set_session_cart(request, session_cart)
 
     return render(request, 'store/cart.html', {
         'items': items,
         'total': total,
-        'has_unavailable': has_unavailable,
+        'removed_unavailable': removed_unavailable,
     })
 
 @login_required
@@ -334,11 +343,18 @@ def checkout(request):
     _merge_session_cart_into_user(request)
     cart_items_qs = CartItem.objects.filter(user=request.user).select_related('product')
     cart_items = list(cart_items_qs)
+    removed_unavailable = []
+    if cart_items:
+        unavailable_items = [item for item in cart_items if not item.product.is_available]
+        if unavailable_items:
+            CartItem.objects.filter(id__in=[item.id for item in unavailable_items]).delete()
+            removed_unavailable = [item.product.name for item in unavailable_items]
+            cart_items_qs = CartItem.objects.filter(user=request.user).select_related('product')
+            cart_items = list(cart_items_qs)
+
     items_subtotal = sum(item.total_price() for item in cart_items)
     subtotal = int(items_subtotal)
     item_count = sum(int(item.quantity) for item in cart_items)
-    unavailable_items = [item for item in cart_items if not item.product.is_available]
-    has_unavailable = bool(unavailable_items)
 
     shipping_settings = ShippingSettings.get_solo()
     shipping_fee_per_item = int(shipping_settings.shipping_fee or 0)
@@ -419,8 +435,6 @@ def checkout(request):
             errors['address'] = "باید آدرس کامل را وارد کنید."
         if not values['accept_terms']:
             errors['accept_terms'] = "لطفاً با قوانین و حریم خصوصی موافقت کنید."
-        if has_unavailable:
-            errors['cart'] = "برخی از محصولات سبد خرید ناموجود شده‌اند. لطفا آن‌ها را حذف کنید."
 
         if values['phone']:
             new_phone = values['phone'].replace(' ', '').replace('-', '')
@@ -461,7 +475,7 @@ def checkout(request):
         if errors:
             return render(request, 'store/checkout.html', {
                 'cart_items': cart_items,
-                'has_unavailable': has_unavailable,
+                'removed_unavailable': removed_unavailable,
                 'items_subtotal': items_subtotal,
                 'subtotal': subtotal,
                 'discount_code': discount_code,
@@ -591,7 +605,7 @@ def checkout(request):
             errors['discount_code'] = recheck_error
             return render(request, 'store/checkout.html', {
                 'cart_items': cart_items,
-                'has_unavailable': has_unavailable,
+                'removed_unavailable': removed_unavailable,
                 'items_subtotal': items_subtotal,
                 'subtotal': subtotal,
                 'discount_code': discount_code,
@@ -636,7 +650,7 @@ def checkout(request):
 
     return render(request, 'store/checkout.html', {
         'cart_items': cart_items,
-        'has_unavailable': has_unavailable,
+        'removed_unavailable': removed_unavailable,
         'items_subtotal': items_subtotal,
         'subtotal': subtotal,
         'discount_code': discount_code,
@@ -960,47 +974,72 @@ def manual_invoice_pdf(request):
 
 @require_GET
 def cart_preview(request):
-    items, total = _build_cart_preview_data(request)
-    return JsonResponse({'items': items, 'total': total})
+    items, total, removed_unavailable = _build_cart_preview_data(request)
+    return JsonResponse({'items': items, 'total': total, 'removed_unavailable': removed_unavailable})
 
 
-def _build_cart_preview_data(request) -> tuple[list[dict], int]:
+def _build_cart_preview_data(request) -> tuple[list[dict], int, list[str]]:
     if request.user.is_authenticated:
         _merge_session_cart_into_user(request)
         cart_items = list(CartItem.objects.filter(user=request.user).select_related('product'))
         items: list[dict] = []
         total = 0
+        removed_unavailable: list[str] = []
         for item in cart_items:
-            item_total = int(item.total_price())
+            is_available = bool(item.product.is_available)
+            item_total = int(item.total_price()) if is_available else 0
             items.append({
                 'id': item.product_id,
                 'name': item.product.name,
                 'quantity': int(item.quantity),
                 'unit_price': int(item.product.price),
                 'total_price': item_total,
+                'is_available': is_available,
+                'removed': not is_available,
             })
-            total += item_total
-        return items, total
+            if is_available:
+                total += item_total
+            else:
+                removed_unavailable.append(item.product.name)
+
+        if removed_unavailable:
+            CartItem.objects.filter(
+                id__in=[item.id for item in cart_items if not item.product.is_available]
+            ).delete()
+
+        return items, total, removed_unavailable
 
     session_cart = _get_session_cart(request)
     products = list(Product.objects.filter(id__in=list(session_cart.keys())))
     products_by_id = {str(p.id): p for p in products}
     items: list[dict] = []
     total = 0
+    removed_unavailable: list[str] = []
     for product_id, quantity in session_cart.items():
         product = products_by_id.get(product_id)
         if not product:
             continue
-        item_total = int(product.price) * int(quantity)
+        is_available = bool(product.is_available)
+        item_total = int(product.price) * int(quantity) if is_available else 0
         items.append({
             'id': int(product_id),
             'name': product.name,
             'quantity': int(quantity),
             'unit_price': int(product.price),
             'total_price': item_total,
+            'is_available': is_available,
+            'removed': not is_available,
         })
-        total += item_total
-    return items, total
+        if is_available:
+            total += item_total
+        else:
+            removed_unavailable.append(product.name)
+            session_cart.pop(str(product_id), None)
+
+    if removed_unavailable:
+        _set_session_cart(request, session_cart)
+
+    return items, total, removed_unavailable
 
 
 @require_POST
@@ -1013,8 +1052,17 @@ def cart_remove(request):
 
     if product_id <= 0:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            items, total = _build_cart_preview_data(request)
-            return JsonResponse({'ok': False, 'message': 'ط¢غŒطھظ… ظ†ط§ظ…ط¹طھط¨ط± ط§ط³طھ.', 'items': items, 'total': total}, status=400)
+            items, total, removed_unavailable = _build_cart_preview_data(request)
+            return JsonResponse(
+                {
+                    'ok': False,
+                    'message': 'ط¢غŒطھظ… ظ†ط§ظ…ط¹طھط¨ط± ط§ط³طھ.',
+                    'items': items,
+                    'total': total,
+                    'removed_unavailable': removed_unavailable,
+                },
+                status=400,
+            )
         return redirect(reverse('cart'))
 
     if request.user.is_authenticated:
@@ -1026,8 +1074,8 @@ def cart_remove(request):
         _set_session_cart(request, cart)
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        items, total = _build_cart_preview_data(request)
-        return JsonResponse({'ok': True, 'items': items, 'total': total})
+        items, total, removed_unavailable = _build_cart_preview_data(request)
+        return JsonResponse({'ok': True, 'items': items, 'total': total, 'removed_unavailable': removed_unavailable})
 
     next_url = _safe_next_url(request, request.POST.get('next')) or reverse('cart')
     return redirect(next_url)

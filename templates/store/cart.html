@@ -8,8 +8,8 @@
 <section class="section">
     <div class="container">
         <h1>سبد خرید شما</h1>
-        {% if has_unavailable %}
-        <div class="form-error">برخی از محصولات سبد خرید ناموجود شده‌اند. لطفا آن‌ها را حذف کنید.</div>
+        {% if removed_unavailable %}
+        <div class="form-error">محصولات ناموجود از سبد حذف شدند: {{ removed_unavailable|join:", " }}</div>
         {% endif %}
         {% if items %}
         <table class="cart-table">
@@ -48,11 +48,7 @@
         </table>
         <div class="cart-summary">
             <p>جمع کل: <strong>{{ total|money }} تومان</strong></p>
-            {% if has_unavailable %}
-            <button type="button" class="btn btn-primary" disabled>ادامه به پرداخت</button>
-            {% else %}
             <a href="{% url 'checkout' %}" class="btn btn-primary">ادامه به پرداخت</a>
-            {% endif %}
         </div>
         {% else %}
         <p class="empty-text">سبد خرید شما خالی است.</p>

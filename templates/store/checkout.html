@@ -13,8 +13,9 @@
     {% endif %}
     {% if errors and errors.cart %}
       <div class="form-error">{{ errors.cart }}</div>
-    {% elif has_unavailable %}
-      <div class="form-error">برخی از محصولات سبد خرید ناموجود شده‌اند. لطفا آن‌ها را حذف کنید.</div>
+    {% endif %}
+    {% if removed_unavailable %}
+      <div class="form-error">محصولات ناموجود از سبد حذف شدند: {{ removed_unavailable|join:", " }}</div>
     {% endif %}
 
     <div class="checkout-layout">
@@ -123,7 +124,7 @@
             </label>
           </div>
 
-          <button type="submit" class="btn btn-primary" {% if has_unavailable %}disabled aria-disabled="true"{% endif %}>ط§ط¯ط§ظ…ظ‡ ط¨ظ‡ ظ¾ط±ط¯ط§ط®طھ</button>
+          <button type="submit" class="btn btn-primary">ط§ط¯ط§ظ…ظ‡ ط¨ظ‡ ظ¾ط±ط¯ط§ط®طھ</button>
         </form>
       </div>
 

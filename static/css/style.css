@@ -4963,6 +4963,21 @@ body.mini-cart-open #global-chat-toggle {
     gap: 0.75rem;
 }
 
+.mini-cart-alert {
+    margin: 0 1.2rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--text);
+    background: rgba(88, 111, 124, 0.35);
+    border: 1px solid rgba(244, 244, 249, 0.18);
+    display: none;
+}
+
+.mini-cart-alert.show {
+    display: block;
+}
+
 .mini-cart-empty {
     margin: 0;
     text-align: center;
@@ -4980,6 +4995,10 @@ body.mini-cart-open #global-chat-toggle {
     border: 1px solid rgba(244, 244, 249, 0.14);
 }
 
+.mini-cart-item.unavailable {
+    opacity: 0.65;
+}
+
 .mini-cart-item-main {
     min-width: 0;
 }
@@ -4989,6 +5008,12 @@ body.mini-cart-open #global-chat-toggle {
     color: #F4F4F9;
     font-size: 0.95rem;
     line-height: 1.25rem;
+}
+
+.mini-cart-item-status {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--muted);
 }
 
 .mini-cart-item-meta {
