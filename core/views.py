@@ -197,7 +197,8 @@ def privacy(request):
 
 def about(request):
     """Render About Us page."""
-    return render(request, "about.html")
+    template_name = getattr(settings, "ABOUT_TEMPLATE", "about.html")
+    return render(request, template_name)
 
 
 def health_check(request):
