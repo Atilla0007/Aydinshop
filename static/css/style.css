@@ -3045,42 +3045,46 @@ body.modal-open {
 
 @media (max-width: 768px) {
     .nav-container {
-        flex-wrap: wrap;
-        gap: 0.6rem;
+        flex-wrap: nowrap;
+        gap: 0.4rem;
     }
 
     .logo {
         order: 1;
     }
 
+    .logo-text {
+        display: none;
+    }
+
     .sidebar-toggle-btn {
         order: 2;
-        width: 120px;
-        height: 44px;
-        font-size: 16px;
+        width: 54px;
+        height: 42px;
+        font-size: 14px;
     }
 
     .sidebar-toggle-btn .icon {
-        width: 60px;
+        width: 54px;
     }
 
     .sidebar-toggle-btn .text {
-        transform: translateX(44px);
+        display: none;
     }
 
     .nav-actions {
         order: 3;
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.4rem;
+        width: auto;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+        gap: 0.35rem;
     }
 
     .nav-actions .btn,
     .user-profile {
-        height: 44px;
-        min-width: 120px;
-        padding: 0 0.9rem;
+        height: 40px;
+        min-width: 90px;
+        padding: 0 0.75rem;
     }
 
     .user-profile-inner {
@@ -3116,13 +3120,13 @@ body.modal-open {
     }
 
     .sidebar-toggle-btn {
-        width: 110px;
-        height: 40px;
+        width: 50px;
+        height: 38px;
         font-size: 14px;
     }
 
     .sidebar-toggle-btn .text {
-        transform: translateX(40px);
+        display: none;
     }
 }
 
