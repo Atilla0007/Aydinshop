@@ -3041,6 +3041,59 @@ body.modal-open {
     flex: 0 0 auto;
 }
 
+.sidebar-toggle-button {
+    position: relative;
+    width: 150px;
+    height: 50px;
+    border-radius: 5px;
+    border: none;
+    transition: all 0.5s ease-in-out;
+    font-size: 20px;
+    font-family: "IranKharazmi", Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    background: #040f16;
+    color: #f5f5f5;
+    cursor: pointer;
+    padding: 0;
+}
+
+.sidebar-toggle-button:hover {
+    box-shadow: 0 0 20px 0 #2e2e2e3a;
+}
+
+.sidebar-toggle-button .sidebar-toggle-icon {
+    position: absolute;
+    height: 40px;
+    width: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s;
+}
+
+.sidebar-toggle-button .sidebar-toggle-text {
+    transform: translateX(55px);
+}
+
+.sidebar-toggle-button:hover .sidebar-toggle-icon {
+    width: 175px;
+}
+
+.sidebar-toggle-button:hover .sidebar-toggle-text {
+    transition: all 0.5s;
+    opacity: 0;
+}
+
+.sidebar-toggle-button:focus {
+    outline: none;
+}
+
+.sidebar-toggle-button:active .sidebar-toggle-icon {
+    transform: scale(0.85);
+}
+
 .filter-actions .btn {
     width: 100%;
 }
