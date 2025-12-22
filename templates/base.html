@@ -28,7 +28,10 @@
     </button>
 
     <a href="{% url 'home' %}" class="logo">
-      <img src="{% static 'img/logo-styra.png' %}" alt="لوگوی استیرا" class="logo-img" />
+      <picture>
+        <source srcset="{% static 'img/logo-styra.webp' %}" type="image/webp">
+        <img src="{% static 'img/logo-styra.png' %}" alt="لوگوی استیرا" class="logo-img" decoding="async" loading="eager" />
+      </picture>
       <span class="logo-text light">استیرا</span>
     </a>
 
@@ -168,11 +171,15 @@
     </div>
   </div>
 </aside>
-<script src="{% static 'js/mini-cart.js' %}"></script>
-<script src="{% static 'js/banner.js' %}"></script>
-<script src="{% static 'js/sidebar.js' %}"></script>
-<script src="{% static 'js/theme.js' %}"></script>
-<script src="{% static 'js/user-menu.js' %}"></script>
+<script src="{% static 'js/mini-cart.js' %}" defer></script>
+{% if request.resolver_match.url_name == 'home' and public_promo %}
+<script src="{% static 'js/banner.js' %}" defer></script>
+{% endif %}
+<script src="{% static 'js/sidebar.js' %}" defer></script>
+<script src="{% static 'js/theme.js' %}" defer></script>
+{% if user.is_authenticated %}
+<script src="{% static 'js/user-menu.js' %}" defer></script>
+{% endif %}
 {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -317,7 +317,10 @@
         </h1>
       </div>
 
-      <img src="{% static 'img/logo-styra.png' %}" class="inv-logo" alt="لوگو استیرا" />
+      <picture>
+        <source srcset="{% static 'img/logo-styra.webp' %}" type="image/webp">
+        <img src="{% static 'img/logo-styra.png' %}" class="inv-logo" alt="لوگو استیرا" decoding="async" loading="lazy" />
+      </picture>
 
       <div class="inv-header">
         <div>

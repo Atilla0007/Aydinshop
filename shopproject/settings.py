@@ -73,6 +73,8 @@ INSTALLED_APPS=[
 MIDDLEWARE=[
     'django.middleware.security.SecurityMiddleware',
     'core.middleware.SecurityHeadersMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -91,6 +93,7 @@ ASGI_APPLICATION = 'shopproject.asgi.application'
 DATABASES={'default':{'ENGINE':'django.db.backends.sqlite3','NAME':BASE_DIR/'db.sqlite3'}}
 STATIC_URL='/static/'
 STATICFILES_DIRS=[BASE_DIR/'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL='/'
@@ -115,6 +118,13 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
     SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", True)
     SECURE_HSTS_PRELOAD = _env_bool("SECURE_HSTS_PRELOAD", True)
+
+# Static files caching/compression (WhiteNoise)
+WHITENOISE_MAX_AGE = int(os.getenv("WHITENOISE_MAX_AGE", "31536000"))
+WHITENOISE_AUTOREFRESH = _env_bool("WHITENOISE_AUTOREFRESH", DEBUG)
+WHITENOISE_USE_FINDERS = _env_bool("WHITENOISE_USE_FINDERS", DEBUG)
+if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 

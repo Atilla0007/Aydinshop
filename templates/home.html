@@ -28,7 +28,10 @@
         </div>
         <div class="hero-image">
             <div class="hero-image-main">
-                <img src="{% static 'img/hero-shop.jpg' %}" alt="فروشگاه استیرا" />
+                <picture>
+                    <source srcset="{% static 'img/hero-shop.webp' %}" type="image/webp">
+                    <img src="{% static 'img/hero-shop.jpg' %}" alt="فروشگاه استیرا" decoding="async" loading="eager" />
+                </picture>
                 <div class="hero-floating-card">
                     <span class="card-label">موجودی فعال</span>
                     <strong>1,000+</strong>
@@ -82,7 +85,10 @@
             {% for product in products %}
             <div class="product-card" data-product-card data-href="{% url 'product_detail' product.id %}">
                 <div class="product-image">
-                    <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}">
+                    <picture>
+                        <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
+                        <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+                    </picture>
                     {% if forloop.first %}
                         <span class="product-badge new">جدید</span>
                     {% elif forloop.counter == 2 %}
@@ -184,7 +190,10 @@
 <section class="section support">
     <div class="container support-container">
         <div class="support-image">
-            <img src="{% static 'img/support.jpg' %}" alt="پشتیبانی مشتریان">
+            <picture>
+                <source srcset="{% static 'img/support.webp' %}" type="image/webp">
+                <img src="{% static 'img/support.jpg' %}" alt="پشتیبانی مشتریان" loading="lazy" decoding="async">
+            </picture>
         </div>
         <div class="support-content">
             <h2 class="section-title right">پشتیبانی واقعی کنار شماست</h2>
@@ -237,5 +246,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/shop.js' %}"></script>
+  <script src="{% static 'js/shop.js' %}" defer></script>
 {% endblock %}

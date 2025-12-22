@@ -50,9 +50,12 @@
     <div class="products-grid">
       {% for product in products %}
         <div class="product-card" data-product-card data-href="{% url 'product_detail' product.id %}">
-          <div class="product-image">
-            <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}">
-          </div>
+        <div class="product-image">
+            <picture>
+              <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
+              <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+            </picture>
+        </div>
 
           <div class="product-info">
             <h3>{{ product.name }}</h3>
@@ -120,5 +123,5 @@
     });
   });
 </script>
-<script src="{% static 'js/shop.js' %}"></script>
+<script src="{% static 'js/shop.js' %}" defer></script>
 {% endblock %}
