@@ -3045,24 +3045,24 @@ body.modal-open {
     position: relative;
     width: 150px;
     height: 50px;
-    border-radius: 5px;
-    border: none;
+    border-radius: 12px;
+    border: 1px solid var(--border);
     transition: all 0.5s ease-in-out;
     font-size: 20px;
     font-family: "IranKharazmi", Verdana, Geneva, Tahoma, sans-serif;
     font-weight: 600;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    background: #040f16;
-    color: #f5f5f5;
+    justify-content: flex-end;
+    background: var(--surface-2);
+    color: var(--text);
     cursor: pointer;
-    padding: 0 16px 0 0;
+    padding: 0 16px;
     overflow: hidden;
 }
 
 .sidebar-toggle-button:hover {
-    box-shadow: 0 0 20px 0 #2e2e2e3a;
+    box-shadow: 0 0 20px 0 rgba(46, 46, 46, 0.23);
 }
 
 .sidebar-toggle-button .sidebar-toggle-icon {
@@ -3073,20 +3073,24 @@ body.modal-open {
     justify-content: center;
     align-items: center;
     transition: all 0.5s;
-    inset-inline-start: 0;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    color: var(--text);
+    z-index: 1;
 }
 
 .sidebar-toggle-button .sidebar-toggle-text {
-    padding-inline-start: 72px;
-    transform: none;
+    position: absolute;
+    inset-inline-end: 16px;
+    z-index: 2;
+    transition: opacity 0.5s ease;
 }
 
 .sidebar-toggle-button:hover .sidebar-toggle-icon {
-    width: 175px;
+    width: 150px;
 }
 
 .sidebar-toggle-button:hover .sidebar-toggle-text {
-    transition: all 0.5s;
     opacity: 0;
 }
 
@@ -3095,7 +3099,11 @@ body.modal-open {
 }
 
 .sidebar-toggle-button:active .sidebar-toggle-icon {
-    transform: scale(0.85);
+    transform: translateX(-50%) scale(0.85);
+}
+
+.sidebar-toggle-button svg rect {
+    fill: currentColor;
 }
 
 .filter-actions .btn {
