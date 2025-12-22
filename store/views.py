@@ -16,7 +16,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
 from .invoice import render_manual_invoice_pdf, render_order_invoice_pdf
-from .models import Product, CartItem, Order, OrderItem, Category, ManualInvoiceSequence
+from .models import Product, CartItem, Order, OrderItem, Category, ManualInvoiceSequence, ShippingAddress
 from accounts.models import UserProfile
 from core.models import DiscountCode, DiscountRedemption, ShippingSettings
 from core.utils.formatting import format_money
@@ -321,6 +321,7 @@ def checkout(request):
 
     account_first_name = (request.user.first_name or "").strip()
     account_last_name = (request.user.last_name or "").strip()
+    default_address = ShippingAddress.objects.filter(user=request.user, is_default=True).first()
 
     def normalize_digits(value: str) -> str:
         if not value:
@@ -363,12 +364,17 @@ def checkout(request):
             'discount_code': _normalize_discount_code(request.POST.get('discount_code') or ''),
             'discount_code_applied': _normalize_discount_code(request.POST.get('discount_code_applied') or ''),
             'recipient_is_other': recipient_is_other,
+            'address_id': (request.POST.get('address_id') or '').strip(),
         }
 
         if not recipient_is_other:
             values['first_name'] = account_first_name
             values['last_name'] = account_last_name
             values['phone'] = account_phone
+
+        selected_address = default_address
+        if values['address_id'].isdigit():
+            selected_address = ShippingAddress.objects.filter(user=request.user, pk=int(values['address_id'])).first()
 
         errors: dict[str, str] = {}
         if not values['first_name']:
@@ -474,6 +480,7 @@ def checkout(request):
             else:
                 order = Order.objects.create(
                     user=request.user,
+                    shipping_address=selected_address,
                     total_price=total_payable,
                     status='unpaid',
                     first_name=values['first_name'],
@@ -555,12 +562,13 @@ def checkout(request):
         'last_name': account_last_name,
         'phone': normalize_digits((profile.phone or '').strip()).replace(' ', '').replace('-', ''),
         'email': (request.user.email or '').strip(),
-        'province': '',
-        'city': '',
-        'address': '',
+        'province': default_address.province if default_address else '',
+        'city': default_address.city if default_address else '',
+        'address': default_address.address if default_address else '',
         'note': '',
         'discount_code': '',
         'recipient_is_other': bool(not account_first_name or not account_last_name),
+        'address_id': str(default_address.id) if default_address else '',
     }
     shipping_applied, shipping_applicable, shipping_is_free, shipping_total_full = compute_shipping(
         values['province'],
@@ -730,9 +738,18 @@ def payment_contact_admin(request, order_id: int):
 def proforma_pdf(request, order_id: int):
     order = get_object_or_404(Order, pk=order_id, user=request.user)
 
-    pdf_bytes = render_order_invoice_pdf(order=order, title="پیش‌فاکتور استیرا")
+    pdf_bytes = render_order_invoice_pdf(order=order, title="Proforma")
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="proforma-{order.id}.pdf"'
+    return response
+
+
+@login_required
+def order_invoice_pdf(request, order_id: int):
+    order = get_object_or_404(Order, pk=order_id, user=request.user)
+    pdf_bytes = render_order_invoice_pdf(order=order, title="Invoice")
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="invoice-{order.id}.pdf"'
     return response
 
 
@@ -1046,3 +1063,6 @@ def compare(request):
         'related_products': related_products,
         'other_products': other_products,
     })
+
+
+

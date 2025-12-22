@@ -5,7 +5,7 @@ from django.utils.html import format_html
 
 from accounts.sms import send_sms
 from .emails import send_order_payment_approved_email
-from .models import CartItem, Category, ManualInvoiceSequence, Order, OrderItem, Product
+from .models import CartItem, Category, ManualInvoiceSequence, Order, OrderItem, Product, ShippingAddress
 
 
 @admin.register(Product)
@@ -144,3 +144,10 @@ class OrderAdmin(admin.ModelAdmin):
 class ManualInvoiceSequenceAdmin(admin.ModelAdmin):
     list_display = ("id", "last_number", "updated_at")
     readonly_fields = ("updated_at",)
+
+
+@admin.register(ShippingAddress)
+class ShippingAddressAdmin(admin.ModelAdmin):
+    list_display = ("user", "label", "city", "province", "is_default", "updated_at")
+    list_filter = ("is_default", "province")
+    search_fields = ("label", "city", "province", "address", "user__username", "user__email", "phone")

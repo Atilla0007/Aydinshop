@@ -1,8 +1,8 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 {% load jalali %}
 
-{% block title %}پروفایل{% endblock %}
+{% block title %}پروفایل کاربری{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/profile.css' %}">
@@ -23,36 +23,32 @@
       <div class="profile-badges">
         {% if profile.phone %}
           {% if profile.phone_verified %}
-            <span class="badge ok">شماره موبایل تایید شده</span>
+            <span class="badge ok">موبایل تایید شده</span>
           {% else %}
-            <span class="badge warn">شماره موبایل تایید نشده</span>
+            <span class="badge warn">موبایل نیاز به تایید</span>
           {% endif %}
         {% else %}
-          <span class="badge info">شماره موبایل وارد نشده</span>
+          <span class="badge info">موبایل ثبت نشده</span>
         {% endif %}
 
         {% if profile.email_verified %}
           <span class="badge ok">ایمیل تایید شده</span>
         {% else %}
-          <span class="badge warn">ایمیل تایید نشده</span>
+          <span class="badge warn">ایمیل نیاز به تایید</span>
         {% endif %}
       </div>
 
       {% if profile.email_verified %}
-        <div class="email-verify-done">ایمیل تایید شده است</div>
+        <div class="email-verify-done">ایمیل شما تایید شده است</div>
       {% else %}
-        <a class="email-verify-cta" href="{% url 'email_otp_verify_page' %}?next={% url 'profile' %}">
-          برای تایید ایمیل کلیک کنید
-        </a>
+        <a class="email-verify-cta" href="{% url 'email_otp_verify_page' %}?next={% url 'profile' %}">تایید ایمیل</a>
       {% endif %}
 
       {% if profile.phone %}
         {% if profile.phone_verified %}
-          <div class="phone-verify-done">شماره موبایل تایید شده است</div>
+          <div class="phone-verify-done">موبایل تایید شده است</div>
         {% else %}
-          <a class="phone-verify-cta" href="{% url 'phone_otp_verify_page' %}?next={% url 'profile' %}">
-            برای تایید شماره موبایل کلیک کنید
-          </a>
+          <a class="phone-verify-cta" href="{% url 'phone_otp_verify_page' %}?next={% url 'profile' %}">تایید موبایل</a>
         {% endif %}
       {% endif %}
 
@@ -71,11 +67,29 @@
     <main class="orders-card" id="orders">
       <div class="orders-header">
         <h2>سفارش‌های قبلی</h2>
-        <p class="muted">کد رهگیری فعلاً همان شماره سفارش است.</p>
+        <p class="muted">ردیابی و دانلود فاکتور یا پیش‌فاکتور.</p>
       </div>
 
+      <form class="orders-filters" method="get" action="#orders">
+        <div class="filter-field">
+          <label for="status">وضعیت</label>
+          <select id="status" name="status">
+            <option value="">همه</option>
+            {% for value,label in order_statuses %}
+              <option value="{{ value }}" {% if value == active_status %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filter-field grow">
+          <label for="search">جستجو سفارش / محصول</label>
+          <input id="search" type="text" name="q" value="{{ search_term }}" placeholder="شماره سفارش، محصول، شهر...">
+        </div>
+        <button class="btn btn-primary" type="submit">اعمال</button>
+        <a class="btn btn-outline" href="{% url 'profile' %}#orders">حذف فیلتر</a>
+      </form>
+
       {% if request.GET.payment_submitted == '1' %}
-        <div class="form-success">پرداخت شما ثبت شد و در انتظار بررسی ادمین است.</div>
+        <div class="form-success">اطلاعات پرداخت ثبت شد.</div>
       {% endif %}
 
       {% if orders %}
@@ -85,7 +99,7 @@
               <div class="order-top">
                 <div>
                   <div class="order-title">سفارش #{{ o.id|order_number }}</div>
-                  <div class="order-meta">تاریخ: {{ o.created_at|jalali:"Y/m/d" }} | وضعیت: {{ o.get_status_display }}</div>
+                  <div class="order-meta">تاریخ: {{ o.created_at|jalali:"Y/m/d" }} <span class="status-pill status-{{ o.status }}">{{ o.get_status_display }}</span></div>
                 </div>
                 <div class="order-price">{{ o.total_price|money }} تومان</div>
               </div>
@@ -102,6 +116,14 @@
                 {% endfor %}
               </ul>
               {% endif %}
+
+              <div class="order-actions">
+                <a class="btn btn-outline small" href="{% url 'proforma_pdf' o.id %}">دانلود پیش‌فاکتور</a>
+                {% if o.payment_status == 'approved' or o.status == 'sent' or o.status == 'done' or o.status == 'paid' %}
+                  <a class="btn btn-primary small" href="{% url 'order_invoice_pdf' o.id %}">دانلود فاکتور</a>
+                {% endif %}
+                <a class="btn btn-outline small" href="{% url 'payment' o.id %}">جزئیات/پرداخت</a>
+              </div>
             </div>
           {% endfor %}
         </div>
@@ -110,5 +132,149 @@
       {% endif %}
     </main>
   </div>
+
+  <section class="addresses-card" id="addresses">
+    <div class="addresses-header">
+      <div>
+        <h2>آدرس‌های من</h2>
+        <p class="muted">چند آدرس را ذخیره کنید و یکی را پیش‌فرض بگذارید.</p>
+      </div>
+    </div>
+
+    <div class="addresses-grid">
+      <div class="address-form-card">
+        <h3>آدرس جدید</h3>
+        <form method="post" action="{% url 'address_save' %}">
+          {% csrf_token %}
+          <div class="field">
+            <label>برچسب (اختیاری)</label>
+            <input type="text" name="label" placeholder="خانه / دفتر">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>نام</label>
+              <input type="text" name="first_name" required>
+            </div>
+            <div class="field">
+              <label>نام خانوادگی</label>
+              <input type="text" name="last_name" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>موبایل</label>
+              <input type="tel" name="phone" required>
+            </div>
+            <div class="field">
+              <label>ایمیل (اختیاری)</label>
+              <input type="email" name="email">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>استان</label>
+              <input type="text" name="province" required>
+            </div>
+            <div class="field">
+              <label>شهر</label>
+              <input type="text" name="city" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>آدرس کامل</label>
+            <textarea name="address" rows="2" required></textarea>
+          </div>
+          <label class="inline-check">
+            <input type="checkbox" name="is_default" value="1">
+            <span>به عنوان پیش‌فرض تنظیم شود</span>
+          </label>
+          <button class="btn btn-primary" type="submit">ذخیره آدرس</button>
+        </form>
+      </div>
+
+      <div class="addresses-list">
+        {% if addresses %}
+          {% for addr in addresses %}
+            <div class="address-item {% if addr.is_default %}default{% endif %}">
+              <div class="address-head">
+                <div>
+                  <strong>{{ addr.label|default:"آدرس" }}</strong>
+                  {% if addr.is_default %}<span class="address-pill">پیش‌فرض</span>{% endif %}
+                  <div class="muted">{{ addr.city }}، {{ addr.province }}</div>
+                </div>
+                <div class="address-actions">
+                  <form method="post" action="{% url 'address_set_default' addr.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline small" type="submit" {% if addr.is_default %}disabled{% endif %}>پیش‌فرض</button>
+                  </form>
+                  <form method="post" action="{% url 'address_delete' addr.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline small" type="submit">حذف</button>
+                  </form>
+                </div>
+              </div>
+              <div class="address-body">
+                <div>{{ addr.first_name }} {{ addr.last_name }}</div>
+                <div dir="ltr">{{ addr.phone }}</div>
+                {% if addr.email %}<div dir="ltr">{{ addr.email }}</div>{% endif %}
+                <div class="muted">{{ addr.address }}</div>
+              </div>
+              <details class="address-edit">
+                <summary>ویرایش</summary>
+                <form method="post" action="{% url 'address_update' addr.id %}">
+                  {% csrf_token %}
+                  <div class="field">
+                    <label>برچسب</label>
+                    <input type="text" name="label" value="{{ addr.label }}">
+                  </div>
+                  <div class="field-row">
+                    <div class="field">
+                      <label>نام</label>
+                      <input type="text" name="first_name" value="{{ addr.first_name }}" required>
+                    </div>
+                    <div class="field">
+                      <label>نام خانوادگی</label>
+                      <input type="text" name="last_name" value="{{ addr.last_name }}" required>
+                    </div>
+                  </div>
+                  <div class="field-row">
+                    <div class="field">
+                      <label>موبایل</label>
+                      <input type="tel" name="phone" value="{{ addr.phone }}" required>
+                    </div>
+                    <div class="field">
+                      <label>ایمیل</label>
+                      <input type="email" name="email" value="{{ addr.email }}">
+                    </div>
+                  </div>
+                  <div class="field-row">
+                    <div class="field">
+                      <label>استان</label>
+                      <input type="text" name="province" value="{{ addr.province }}" required>
+                    </div>
+                    <div class="field">
+                      <label>شهر</label>
+                      <input type="text" name="city" value="{{ addr.city }}" required>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>آدرس کامل</label>
+                    <textarea name="address" rows="2" required>{{ addr.address }}</textarea>
+                  </div>
+                  <label class="inline-check">
+                    <input type="checkbox" name="is_default" value="1" {% if addr.is_default %}checked{% endif %}>
+                    <span>به عنوان پیش‌فرض تنظیم شود</span>
+                  </label>
+                  <button class="btn btn-primary" type="submit">ذخیره تغییرات</button>
+                </form>
+              </details>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="empty">هنوز آدرسی ثبت نکرده‌اید.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 </section>
 {% endblock %}

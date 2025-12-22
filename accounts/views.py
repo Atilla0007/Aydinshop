@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 
-from store.models import Order
+from django.db.models import Q
+
+from store.models import Order, ShippingAddress
 
 from .forms import SignupForm
 from .models import UserProfile
@@ -72,12 +74,47 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     profile = _get_profile(request.user)
+
+    status_filter = (request.GET.get("status") or "").strip()
+    search_term = (request.GET.get("q") or "").strip()
+
     orders = (
         Order.objects.filter(user=request.user)
         .prefetch_related("items", "items__product")
         .order_by("-created_at")
     )
-    return render(request, "accounts/profile.html", {"profile": profile, "orders": orders})
+    if status_filter:
+        orders = orders.filter(status=status_filter)
+    if search_term:
+        digits = "".join(ch for ch in search_term if ch.isdigit())
+        q_objects = Q(items__product__name__icontains=search_term) | Q(city__icontains=search_term) | Q(
+            province__icontains=search_term
+        ) | Q(address__icontains=search_term)
+        if digits:
+            try:
+                numeric_id = int(digits)
+                q_objects |= Q(id=numeric_id)
+            except ValueError:
+                pass
+        orders = orders.filter(q_objects).distinct()
+
+    addresses = (
+        ShippingAddress.objects.filter(user=request.user)
+        .order_by("-is_default", "-updated_at")
+    )
+
+    return render(
+        request,
+        "accounts/profile.html",
+        {
+            "profile": profile,
+            "orders": orders,
+            "order_statuses": Order.STATUS_CHOICES,
+            "active_status": status_filter,
+            "search_term": search_term,
+            "addresses": addresses,
+        },
+    )
 
 
 @login_required
@@ -133,3 +170,74 @@ def profile_edit_view(request):
 
     return redirect("profile")
 
+
+@login_required
+def address_save(request, address_id: int | None = None):
+    if request.method != "POST":
+        return redirect("profile")
+
+    instance = None
+    if address_id:
+        instance = ShippingAddress.objects.filter(pk=address_id, user=request.user).first()
+        if not instance:
+            return redirect("profile")
+
+    data = {
+        "label": (request.POST.get("label") or "").strip(),
+        "first_name": (request.POST.get("first_name") or "").strip(),
+        "last_name": (request.POST.get("last_name") or "").strip(),
+        "phone": (request.POST.get("phone") or "").strip(),
+        "email": (request.POST.get("email") or "").strip(),
+        "province": (request.POST.get("province") or "").strip(),
+        "city": (request.POST.get("city") or "").strip(),
+        "address": (request.POST.get("address") or "").strip(),
+        "is_default": bool(request.POST.get("is_default")),
+    }
+
+    target = instance or ShippingAddress(user=request.user)
+    for field, value in data.items():
+        setattr(target, field, value)
+    target.save()
+
+    if target.is_default:
+        ShippingAddress.objects.filter(user=request.user).exclude(pk=target.pk).update(is_default=False)
+
+    return redirect("profile")
+
+
+@login_required
+def address_delete(request, address_id: int):
+    if request.method != "POST":
+        return redirect("profile")
+
+    addr = ShippingAddress.objects.filter(pk=address_id, user=request.user).first()
+    if not addr:
+        return redirect("profile")
+
+    was_default = addr.is_default
+    addr.delete()
+
+    if was_default:
+        next_default = (
+            ShippingAddress.objects.filter(user=request.user).order_by("-updated_at").first()
+        )
+        if next_default:
+            next_default.is_default = True
+            next_default.save(update_fields=["is_default"])
+
+    return redirect("profile")
+
+
+@login_required
+def address_set_default(request, address_id: int):
+    if request.method != "POST":
+        return redirect("profile")
+
+    addr = ShippingAddress.objects.filter(pk=address_id, user=request.user).first()
+    if not addr:
+        return redirect("profile")
+
+    ShippingAddress.objects.filter(user=request.user).update(is_default=False)
+    addr.is_default = True
+    addr.save(update_fields=["is_default"])
+    return redirect("profile")

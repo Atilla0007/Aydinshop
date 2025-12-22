@@ -3,6 +3,7 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 
 
 def order_receipt_upload_to(instance, filename: str) -> str:
@@ -112,6 +113,13 @@ class Order(models.Model):
         ('rejected', 'رد شد'),
     )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+    shipping_address = models.ForeignKey(
+        "ShippingAddress",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     total_price = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
@@ -184,3 +192,35 @@ class ManualInvoiceSequence(models.Model):
     def get_solo(cls) -> "ManualInvoiceSequence":
         obj, _ = cls.objects.get_or_create(pk=1, defaults={"last_number": 0})
         return obj
+
+
+class ShippingAddress(models.Model):
+    """Multiple saved addresses per user with a single default."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="shipping_addresses")
+    label = models.CharField(max_length=120, blank=True)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField(blank=True)
+    province = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    address = models.TextField()
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "آدرس ارسال"
+        verbose_name_plural = "آدرس‌های ارسال"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=Q(is_default=True),
+                name="unique_default_address_per_user",
+            )
+        ]
+
+    def __str__(self) -> str:
+        label = self.label or f"{self.city} - {self.province}"
+        return f"{label} ({self.user.username})"
