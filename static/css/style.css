@@ -809,6 +809,66 @@ input::placeholder {
     margin-top: 1.4rem;
 }
 
+.button {
+    line-height: 1;
+    text-decoration: none;
+    display: inline-flex;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--clr);
+    color: var(--text);
+    border-radius: 10rem;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    padding-left: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background-color 0.3s;
+}
+
+.shop-cta-button {
+    --clr: var(--accent-2);
+}
+
+.button__icon-wrapper {
+    flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    color: var(--bg);
+    background-color: var(--text);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.button:hover {
+    background-color: var(--bg);
+}
+
+.button:hover .button__icon-wrapper {
+    color: var(--bg);
+}
+
+.button__icon-svg--copy {
+    position: absolute;
+    transform: translate(-150%, 150%);
+}
+
+.button:hover .button__icon-svg:first-child {
+    transition: transform 0.3s ease-in-out;
+    transform: translate(150%, -150%);
+}
+
+.button:hover .button__icon-svg--copy {
+    transition: transform 0.3s ease-in-out 0.1s;
+    transform: translate(0);
+}
+
 .hero-meta {
     display: flex;
     flex-wrap: wrap;
@@ -3041,6 +3101,100 @@ body.modal-open {
     flex: 0 0 auto;
 }
 
+.animated-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 14px 32px;
+    border: 2px solid transparent;
+    font-size: 16px;
+    background-color: var(--surface-2);
+    border-radius: 100px;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 0 0 2px var(--text);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    text-decoration: none;
+}
+
+.animated-button svg {
+    position: absolute;
+    width: 24px;
+    fill: var(--text);
+    z-index: 2;
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animated-button .arr-1 {
+    right: 16px;
+}
+
+.animated-button .arr-2 {
+    left: -25%;
+}
+
+.animated-button .circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background-color: var(--text);
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animated-button .text {
+    position: relative;
+    z-index: 3;
+    transform: translateX(-12px);
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animated-button:hover {
+    box-shadow: 0 0 0 12px transparent;
+    color: var(--bg);
+    border-radius: 12px;
+}
+
+.animated-button:hover .arr-1 {
+    right: -25%;
+}
+
+.animated-button:hover .arr-2 {
+    left: 16px;
+}
+
+.animated-button:hover .text {
+    transform: translateX(12px);
+}
+
+.animated-button:hover svg {
+    fill: var(--bg);
+}
+
+.animated-button:active {
+    scale: 0.95;
+    box-shadow: 0 0 0 4px var(--accent-2);
+}
+
+.animated-button:hover .circle {
+    width: 220px;
+    height: 220px;
+    opacity: 1;
+}
+
+.filter-actions .animated-button {
+    flex: 1 1 160px;
+    width: 100%;
+}
+
 .sidebar-toggle-btn {
     position: relative;
     width: 150px;
@@ -4978,6 +5132,50 @@ select {
 
 .user-menu.open .user-menu-dropdown {
     display: block;
+}
+
+.user-profile {
+    width: 131px;
+    height: 51px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    background: linear-gradient(to bottom right, var(--accent-2) 0%, rgba(88, 111, 124, 0) 30%);
+    background-color: rgba(88, 111, 124, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.user-profile:hover,
+.user-profile:focus {
+    background-color: rgba(88, 111, 124, 0.7);
+    box-shadow: 0 0 10px rgba(88, 111, 124, 0.5);
+    outline: none;
+}
+
+.user-profile-inner {
+    width: 127px;
+    height: 47px;
+    border-radius: 13px;
+    background-color: var(--bg-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.user-profile-inner p {
+    margin: 0;
+}
+
+.user-profile-inner svg {
+    width: 27px;
+    height: 27px;
+    fill: var(--text);
 }
 
 /* Inputs: darker background when filled/idle (except submit buttons) */
