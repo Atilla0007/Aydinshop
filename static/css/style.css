@@ -5207,8 +5207,21 @@ select {
     justify-content: center;
 }
 
-.orders-filters .btn.btn-primary {
-    margin-top: 0.6rem;
+.orders-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: flex-end;
+}
+
+.orders-filters .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.orders-filters .filter-field.grow {
+    flex: 1 1 220px;
 }
 
 .addresses-card {
