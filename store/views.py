@@ -379,29 +379,28 @@ def checkout(request):
         if values['address_id'].isdigit():
             selected_address = ShippingAddress.objects.filter(user=request.user, pk=int(values['address_id'])).first()
 
-                errors: dict[str, str] = {}
+        errors: dict[str, str] = {}
         if not values['first_name']:
-            errors['first_name'] = 'باید نام را وارد کنید.'
+            errors['first_name'] = "باید نام را وارد کنید."
         if not values['last_name']:
-            errors['last_name'] = 'باید نام خانوادگی را وارد کنید.'
+            errors['last_name'] = "باید نام خانوادگی را وارد کنید."
         if not values['phone']:
-            errors['phone'] = 'باید شماره موبایل را وارد کنید.'
+            errors['phone'] = "باید شماره موبایل را وارد کنید."
         if not values['province']:
-            errors['province'] = 'باید استان را انتخاب کنید.'
+            errors['province'] = "باید استان را انتخاب کنید."
         if not values['city']:
-            errors['city'] = 'باید شهر را انتخاب کنید.'
+            errors['city'] = "باید شهر را انتخاب کنید."
         if not values['address']:
-            errors['address'] = 'باید آدرس کامل را وارد کنید.'
+            errors['address'] = "باید آدرس کامل را وارد کنید."
         if not values['accept_terms']:
-            errors['accept_terms'] = 'لطفاً با قوانین و حریم خصوصی موافقت کنید.'
+            errors['accept_terms'] = "لطفاً با قوانین و حریم خصوصی موافقت کنید."
 
         if values['phone']:
             new_phone = values['phone'].replace(' ', '').replace('-', '')
             values['phone'] = new_phone
 
         if not profile.phone_verified:
-            errors['phone_verified'] = 'برای ثبت سفارش باید موبایل خود را تأیید کنید.'
-            errors['phone_verified'] = 'برای ثبت سفارش باید موبایل خود را تأیید کنید.'
+            errors['phone_verified'] = "برای ثبت سفارش باید موبایل خود را تأیید کنید."
 
         discount_code = values.get('discount_code_applied') or ""
         if discount_code:
@@ -1086,6 +1085,9 @@ def compare(request):
         'related_products': related_products,
         'other_products': other_products,
     })
+
+
+
 
 
 
