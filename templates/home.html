@@ -316,22 +316,22 @@
 
 <section class="section latest-news">
     <div class="container">
-        <h2 class="section-title">آخرین اخبار</h2>
+        <h2 class="section-title">????? ?????</h2>
         <div class="news-grid">
             {% for item in news %}
             <article class="news-card">
                 <a href="{% url 'news_detail' item.pk %}">
                     <h3>{{ item.title }}</h3>
-                    <p>{{ item.text|truncatechars:120 }}</p>
+                    <p>{{ item.text|truncatechars:220 }}</p>
                     <span class="news-date">{{ item.created_at|jalali:"Y/m/d" }}</span>
                 </a>
             </article>
             {% empty %}
-            <p class="empty-text">خبر جدیدی یافت نشد.</p>
+            <p class="empty-text">????? ??? ????? ??????.</p>
             {% endfor %}
         </div>
         <div class="section-cta-center">
-            <a href="{% url 'news_list' %}" class="btn btn-outline small">مشاهده همه اخبار</a>
+            <a href="{% url 'news_list' %}" class="btn btn-outline small">?????? ??? ?????</a>
         </div>
     </div>
 </section>

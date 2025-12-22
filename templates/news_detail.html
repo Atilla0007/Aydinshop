@@ -3,32 +3,54 @@
 {% block title %}{{ item.title }}{% endblock %}
 
 {% block content %}
-<section class="section">
-    <div class="container">
-        <div class="news-detail">
-            <span class="news-date">{{ item.created_at|jalali:"Y/m/d" }}</span>
-            <h1>{{ item.title }}</h1>
-            <div class="news-body">
-                <p>{{ item.text|linebreaks }}</p>
-            </div>
+<section class="section news-detail-section">
+  <div class="container">
+    <div class="news-detail-layout">
+      <div class="news-detail-main">
+        <article class="news-detail-card">
+          <span class="news-date">{{ item.created_at|jalali:"Y/m/d" }}</span>
+          <h1>{{ item.title }}</h1>
+          <div class="news-body">
+            {{ item.text|linebreaks }}
+          </div>
+        </article>
+      </div>
+      <aside class="news-detail-aside">
+        <div class="news-meta-card">
+          <h3>جزئیات خبر</h3>
+          <div class="news-meta-row">
+            <span>تاریخ انتشار</span>
+            <span>{{ item.created_at|jalali:"Y/m/d" }}</span>
+          </div>
+          <div class="news-meta-row">
+            <span>شناسه خبر</span>
+            <span>#{{ item.id }}</span>
+          </div>
         </div>
-
-        {% if latest %}
-        <div class="related-news">
-            <h2>خبرهای مرتبط</h2>
-            <div class="news-grid">
-                {% for n in latest %}
-                <article class="news-card">
-                    <a href="{% url 'news_detail' n.pk %}">
-                        <h3>{{ n.title }}</h3>
-                        <p>{{ n.text|truncatechars:140 }}</p>
-                        <span class="news-date">{{ n.created_at|jalali:"Y/m/d" }}</span>
-                    </a>
-                </article>
-                {% endfor %}
-            </div>
+        <div class="news-meta-card">
+          <h3>راهنما</h3>
+          <a href="{% url 'news_list' %}" class="btn btn-outline small">بازگشت به اخبار</a>
+          <a href="{% url 'contact' %}" class="btn btn-primary small">مشاوره و تماس</a>
         </div>
-        {% endif %}
+      </aside>
     </div>
+
+    {% if latest %}
+      <div class="related-news">
+        <h2>خبرهای مرتبط</h2>
+        <div class="news-grid">
+          {% for n in latest %}
+            <article class="news-card">
+              <a href="{% url 'news_detail' n.pk %}">
+                <h3>{{ n.title }}</h3>
+                <p>{{ n.text|truncatechars:180 }}</p>
+                <span class="news-date">{{ n.created_at|jalali:"Y/m/d" }}</span>
+              </a>
+            </article>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
 </section>
 {% endblock %}

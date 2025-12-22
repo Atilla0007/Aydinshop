@@ -50,6 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    sidebar?.addEventListener('click', (event) => {
+        const target = event.target;
+        const button = target && target.closest ? target.closest('button[data-url]') : null;
+        if (!button) return;
+        event.preventDefault();
+        gotoPage(button);
+    });
+
     toggle?.addEventListener('click', () => {
         if (!sidebar) return;
         if (sidebar.classList.contains('open')) {
