@@ -20,6 +20,7 @@ from urllib.parse import parse_qs, quote, urlencode, urlparse, urlunparse
 from .invoice import render_manual_invoice_pdf, render_order_invoice_pdf
 from .models import Product, CartItem, Order, OrderItem, Category, ManualInvoiceSequence, ShippingAddress, ProductReview
 from .forms import ProductReviewForm
+from .utils import build_gallery_images, get_primary_image_url
 from accounts.models import UserProfile
 from core.models import DiscountCode, DiscountRedemption, ShippingSettings
 from core.utils.formatting import format_money
@@ -240,6 +241,9 @@ def shop(request):
         order_fields = ["-created_at", "-id"]
 
     products = products.order_by("-is_available", *order_fields)
+    products = list(products)
+    for product in products:
+        product.card_image_url = get_primary_image_url(product)
 
     return render(request, 'store/shop.html', {
         'products': products,
@@ -280,6 +284,7 @@ def product_detail(request, pk):
     features = product.features.all()
     absolute_url = request.build_absolute_uri()
     review_submitted = False
+    gallery_images = build_gallery_images(product)
 
     if request.method == "POST":
         review_form = ProductReviewForm(request.POST)
@@ -309,6 +314,7 @@ def product_detail(request, pk):
         'avg_rating': avg_rating,
         'review_count': reviews_qs.count(),
         'review_submitted': review_submitted,
+        'gallery_images': gallery_images,
     })
 
 

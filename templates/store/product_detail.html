@@ -18,12 +18,12 @@
       <div class="product-detail-media">
         <div class="product-media-card">
           <div class="product-media-inner">
-            {% with images=product.images.all %}
+            {% with images=gallery_images %}
             <div class="product-gallery" data-product-gallery tabindex="0" aria-roledescription="carousel" aria-label="گالری تصاویر محصول">
               <div class="product-gallery-main" data-gallery-main>
                 {% for image in images %}
                   <div class="product-gallery-slide{% if forloop.first %} is-active{% endif %}" data-gallery-slide>
-                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" loading="lazy" decoding="async">
+                    <img src="{{ image.url }}" alt="{{ image.alt|default:product.name }}" loading="lazy" decoding="async">
                   </div>
                 {% empty %}
                   <div class="product-gallery-slide is-active" data-gallery-slide>
@@ -42,7 +42,7 @@
                 </button>
               </div>
 
-              {% if images %}
+              {% if images|length > 1 %}
               <div class="product-gallery-thumbs" data-gallery-thumbs aria-label="تصاویر بندانگشتی">
                 {% for image in images %}
                   <button
@@ -52,7 +52,7 @@
                     data-index="{{ forloop.counter0 }}"
                     aria-label="مشاهده تصویر {{ forloop.counter }}"
                   >
-                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" loading="lazy" decoding="async">
+                    <img src="{{ image.url }}" alt="{{ image.alt|default:product.name }}" loading="lazy" decoding="async">
                   </button>
                 {% endfor %}
               </div>

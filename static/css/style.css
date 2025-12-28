@@ -1530,8 +1530,7 @@ textarea:focus {
     border-radius: 16px;
     overflow: hidden;
     background: rgba(0, 0, 0, 0.2);
-    aspect-ratio: 16 / 9;
-    min-height: 240px;
+    height: clamp(320px, 45vw, 520px);
 }
 
 .product-gallery-slide {
@@ -1553,7 +1552,7 @@ textarea:focus {
 .product-gallery-slide img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     border-radius: 12px;
 }
@@ -1642,8 +1641,7 @@ textarea:focus {
 
 @media (max-width: 900px) {
     .product-gallery-main {
-        aspect-ratio: 4 / 3;
-        min-height: 220px;
+        height: clamp(240px, 65vw, 440px);
     }
 }
 

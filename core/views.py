@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 
 from store.models import Category, Product, ProductReview
+from store.utils import get_primary_image_url
 
 from .forms import ContactForm
 from .models import News
@@ -54,6 +55,13 @@ def home(request):
             cart_product_ids = {int(k) for k in session_cart.keys() if str(k).isdigit()}
     except Exception:
         cart_product_ids = set()
+
+    products = list(products)
+    top_viewed_products = list(top_viewed_products)
+    for product in products:
+        product.card_image_url = get_primary_image_url(product)
+    for product in top_viewed_products:
+        product.card_image_url = get_primary_image_url(product)
 
     context = {
         "products": products,
