@@ -27,6 +27,16 @@ from core.utils.jalali import format_jalali
 
 
 SESSION_CART_KEY = 'cart'
+DIGIT_TRANS = str.maketrans(
+    "\u06f0\u06f1\u06f2\u06f3\u06f4\u06f5\u06f6\u06f7\u06f8\u06f9\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669",
+    "01234567890123456789",
+)
+
+
+def _normalize_digits(value: str) -> str:
+    if not value:
+        return value
+    return value.translate(DIGIT_TRANS)
 
 
 def _send_order_payment_submitted_email_nonblocking(*, order_id: int, request=None) -> None:
@@ -194,8 +204,8 @@ def shop(request):
         cleaned = str(value).strip()
         if not cleaned:
             return None
-        cleaned = cleaned.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789"))
-        cleaned = cleaned.replace(",", "").replace("٬", "").replace("،", "")
+        cleaned = _normalize_digits(cleaned)
+        cleaned = cleaned.replace(",", "").replace("\u066c", "").replace("\u066b", "").replace("\u060c", "")
         digits = "".join(ch for ch in cleaned if ch.isdigit())
         if not digits:
             return None
@@ -253,7 +263,7 @@ def shop_suggest(request):
     query = (request.GET.get("q") or "").strip()
     if len(query) < 2:
         return JsonResponse({"suggestions": []})
-    query = query.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789"))
+    query = _normalize_digits(query)
     suggestions = list(
         Product.objects.filter(Q(name__icontains=query) | Q(domain__icontains=query))
         .values_list("name", flat=True)
@@ -310,7 +320,7 @@ def add_to_cart(request, pk):
         )
         return redirect(next_url)
     raw_qty = (request.POST.get('qty') or request.GET.get('qty') or '1').strip()
-    raw_qty = raw_qty.translate(str.maketrans("غ°غ±غ²غ³غ´غµغ¶غ·غ¸غ¹ظ ظ،ظ¢ظ£ظ¤ظ¥ظ¦ظ§ظ¨ظ©", "01234567890123456789"))
+    raw_qty = _normalize_digits(raw_qty)
     try:
         qty = int(raw_qty)
     except (TypeError, ValueError):
@@ -467,7 +477,7 @@ def checkout(request):
     def normalize_digits(value: str) -> str:
         if not value:
             return value
-        return value.translate(str.maketrans("غ°غ±غ²غ³غ´غµغ¶غ·غ¸غ¹ظ ظ،ظ¢ظ£ظ¤ظ¥ظ¦ظ§ظ¨ظ©", "01234567890123456789"))
+        return _normalize_digits(value)
 
     def compute_shipping(province_value: str | None, effective_subtotal: int) -> tuple[int, bool, bool, int]:
         province_selected = bool((province_value or "").strip())
