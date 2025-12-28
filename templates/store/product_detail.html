@@ -18,10 +18,47 @@
       <div class="product-detail-media">
         <div class="product-media-card">
           <div class="product-media-inner">
-            <picture>
-              <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
-              <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
-            </picture>
+            {% with images=product.images.all %}
+            <div class="product-gallery" data-product-gallery tabindex="0" aria-roledescription="carousel" aria-label="گالری تصاویر محصول">
+              <div class="product-gallery-main" data-gallery-main>
+                {% for image in images %}
+                  <div class="product-gallery-slide{% if forloop.first %} is-active{% endif %}" data-gallery-slide>
+                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" loading="lazy" decoding="async">
+                  </div>
+                {% empty %}
+                  <div class="product-gallery-slide is-active" data-gallery-slide>
+                    <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+                  </div>
+                {% endfor %}
+                <button class="gallery-nav prev" type="button" data-gallery-prev aria-label="عکس قبلی">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+                <button class="gallery-nav next" type="button" data-gallery-next aria-label="عکس بعدی">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+              </div>
+
+              {% if images %}
+              <div class="product-gallery-thumbs" data-gallery-thumbs aria-label="تصاویر بندانگشتی">
+                {% for image in images %}
+                  <button
+                    class="product-gallery-thumb{% if forloop.first %} is-active{% endif %}"
+                    type="button"
+                    data-gallery-thumb
+                    data-index="{{ forloop.counter0 }}"
+                    aria-label="مشاهده تصویر {{ forloop.counter }}"
+                  >
+                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" loading="lazy" decoding="async">
+                  </button>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            {% endwith %}
           </div>
         </div>
 
@@ -197,6 +234,10 @@
   </div>
 
 </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/product-gallery.js' %}" defer></script>
 {% endblock %}
 
 {% block extra_js %}

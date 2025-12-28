@@ -5,7 +5,23 @@ from django.utils.html import format_html
 
 from accounts.sms import send_sms
 from .emails import send_order_payment_approved_email
-from .models import CartItem, Category, ManualInvoiceSequence, Order, OrderItem, Product, ProductReview, ShippingAddress
+from .models import (
+    CartItem,
+    Category,
+    ManualInvoiceSequence,
+    Order,
+    OrderItem,
+    Product,
+    ProductImage,
+    ProductReview,
+    ShippingAddress,
+)
+
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+    fields = ("image", "alt_text", "is_primary", "sort_order")
 
 
 @admin.register(Product)
@@ -13,6 +29,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ("name", "category", "domain", "price", "is_available", "view_count", "sales_count")
     list_filter = ("category", "domain", "is_available")
     search_fields = ("name", "domain")
+    inlines = [ProductImageInline]
 
 
 @admin.register(Category)

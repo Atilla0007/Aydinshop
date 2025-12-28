@@ -113,10 +113,16 @@
             {% for product in products %}
             <div class="product-card{% if not product.is_available %} unavailable{% endif %}" data-product-card data-href="{% url 'product_detail' product.id %}">
                 <div class="product-image">
-                    <picture>
-                        <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
-                        <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
-                    </picture>
+                    {% with primary=product.primary_image %}
+                        {% if primary %}
+                            <img src="{{ primary.image.url }}" alt="{{ primary.alt_text|default:product.name }}" loading="lazy" decoding="async">
+                        {% else %}
+                            <picture>
+                                <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
+                                <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+                            </picture>
+                        {% endif %}
+                    {% endwith %}
                     {% if not product.is_available %}
                         <span class="product-badge unavailable">ناموجود</span>
                     {% endif %}
@@ -184,10 +190,16 @@
             {% for product in top_viewed_products %}
             <div class="product-card{% if not product.is_available %} unavailable{% endif %}" data-product-card data-href="{% url 'product_detail' product.id %}">
                 <div class="product-image">
-                    <picture>
-                        <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
-                        <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
-                    </picture>
+                    {% with primary=product.primary_image %}
+                        {% if primary %}
+                            <img src="{{ primary.image.url }}" alt="{{ primary.alt_text|default:product.name }}" loading="lazy" decoding="async">
+                        {% else %}
+                            <picture>
+                                <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
+                                <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+                            </picture>
+                        {% endif %}
+                    {% endwith %}
                     {% if not product.is_available %}
                         <span class="product-badge unavailable">ناموجود</span>
                     {% endif %}

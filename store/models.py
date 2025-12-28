@@ -27,6 +27,13 @@ def order_receipt_upload_to(instance, filename: str) -> str:
     return f"payments/receipts/{order_number}{ext}"
 
 
+def product_image_upload_to(instance, filename: str) -> str:
+    """Store product images under media/products/<product_id>/."""
+    base_name = Path(filename).name
+    product_id = instance.product_id or "unassigned"
+    return f"products/{product_id}/{base_name}"
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
@@ -66,6 +73,32 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def primary_image(self):
+        images = list(self.images.all())
+        if not images:
+            return None
+        for img in images:
+            if img.is_primary:
+                return img
+        return images[0]
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+    image = models.FileField(upload_to=product_image_upload_to)
+    alt_text = models.CharField(max_length=200, blank=True)
+    is_primary = models.BooleanField(default=False)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["-is_primary", "sort_order", "id"]
+        verbose_name = "تصویر محصول"
+        verbose_name_plural = "تصاویر محصولات"
+
+    def __str__(self):
+        return f"{self.product.name} - {Path(self.image.name).name}"
 
 
 class ProductFeature(models.Model):

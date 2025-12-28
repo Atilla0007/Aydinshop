@@ -174,7 +174,7 @@ def _save_compare_list(request, ids):
 
 
 def shop(request):
-    products = Product.objects.all()
+    products = Product.objects.prefetch_related("images").all()
     categories = Category.objects.all()
     brands = list(
         Product.objects.exclude(brand__isnull=True)
@@ -273,7 +273,10 @@ def shop_suggest(request):
 
 
 def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk)
+    product = get_object_or_404(
+        Product.objects.prefetch_related("features", "images"),
+        pk=pk,
+    )
     features = product.features.all()
     absolute_url = request.build_absolute_uri()
     review_submitted = False

@@ -22,9 +22,14 @@ logger = logging.getLogger(__name__)
 
 def home(request):
     """Render home page with highlighted products and news."""
-    products = Product.objects.filter(is_available=True).order_by("-created_at")[:8]
+    products = (
+        Product.objects.filter(is_available=True)
+        .prefetch_related("images")
+        .order_by("-created_at")[:8]
+    )
     top_viewed_products = (
         Product.objects.filter(is_available=True)
+        .prefetch_related("images")
         .order_by("-view_count", "-created_at")[:10]
     )
     latest_reviews = (
