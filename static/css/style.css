@@ -4272,18 +4272,19 @@ body.modal-open {
     position: relative;
     border-radius: 18px;
     overflow: hidden;
-    background: rgba(153, 161, 166, 0.18);
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 190px;
+    height: clamp(180px, 22vw, 240px);
 }
 
 .product-image img {
     display: block;
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    background: #fff;
 }
 
 /* --- News posts: center content + any image --- */
