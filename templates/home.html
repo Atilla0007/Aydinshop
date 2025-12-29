@@ -179,6 +179,15 @@
     </div>
 </section>
 
+<div class="home-more-toggle-wrap">
+    <div class="container">
+        <button type="button" class="btn btn-outline home-more-toggle" data-home-more-toggle aria-expanded="false">
+            مشاهده ادامه محتوا
+        </button>
+    </div>
+</div>
+
+<div class="home-more-sections" data-home-more>
 <section class="section top-viewed-products">
     <div class="container">
         <h2 class="section-title">پربازدیدترین محصولات</h2>
@@ -370,8 +379,10 @@
         </div>
     </div>
 </section>
+</div>
 {% endblock %}
 
 {% block extra_js %}
   <script src="{% static 'js/shop.js' %}" defer></script>
+  <script src="{% static 'js/home.js' %}" defer></script>
 {% endblock %}

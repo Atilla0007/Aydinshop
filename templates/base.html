@@ -203,12 +203,16 @@
     </div>
   </div>
 </aside>
+<button type="button" id="scroll-top-btn" class="scroll-top-btn" aria-label="بازگشت به بالا">
+  <i class="bx bx-up-arrow-alt" aria-hidden="true"></i>
+</button>
 <script src="{% static 'js/mini-cart.js' %}" defer></script>
 {% if request.resolver_match.url_name == 'home' and public_promo %}
 <script src="{% static 'js/banner.js' %}" defer></script>
 {% endif %}
 <script src="{% static 'js/sidebar.js' %}" defer></script>
 <script src="{% static 'js/theme.js' %}" defer></script>
+<script src="{% static 'js/site-ui.js' %}" defer></script>
 {% if user.is_authenticated %}
 <script src="{% static 'js/user-menu.js' %}" defer></script>
 {% endif %}
