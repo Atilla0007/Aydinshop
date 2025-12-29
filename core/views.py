@@ -23,15 +23,25 @@ logger = logging.getLogger(__name__)
 
 def home(request):
     """Render home page with highlighted products and news."""
-    products = (
-        Product.objects.filter(is_available=True)
-        .prefetch_related("images")
-        .order_by("-created_at")[:8]
-    )
-    top_viewed_products = (
-        Product.objects.filter(is_available=True)
-        .prefetch_related("images")
-        .order_by("-view_count", "-created_at")[:10]
+    base_products = Product.objects.filter(is_available=True).prefetch_related("images")
+    used_ids: set[int] = set()
+
+    def _pick_unique(qs):
+        for item in qs[:10]:
+            if item.id in used_ids:
+                continue
+            used_ids.add(item.id)
+            return item
+        return None
+
+    best_seller = _pick_unique(base_products.order_by("-sales_count", "-created_at"))
+    most_viewed = _pick_unique(base_products.order_by("-view_count", "-created_at"))
+    newest = _pick_unique(base_products.order_by("-created_at"))
+
+    featured_products = [p for p in (best_seller, most_viewed, newest) if p]
+    featured_ids = [p.id for p in featured_products]
+    more_products = list(
+        base_products.exclude(id__in=featured_ids).order_by("-created_at")[:7]
     )
     latest_reviews = (
         ProductReview.objects.filter(is_approved=True)
@@ -56,16 +66,14 @@ def home(request):
     except Exception:
         cart_product_ids = set()
 
-    products = list(products)
-    top_viewed_products = list(top_viewed_products)
-    for product in products:
+    for product in featured_products:
         product.card_image_url = get_primary_image_url(product)
-    for product in top_viewed_products:
+    for product in more_products:
         product.card_image_url = get_primary_image_url(product)
 
     context = {
-        "products": products,
-        "top_viewed_products": top_viewed_products,
+        "home_featured_products": featured_products,
+        "home_more_products": more_products,
         "latest_reviews": latest_reviews,
         "news": news,
         "categories": categories,

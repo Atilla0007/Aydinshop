@@ -1,24 +1,37 @@
 (() => {
-  const toggle = document.querySelector('[data-home-more-toggle]');
-  const sections = document.querySelector('[data-home-more]');
+  const initToggle = (toggle, target, openText, closeText) => {
+    if (!toggle || !target) {
+      return;
+    }
 
-  if (!toggle || !sections) {
-    return;
-  }
+    const updateText = () => {
+      const isOpen = target.classList.contains('is-open');
+      toggle.textContent = isOpen ? closeText : openText;
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    };
 
-  const updateText = () => {
-    const isOpen = sections.classList.contains('is-open');
-    toggle.textContent = isOpen ? 'بستن ادامه محتوا' : 'مشاهده ادامه محتوا';
-    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    toggle.addEventListener('click', () => {
+      target.classList.toggle('is-open');
+      updateText();
+      if (target.classList.contains('is-open')) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    updateText();
   };
 
-  toggle.addEventListener('click', () => {
-    sections.classList.toggle('is-open');
-    updateText();
-    if (sections.classList.contains('is-open')) {
-      sections.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
+  initToggle(
+    document.querySelector('[data-home-more-toggle]'),
+    document.querySelector('[data-home-more]'),
+    'مشاهده ادامه محتوا',
+    'بستن ادامه محتوا'
+  );
 
-  updateText();
+  initToggle(
+    document.querySelector('[data-home-products-toggle]'),
+    document.querySelector('[data-home-products-extra]'),
+    'نمایش محصولات بیشتر',
+    'بستن محصولات بیشتر'
+  );
 })();

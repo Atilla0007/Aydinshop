@@ -109,8 +109,8 @@
             محبوب‌ترین کالاهای انتخاب‌شده توسط مشتریان ما را ببینید و سریع خرید کنید.
         </p>
 
-        <div class="products-grid">
-            {% for product in products %}
+        <div class="products-grid home-products-grid">
+            {% for product in home_featured_products %}
             <div class="product-card{% if not product.is_available %} unavailable{% endif %}" data-product-card data-href="{% url 'product_detail' product.id %}">
                 <div class="product-image">
                     {% if product.card_image_url %}
@@ -124,10 +124,12 @@
                     {% if not product.is_available %}
                         <span class="product-badge unavailable">ناموجود</span>
                     {% endif %}
-                    {% if forloop.first %}
-                        <span class="product-badge new">جدید</span>
-                    {% elif forloop.counter == 2 %}
+                    {% if forloop.counter == 1 %}
                         <span class="product-badge best">پرفروش</span>
+                    {% elif forloop.counter == 2 %}
+                        <span class="product-badge viewed">پربازدید</span>
+                    {% elif forloop.counter == 3 %}
+                        <span class="product-badge new">جدید</span>
                     {% endif %}
                 </div>
                 <div class="product-info">
@@ -173,28 +175,15 @@
             {% endfor %}
         </div>
 
-        <div class="section-cta-center">
-            <a href="{% url 'shop' %}" class="btn btn-outline">مشاهده همه محصولات</a>
+        {% if home_more_products %}
+        <div class="home-products-toggle">
+            <button type="button" class="btn btn-outline home-products-toggle-btn" data-home-products-toggle aria-expanded="false">
+                نمایش محصولات بیشتر
+            </button>
         </div>
-    </div>
-</section>
 
-<div class="home-more-toggle-wrap">
-    <div class="container">
-        <button type="button" class="btn btn-outline home-more-toggle" data-home-more-toggle aria-expanded="false">
-            مشاهده ادامه محتوا
-        </button>
-    </div>
-</div>
-
-<div class="home-more-sections" data-home-more>
-<section class="section top-viewed-products">
-    <div class="container">
-        <h2 class="section-title">پربازدیدترین محصولات</h2>
-        <p class="section-subtitle">این محصولات بیشترین بازدید را در سایت داشته‌اند.</p>
-
-        <div class="products-grid">
-            {% for product in top_viewed_products %}
+        <div class="products-grid home-products-extra" data-home-products-extra>
+            {% for product in home_more_products %}
             <div class="product-card{% if not product.is_available %} unavailable{% endif %}" data-product-card data-href="{% url 'product_detail' product.id %}">
                 <div class="product-image">
                     {% if product.card_image_url %}
@@ -213,9 +202,6 @@
                     <h3>{{ product.name }}</h3>
                     <p class="product-domain">{{ product.domain }}</p>
                     <p class="product-price">{{ product.price|money }} تومان</p>
-                    <div class="product-metrics">
-                        <span>فروش: {{ product.sales_count|money }}</span>
-                    </div>
                 </div>
 
                 <div class="product-card-cart" data-no-card-nav>
@@ -223,7 +209,7 @@
                         <div class="checkbox-wrapper">
                             <input
                                 class="checkbox"
-                                id="top-cart-toggle-{{ product.id }}"
+                                id="home-more-cart-toggle-{{ product.id }}"
                                 type="checkbox"
                                 data-cart-toggle
                                 data-product-id="{{ product.id }}"
@@ -232,7 +218,7 @@
                                 {% if product.id in cart_product_ids %}checked{% endif %}
                                 {% if not product.is_available %}disabled aria-disabled="true"{% endif %}
                             />
-                            <label class="checkbox-label" for="top-cart-toggle-{{ product.id }}">
+                            <label class="checkbox-label" for="home-more-cart-toggle-{{ product.id }}">
                                 <div class="checkbox-flip">
                                     <div class="checkbox-front" aria-hidden="true">
                                         <svg fill="white" height="28" width="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -250,12 +236,23 @@
                     </div>
                 </div>
             </div>
-            {% empty %}
-            <p class="empty-text">هنوز داده‌ای برای نمایش وجود ندارد.</p>
             {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="section-cta-center">
+            <a href="{% url 'shop' %}" class="btn btn-outline">مشاهده همه محصولات</a>
         </div>
     </div>
 </section>
+
+<div class="home-more-toggle-wrap">
+    <div class="container">
+        <button type="button" class="btn btn-outline home-more-toggle" data-home-more-toggle aria-expanded="false">مشاهده ادامه محتوا</button>
+    </div>
+</div>
+
+<div class="home-more-sections" data-home-more>
 
 <section class="section steps">
     <div class="container">
@@ -360,7 +357,7 @@
 
 <section class="section latest-news">
     <div class="container">
-        <h2 class="section-title">????? ?????</h2>
+        <h2 class="section-title">آخرین اخبار</h2>
         <div class="news-grid">
             {% for item in news %}
             <article class="news-card">
@@ -371,11 +368,11 @@
                 </a>
             </article>
             {% empty %}
-            <p class="empty-text">????? ??? ????? ??????.</p>
+            <p class="empty-text">هنوز خبری ثبت نشده است.</p>
             {% endfor %}
         </div>
         <div class="section-cta-center">
-            <a href="{% url 'news_list' %}" class="btn btn-outline small">?????? ??? ?????</a>
+            <a href="{% url 'news_list' %}" class="btn btn-outline small">مشاهده همه اخبار</a>
         </div>
     </div>
 </section>
