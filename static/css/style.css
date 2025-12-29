@@ -1,7 +1,35 @@
 @font-face {
-    font-family: "IranKharazmi";
-    src: url("../fonts/IRAN%20Kharazmi.woff") format("woff");
+    font-family: "Divan";
+    src: url("../fonts/Divan-Black.woff2") format("woff2"),
+        url("../fonts/Divan-Black.woff") format("woff");
     font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Divan";
+    src: url("../fonts/Divan-Black.woff2") format("woff2"),
+        url("../fonts/Divan-Black.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "DivanFaNum";
+    src: url("../fonts/Divan-FaNum-Black.woff2") format("woff2"),
+        url("../fonts/Divan-FaNum-Black.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "DivanFaNum";
+    src: url("../fonts/Divan-FaNum-Black.woff2") format("woff2"),
+        url("../fonts/Divan-FaNum-Black.woff") format("woff");
+    font-weight: 700;
     font-style: normal;
     font-display: swap;
 }
@@ -80,7 +108,7 @@ html {
 
 body.body {
     margin: 0;
-    font-family: "IranKharazmi", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "DivanFaNum", "Divan", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: var(--bg);
     color: var(--text);
     direction: rtl;
@@ -95,7 +123,7 @@ input,
 select,
 textarea,
 option {
-    font-family: "IranKharazmi", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "DivanFaNum", "Divan", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .visually-hidden {
@@ -3494,7 +3522,7 @@ body.modal-open {
     border: none;
     transition: all 0.5s ease-in-out;
     font-size: 20px;
-    font-family: "IranKharazmi", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "DivanFaNum", "Divan", Verdana, Geneva, Tahoma, sans-serif;
     font-weight: 600;
     display: flex;
     align-items: center;

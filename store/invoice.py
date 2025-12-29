@@ -27,8 +27,24 @@ def _rtl(text: str) -> str:
 
 def _register_invoice_font() -> str:
     fonts_dir = Path(settings.BASE_DIR) / "static" / "fonts"
+    divan_fanum_path = fonts_dir / "Divan-FaNum.ttf"
+    divan_path = fonts_dir / "Divan.ttf"
     preferred_path = fonts_dir / "IRAN-Kharazmi.ttf"
     fallback_path = fonts_dir / "Vazirmatn-Regular.ttf"
+
+    if divan_fanum_path.exists():
+        try:
+            pdfmetrics.registerFont(TTFont("DivanFaNum", str(divan_fanum_path)))
+        except Exception:
+            pass
+        return "DivanFaNum"
+
+    if divan_path.exists():
+        try:
+            pdfmetrics.registerFont(TTFont("Divan", str(divan_path)))
+        except Exception:
+            pass
+        return "Divan"
 
     if preferred_path.exists():
         try:
