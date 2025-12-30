@@ -1,4 +1,4 @@
-Django>=5.2.8
+Django==5.2.8
 django-crispy-forms
 django-jazzmin
 django-otp>=1.6.3
