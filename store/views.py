@@ -95,22 +95,110 @@ def _set_session_cart(request, cart: dict[str, int]) -> None:
     request.session[SESSION_CART_KEY] = cart
 
 
-def _check_discount_eligibility(discount: DiscountCode, user) -> tuple[bool, str]:
-    """Return eligibility for a discount code (limits + assigned user)."""
+def _check_discount_eligibility(
+    discount: DiscountCode,
+    user,
+    *,
+    items_subtotal: int | None = None,
+    cart_items=None,
+) -> dict:
+    """Return eligibility for a discount code (limits + scope)."""
 
     if discount.assigned_user_id and discount.assigned_user_id != user.id:
-        return False, 'ط§غŒظ† ع©ط¯ ظپظ‚ط· ط¨ط±ط§غŒ ع©ط§ط±ط¨ط± ظ…ط´ط®طµ ط´ط¯ظ‡ ظ‚ط§ط¨ظ„ ط§ط³طھظپط§ط¯ظ‡ ط§ط³طھ.'
+        return {
+            "ok": False,
+            "message": "این کد تخفیف فقط برای حساب مشخصی فعال شده و برای شما قابل استفاده نیست.",
+            "level": "error",
+            "eligible_subtotal": int(items_subtotal or 0),
+            "note": "",
+        }
 
     if discount.max_uses is not None and int(discount.uses_count or 0) >= int(discount.max_uses):
-        return False, 'ط¸ط±ظپغŒطھ ط§ط³طھظپط§ط¯ظ‡ ط§ط² ط§غŒظ† ع©ط¯ طھع©ظ…غŒظ„ ط´ط¯ظ‡ ط§ط³طھ.'
+        return {
+            "ok": False,
+            "message": "این کد تخفیف به سقف استفاده رسیده و دیگر قابل استفاده نیست.",
+            "level": "error",
+            "eligible_subtotal": int(items_subtotal or 0),
+            "note": "",
+        }
 
     if discount.max_uses_per_user:
         used_by_user = DiscountRedemption.objects.filter(discount_code=discount, user=user).count()
         if used_by_user >= int(discount.max_uses_per_user):
-            return False, 'ط§غŒظ† ع©ط¯ ظ‚ط¨ظ„ط§ظ‹ طھظˆط³ط· ط´ظ…ط§ ط§ط³طھظپط§ط¯ظ‡ ط´ط¯ظ‡ ط§ط³طھ.'
+            return {
+                "ok": False,
+                "message": "شما قبلا از این کد تخفیف استفاده کرده\u200cاید.",
+                "level": "error",
+                "eligible_subtotal": int(items_subtotal or 0),
+                "note": "",
+            }
 
-    return True, ""
-    request.session.modified = True
+    now = timezone.now()
+    if discount.valid_from and now < discount.valid_from:
+        return {
+            "ok": False,
+            "message": "این کد تخفیف هنوز فعال نشده است.",
+            "level": "info",
+            "eligible_subtotal": int(items_subtotal or 0),
+            "note": "",
+        }
+
+    if discount.valid_until and now > discount.valid_until:
+        return {
+            "ok": False,
+            "message": "مهلت استفاده از این کد تخفیف به پایان رسیده است.",
+            "level": "info",
+            "eligible_subtotal": int(items_subtotal or 0),
+            "note": "",
+        }
+
+    eligible_subtotal = int(items_subtotal or 0)
+    if items_subtotal is not None:
+        min_total = discount.min_items_subtotal
+        max_total = discount.max_items_subtotal
+        if min_total is not None and int(items_subtotal) < int(min_total):
+            return {
+                "ok": False,
+                "message": f"حداقل مبلغ کالاها برای اعمال تخفیف {format_money(min_total)} تومان است.",
+                "level": "info",
+                "eligible_subtotal": eligible_subtotal,
+                "note": "",
+            }
+        if max_total is not None and int(items_subtotal) > int(max_total):
+            return {
+                "ok": False,
+                "message": f"حداکثر مبلغ کالاها برای اعمال تخفیف {format_money(max_total)} تومان است.",
+                "level": "info",
+                "eligible_subtotal": eligible_subtotal,
+                "note": "",
+            }
+
+    note = ""
+    if cart_items is not None:
+        eligible_ids = list(discount.eligible_products.values_list("id", flat=True))
+        if eligible_ids:
+            eligible_set = set(eligible_ids)
+            eligible_subtotal = int(
+                sum(item.total_price() for item in cart_items if item.product_id in eligible_set)
+            )
+            if eligible_subtotal <= 0:
+                return {
+                    "ok": False,
+                    "message": "این کد تخفیف فقط برای برخی محصولات است و در سبد شما محصول مشمولی وجود ندارد.",
+                    "level": "info",
+                    "eligible_subtotal": 0,
+                    "note": "",
+                }
+            if items_subtotal is not None and eligible_subtotal < int(items_subtotal):
+                note = "تخفیف فقط روی برخی محصولات سبد شما اعمال می\u200cشود."
+
+    return {
+        "ok": True,
+        "message": "",
+        "level": "",
+        "eligible_subtotal": eligible_subtotal,
+        "note": note,
+    }
 
 
 def _add_to_session_cart(request, product_id: int, quantity_delta: int = 1) -> None:
@@ -406,13 +494,13 @@ def cart(request):
 def discount_preview(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     if not profile.email_verified:
-        return JsonResponse({'ok': False, 'message': 'ط§ط¨طھط¯ط§ ط§غŒظ…غŒظ„ ط®ظˆط¯ ط±ط§ طھط§غŒغŒط¯ ع©ظ†غŒط¯.'}, status=403)
+        return JsonResponse({'ok': False, 'message': 'ابتدا ایمیل خود را تایید کنید.'}, status=403)
 
     _merge_session_cart_into_user(request)
     cart_items = CartItem.objects.filter(user=request.user).select_related('product')
     items_subtotal = int(sum(item.total_price() for item in cart_items))
     if not cart_items.exists():
-        return JsonResponse({'ok': False, 'message': 'ط³ط¨ط¯ ط®ط±غŒط¯ ط´ظ…ط§ ط®ط§ظ„غŒ ط§ط³طھ.'}, status=400)
+        return JsonResponse({'ok': False, 'message': 'سبد خرید شما خالی است.'}, status=400)
 
     code = (request.POST.get('code') or '').strip().upper().replace(' ', '')
     if not code:
@@ -423,7 +511,8 @@ def discount_preview(request):
             'amount': 0,
             'items_subtotal': items_subtotal,
             'subtotal': items_subtotal,
-            'message': 'ع©ط¯ طھط®ظپغŒظپ ط­ط°ظپ ط´ط¯.',
+            'message': '',
+            'level': 'ok',
         })
 
     discount = (
@@ -432,15 +521,28 @@ def discount_preview(request):
         .first()
     )
     if not discount:
-        return JsonResponse({'ok': False, 'message': 'ع©ط¯ طھط®ظپغŒظپ ظ†ط§ظ…ط¹طھط¨ط± ط§ط³طھ.'})
+        return JsonResponse({'ok': False, 'message': 'کد تخفیف نامعتبر است.'})
 
-    is_ok, message = _check_discount_eligibility(discount, request.user)
-    if not is_ok:
-        return JsonResponse({'ok': False, 'message': message})
+    eligibility = _check_discount_eligibility(
+        discount,
+        request.user,
+        items_subtotal=items_subtotal,
+        cart_items=cart_items,
+    )
+    if not eligibility["ok"]:
+        return JsonResponse({
+            'ok': False,
+            'message': eligibility["message"],
+            'level': eligibility["level"] or 'error',
+        })
 
     percent = int(discount.percent)
-    amount = int(items_subtotal) * percent // 100
+    eligible_subtotal = int(eligibility.get("eligible_subtotal") or items_subtotal)
+    amount = eligible_subtotal * percent // 100
     subtotal = int(items_subtotal) - int(amount)
+    note = eligibility.get("note") or ""
+    level = "info" if note else "ok"
+    message = note or f"کد {code} اعمال شد ({percent}٪)."
     return JsonResponse({
         'ok': True,
         'code': code,
@@ -448,7 +550,8 @@ def discount_preview(request):
         'amount': amount,
         'items_subtotal': items_subtotal,
         'subtotal': subtotal,
-        'message': f'ع©ط¯ {code} ط§ط¹ظ…ط§ظ„ ط´ط¯ ({percent}ظھ).',
+        'message': message,
+        'level': level,
     })
 
 
@@ -501,6 +604,7 @@ def checkout(request):
     discount_code = ""
     discount_percent = 0
     discount_amount = 0
+    discount_info = ""
 
     def _normalize_discount_code(raw: str) -> str:
         return (raw or "").strip().upper().replace(" ", "")
@@ -553,14 +657,14 @@ def checkout(request):
         if not values['address']:
             errors['address'] = "باید آدرس کامل را وارد کنید."
         if not values['accept_terms']:
-            errors['accept_terms'] = "لطفاً با قوانین و حریم خصوصی موافقت کنید."
+            errors['accept_terms'] = "لطفا با قوانین و حریم خصوصی موافقت کنید."
 
         if values['phone']:
             new_phone = values['phone'].replace(' ', '').replace('-', '')
             values['phone'] = new_phone
 
         if not profile.phone_verified:
-            errors['phone_verified'] = "برای ثبت سفارش باید موبایل خود را تأیید کنید."
+            errors['phone_verified'] = "برای ثبت سفارش باید موبایل خود را تایید کنید."
 
         discount_code = values.get('discount_code_applied') or ""
         if discount_code:
@@ -570,18 +674,29 @@ def checkout(request):
                 .first()
             )
             if not discount:
-                errors['discount_code'] = 'ع©ط¯ طھط®ظپغŒظپ ظ†ط§ظ…ط¹طھط¨ط± ط§ط³طھ.'
+                errors['discount_code'] = 'کد تخفیف نامعتبر است.'
                 discount_code = ""
             else:
-                is_ok, message = _check_discount_eligibility(discount, request.user)
-                if not is_ok:
-                    errors['discount_code'] = message
-                    discount_code = ""
+                eligibility = _check_discount_eligibility(
+                    discount,
+                    request.user,
+                    items_subtotal=int(items_subtotal),
+                    cart_items=cart_items,
+                )
+                if not eligibility['ok']:
+                    if eligibility['level'] == 'info':
+                        discount_info = eligibility['message']
+                        discount_code = ""
+                    else:
+                        errors['discount_code'] = eligibility['message']
+                        discount_code = ""
                 else:
                     discount_percent = int(discount.percent)
-                    discount_amount = int(items_subtotal) * discount_percent // 100
+                    eligible_subtotal = int(eligibility.get('eligible_subtotal') or items_subtotal)
+                    discount_amount = eligible_subtotal * discount_percent // 100
                     subtotal = int(items_subtotal) - int(discount_amount)
-
+                    if eligibility.get('note'):
+                        discount_info = eligibility['note']
         shipping_applied, shipping_applicable, shipping_is_free, shipping_total_full = compute_shipping(
             values['province'],
             int(subtotal),
@@ -589,7 +704,7 @@ def checkout(request):
         total_payable = int(subtotal) + int(shipping_applied)
 
         if not cart_items:
-            errors['cart'] = 'ط³ط¨ط¯ ط®ط±غŒط¯ ط´ظ…ط§ ط®ط§ظ„غŒ ط§ط³طھ.'
+            errors['cart'] = 'سبد خرید شما خالی است.'
 
         if errors:
             return render(request, 'store/checkout.html', {
@@ -600,6 +715,7 @@ def checkout(request):
                 'discount_code': discount_code,
                 'discount_percent': discount_percent,
                 'discount_amount': discount_amount,
+        'discount_info': discount_info,
                 'shipping_fee_per_item': shipping_fee_per_item,
                 'shipping_item_count': item_count,
                 'shipping_total_full': shipping_total_full,
@@ -614,6 +730,7 @@ def checkout(request):
             })
 
         recheck_error = ""
+        recheck_info = ""
         order = None
         with transaction.atomic():
             applied_discount = None
@@ -624,23 +741,35 @@ def checkout(request):
                     .first()
                 )
                 if not applied_discount:
-                    recheck_error = 'ع©ط¯ طھط®ظپغŒظپ ظ†ط§ظ…ط¹طھط¨ط± ط§ط³طھ.'
+                    recheck_error = 'کد تخفیف نامعتبر است.'
                 else:
-                    is_ok, message = _check_discount_eligibility(applied_discount, request.user)
-                    if not is_ok:
-                        recheck_error = message
+                    eligibility = _check_discount_eligibility(
+                        applied_discount,
+                        request.user,
+                        items_subtotal=int(items_subtotal),
+                        cart_items=cart_items,
+                    )
+                    if not eligibility["ok"]:
+                        if eligibility["level"] == "info":
+                            recheck_info = eligibility["message"]
+                            discount_code = ""
+                            discount_percent = 0
+                            discount_amount = 0
+                            subtotal = int(items_subtotal)
+                        else:
+                            recheck_error = eligibility["message"]
                     else:
                         discount_percent = int(applied_discount.percent)
-                        discount_amount = int(items_subtotal) * discount_percent // 100
+                        eligible_subtotal = int(eligibility.get("eligible_subtotal") or items_subtotal)
+                        discount_amount = eligible_subtotal * discount_percent // 100
                         subtotal = int(items_subtotal) - int(discount_amount)
                         (
                             shipping_applied,
                             shipping_applicable,
                             shipping_is_free,
                             shipping_total_full,
-                        ) = compute_shipping(values['province'], int(subtotal))
+                        ) = compute_shipping(values["province"], int(subtotal))
                         total_payable = int(subtotal) + int(shipping_applied)
-
             if not recheck_error:
                 product_ids = [item.product_id for item in cart_items]
                 locked_products = list(Product.objects.select_for_update().filter(id__in=product_ids))
@@ -710,7 +839,7 @@ def checkout(request):
                 update_fields.extend(["marketing_email_opt_in", "marketing_sms_opt_in", "marketing_opt_in_updated_at"])
             if update_fields:
                 profile.save(update_fields=update_fields)
-        if recheck_error:
+        if recheck_error or recheck_info:
             discount_code = ""
             discount_percent = 0
             discount_amount = 0
@@ -720,9 +849,11 @@ def checkout(request):
                 shipping_applicable,
                 shipping_is_free,
                 shipping_total_full,
-            ) = compute_shipping(values['province'], int(subtotal))
+            ) = compute_shipping(values["province"], int(subtotal))
             total_payable = int(subtotal) + int(shipping_applied)
-            errors['discount_code'] = recheck_error
+            if recheck_error:
+                errors["discount_code"] = recheck_error
+            discount_info = recheck_info
             return render(request, 'store/checkout.html', {
                 'cart_items': cart_items,
                 'removed_unavailable': removed_unavailable,
@@ -731,6 +862,7 @@ def checkout(request):
                 'discount_code': discount_code,
                 'discount_percent': discount_percent,
                 'discount_amount': discount_amount,
+        'discount_info': discount_info,
                 'shipping_fee_per_item': shipping_fee_per_item,
                 'shipping_item_count': item_count,
                 'shipping_total_full': shipping_total_full,
@@ -776,6 +908,7 @@ def checkout(request):
         'discount_code': discount_code,
         'discount_percent': discount_percent,
         'discount_amount': discount_amount,
+        'discount_info': discount_info,
         'shipping_fee_per_item': shipping_fee_per_item,
         'shipping_item_count': item_count,
         'shipping_total_full': shipping_total_full,

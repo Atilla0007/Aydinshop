@@ -181,6 +181,76 @@ class CheckoutTests(TestCase):
         self.assertEqual(order.discount_amount, 15000)
         self.assertEqual(order.shipping_total, 10000)
 
+    def test_discount_code_applies_only_to_selected_products(self):
+        product2 = Product.objects.create(
+            name="محصول دوم",
+            description="توضیح",
+            price=50000,
+            domain="test2",
+            category=self.category,
+        )
+        code = DiscountCode.objects.create(code="PONLY", percent=10, is_active=True, is_public=False)
+        code.eligible_products.add(product2)
+
+        self.profile.phone = "09120000000"
+        self.profile.phone_verified = True
+        self.profile.save(update_fields=["phone", "phone_verified"])
+        self.client.force_login(self.user)
+
+        CartItem.objects.create(user=self.user, product=self.product, quantity=1)  # 150000
+        CartItem.objects.create(user=self.user, product=product2, quantity=2)     # 100000
+
+        response = self.client.post(
+            reverse("checkout"),
+            data={
+                "first_name": "سینا",
+                "last_name": "محمدی",
+                "phone": "09120000000",
+                "province": "تهران",
+                "city": "تهران",
+                "discount_code": "PONLY",
+                "discount_code_applied": "PONLY",
+                "address": "خیابان تست",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.items_subtotal, 250000)
+        self.assertEqual(order.discount_amount, 10000)
+        self.assertEqual(order.total_price, 240000)
+
+    def test_discount_code_min_total_ignored_when_below_threshold(self):
+        DiscountCode.objects.create(
+            code="MIN500",
+            percent=10,
+            min_items_subtotal=500000,
+            is_active=True,
+            is_public=False,
+        )
+
+        self.profile.phone = "09120000000"
+        self.profile.phone_verified = True
+        self.profile.save(update_fields=["phone", "phone_verified"])
+        self._login_and_seed_cart(quantity=1)  # 150000
+
+        response = self.client.post(
+            reverse("checkout"),
+            data={
+                "first_name": "سینا",
+                "last_name": "محمدی",
+                "phone": "09120000000",
+                "province": "تهران",
+                "city": "تهران",
+                "discount_code": "MIN500",
+                "discount_code_applied": "MIN500",
+                "address": "خیابان تست",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.discount_amount, 0)
+        self.assertEqual(order.total_price, 160000)
+
     def test_discount_code_max_uses_rejects_when_limit_reached(self):
         DiscountCode.objects.create(
             code="LIMIT1",

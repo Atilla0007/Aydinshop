@@ -122,6 +122,16 @@ class DiscountCode(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="فعال")
     is_public = models.BooleanField(default=False, verbose_name="نمایش در بنر")
     public_message = models.CharField(max_length=200, blank=True, verbose_name="متن بنر (اختیاری)")
+    valid_from = models.DateTimeField(null=True, blank=True, verbose_name="شروع اعتبار")
+    valid_until = models.DateTimeField(null=True, blank=True, verbose_name="پایان اعتبار")
+    min_items_subtotal = models.PositiveIntegerField(null=True, blank=True, verbose_name="حداقل جمع کالاها (تومان)")
+    max_items_subtotal = models.PositiveIntegerField(null=True, blank=True, verbose_name="حداکثر جمع کالاها (تومان)")
+    eligible_products = models.ManyToManyField(
+        "store.Product",
+        blank=True,
+        related_name="discount_codes",
+        verbose_name="محصولات مشمول تخفیف",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

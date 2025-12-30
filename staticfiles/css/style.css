@@ -2243,6 +2243,12 @@ textarea:focus {
     color: var(--danger);
 }
 
+.discount-feedback.info {
+    background: rgba(76, 125, 191, 0.18);
+    border-color: rgba(120, 172, 235, 0.6);
+    color: var(--text);
+}
+
 .field-tag {
     font-size: 0.72rem;
     padding: 0.12rem 0.55rem;

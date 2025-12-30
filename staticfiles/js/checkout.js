@@ -164,13 +164,14 @@
     if (!message) {
       discountFeedbackEl.textContent = '';
       discountFeedbackEl.classList.add('hidden');
-      discountFeedbackEl.classList.remove('ok', 'error');
+      discountFeedbackEl.classList.remove('ok', 'error', 'info');
       return;
     }
     discountFeedbackEl.textContent = message;
     discountFeedbackEl.classList.remove('hidden');
     discountFeedbackEl.classList.toggle('ok', type === 'ok');
     discountFeedbackEl.classList.toggle('error', type === 'error');
+    discountFeedbackEl.classList.toggle('info', type === 'info');
   };
 
   const updateDiscountUI = ({ percent, amount }) => {
@@ -215,7 +216,11 @@
       const data = await response.json().catch(() => null);
       if (!data || data.ok !== true) {
         const msg = (data && data.message) || 'کد تخفیف نامعتبر است.';
-        setDiscountFeedback(msg, 'error');
+        const level = (data && data.level) || 'error';
+        discountAppliedInput.value = '';
+        updateDiscountUI({ percent: 0, amount: 0 });
+        updateTotals();
+        setDiscountFeedback(msg, level);
         return;
       }
 
@@ -232,7 +237,7 @@
 
       updateDiscountUI({ percent: discountPercent, amount: discountAmount });
       updateTotals();
-      setDiscountFeedback(String(data.message || 'کد تخفیف اعمال شد.'), 'ok');
+      setDiscountFeedback(String(data.message || 'کد تخفیف اعمال شد.'), data.level || 'ok');
     } catch {
       setDiscountFeedback('خطا در بررسی کد تخفیف. لطفاً دوباره تلاش کنید.', 'error');
     } finally {

@@ -120,6 +120,8 @@
               <input type="hidden" id="discount_code_applied" name="discount_code_applied" value="{{ discount_code }}">
               {% if errors.discount_code %}
                 <div id="discount-feedback" class="discount-feedback error">{{ errors.discount_code }}</div>
+              {% elif discount_info %}
+                <div id="discount-feedback" class="discount-feedback info">{{ discount_info }}</div>
               {% elif discount_code and discount_percent %}
                 <div id="discount-feedback" class="discount-feedback ok">کد <strong dir="ltr">{{ discount_code }}</strong> اعمال شد ({{ discount_percent }}٪).</div>
               {% else %}

@@ -189,6 +189,9 @@ class DiscountCodeAdmin(admin.ModelAdmin):
         "is_active",
         "is_public",
         "assigned_user",
+        "valid_until",
+        "min_items_subtotal",
+        "max_items_subtotal",
         "uses_count",
         "max_uses",
         "max_uses_per_user",
@@ -196,7 +199,8 @@ class DiscountCodeAdmin(admin.ModelAdmin):
     )
     list_editable = ("is_active", "is_public")
     search_fields = ("code", "assigned_user__username", "assigned_user__email")
-    list_filter = ("is_active", "is_public")
+    list_filter = ("is_active", "is_public", "valid_until")
+    filter_horizontal = ("eligible_products",)
     actions = ["generate_personal_codes"]
 
     class PersonalCodeForm(forms.Form):
@@ -286,10 +290,15 @@ class DiscountCodeAdmin(admin.ModelAdmin):
                         is_active=discount.is_active,
                         is_public=False,
                         public_message="",
+                        valid_from=discount.valid_from,
+                        valid_until=discount.valid_until,
+                        min_items_subtotal=discount.min_items_subtotal,
+                        max_items_subtotal=discount.max_items_subtotal,
                         max_uses=discount.max_uses,
                         max_uses_per_user=discount.max_uses_per_user,
                         uses_count=0,
                     )
+                    personal.eligible_products.set(discount.eligible_products.all())
                     created += 1
 
                     try:
