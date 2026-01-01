@@ -7,6 +7,7 @@ from threading import Thread
 from django.conf import settings
 from django.db import close_old_connections, transaction
 from django.db.models import Avg, F, Q
+from django.core.exceptions import ValidationError
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -21,6 +22,7 @@ from .invoice import render_manual_invoice_pdf, render_order_invoice_pdf
 from .models import Product, CartItem, Order, OrderItem, Category, ManualInvoiceSequence, ShippingAddress, ProductReview
 from .forms import ProductReviewForm
 from .utils import build_gallery_images, get_primary_image_url
+from .validators import validate_receipt_upload
 from accounts.models import UserProfile
 from core.models import DiscountCode, DiscountRedemption, ShippingSettings
 from core.utils.formatting import format_money
@@ -994,21 +996,26 @@ def payment_card_to_card(request, order_id: int):
             if not receipt:
                 error = 'ظ„ط·ظپط§ظ‹ طھطµظˆغŒط± ظپغŒط´ ظˆط§ط±غŒط²غŒ ط±ط§ ط¨ط§ط±ع¯ط°ط§ط±غŒ ع©ظ†غŒط¯.'
             else:
-                order.payment_method = 'card_to_card'
-                order.payment_status = 'submitted'
-                order.payment_submitted_at = timezone.now()
-                if order.receipt_file:
-                    try:
-                        order.receipt_file.delete(save=False)
-                    except Exception:
-                        pass
-                order.receipt_file = receipt
-                order.save(update_fields=['payment_method', 'payment_status', 'payment_submitted_at', 'receipt_file'])
+                try:
+                    validate_receipt_upload(receipt)
+                except ValidationError as exc:
+                    error = exc.messages[0] if getattr(exc, "messages", None) else "فایل فیش معتبر نیست."
+                else:
+                    order.payment_method = 'card_to_card'
+                    order.payment_status = 'submitted'
+                    order.payment_submitted_at = timezone.now()
+                    if order.receipt_file:
+                        try:
+                            order.receipt_file.delete(save=False)
+                        except Exception:
+                            pass
+                    order.receipt_file = receipt
+                    order.save(update_fields=['payment_method', 'payment_status', 'payment_submitted_at', 'receipt_file'])
 
-                if not already_submitted:
-                    _send_order_payment_submitted_email_nonblocking(order_id=order.id, request=request)
+                    if not already_submitted:
+                        _send_order_payment_submitted_email_nonblocking(order_id=order.id, request=request)
 
-                return redirect(f"{reverse('profile')}?payment_submitted=1#orders")
+                    return redirect(f"{reverse('profile')}?payment_submitted=1#orders")
 
     return render(request, 'store/payment_card_to_card.html', {
         'order': order,

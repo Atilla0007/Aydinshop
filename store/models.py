@@ -6,6 +6,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 
+from .validators import product_image_validators, receipt_file_validators
+
 
 def order_receipt_upload_to(instance, filename: str) -> str:
     """Store payment receipt files using the order number as the filename.
@@ -87,7 +89,7 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
-    image = models.FileField(upload_to=product_image_upload_to)
+    image = models.FileField(upload_to=product_image_upload_to, validators=product_image_validators)
     alt_text = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(default=False)
     sort_order = models.PositiveIntegerField(default=0)
@@ -207,7 +209,12 @@ class Order(models.Model):
 
     payment_method = models.CharField(max_length=32, choices=PAYMENT_METHOD_CHOICES, blank=True)
     payment_status = models.CharField(max_length=32, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
-    receipt_file = models.FileField(upload_to=order_receipt_upload_to, null=True, blank=True)
+    receipt_file = models.FileField(
+        upload_to=order_receipt_upload_to,
+        null=True,
+        blank=True,
+        validators=receipt_file_validators,
+    )
     payment_submitted_at = models.DateTimeField(null=True, blank=True)
     payment_reviewed_at = models.DateTimeField(null=True, blank=True)
     receipt_digest_sent_at = models.DateTimeField(null=True, blank=True)
