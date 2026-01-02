@@ -8,20 +8,22 @@
 <section class="section">
     <div class="container">
         <h1>سبد خرید شما</h1>
-        <div class="checkout-steps {% if request.user.is_authenticated %}progress-2{% else %}progress-1{% endif %}" aria-label="مراحل خرید">
-            <div class="checkout-step {% if request.user.is_authenticated %}is-done{% endif %}">
+        <div class="checkout-steps thermo-progress {% if request.user.is_authenticated %}progress-2{% else %}progress-1{% endif %}" aria-label="مراحل خرید">
+            <span class="thermo-track" aria-hidden="true"></span>
+            <span class="thermo-fill" aria-hidden="true"></span>
+            <div class="checkout-step thermo-step {% if request.user.is_authenticated %}is-done{% endif %}">
                 <span class="step-dot" aria-hidden="true"></span>
                 <span class="step-label">ورود</span>
             </div>
-            <div class="checkout-step is-active" aria-current="step">
+            <div class="checkout-step thermo-step is-active" aria-current="step">
                 <span class="step-dot" aria-hidden="true"></span>
                 <span class="step-label">انتخاب محصولات</span>
             </div>
-            <div class="checkout-step">
+            <div class="checkout-step thermo-step">
                 <span class="step-dot" aria-hidden="true"></span>
                 <span class="step-label">ثبت آدرس</span>
             </div>
-            <div class="checkout-step">
+            <div class="checkout-step thermo-step">
                 <span class="step-dot" aria-hidden="true"></span>
                 <span class="step-label">پرداخت</span>
             </div>
@@ -30,6 +32,7 @@
         <div class="form-error">محصولات ناموجود از سبد حذف شدند: {{ removed_unavailable|join:", " }}</div>
         {% endif %}
         {% if items %}
+        <div class="cart-table-wrap">
         <table class="cart-table">
             <thead>
                 <tr>
@@ -43,16 +46,16 @@
             <tbody>
                 {% for item in items %}
                 <tr{% if not item.product.is_available %} class="unavailable"{% endif %}>
-                    <td>
+                    <td data-label="محصول">
                         <div class="cart-product-name">{{ item.product.name }}</div>
                         {% if not item.product.is_available %}
                         <span class="stock-badge out">ناموجود</span>
                         {% endif %}
                     </td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.product.price|money }} تومان</td>
-                    <td>{{ item.total_price|money }} تومان</td>
-                    <td class="cart-remove-cell">
+                    <td data-label="تعداد">{{ item.quantity }}</td>
+                    <td data-label="قیمت واحد">{{ item.product.price|money }} تومان</td>
+                    <td data-label="مجموع">{{ item.total_price|money }} تومان</td>
+                    <td class="cart-remove-cell" data-label="حذف">
                         <form method="post" action="{% url 'cart_remove' %}">
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ item.product.id }}">
@@ -64,6 +67,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         <div class="cart-summary">
             <p>جمع کل: <strong>{{ total|money }} تومان</strong></p>
             <a href="{% url 'checkout' %}" class="btn btn-primary">ادامه به پرداخت</a>
