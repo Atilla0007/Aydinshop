@@ -2,26 +2,65 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 class News(models.Model):
     title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=220, unique=True, blank=True)
+    summary = models.CharField(max_length=300, blank=True)
     text = models.TextField()
+    cover_image = models.FileField(upload_to="projects/", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
-        verbose_name = "خبر"
-        verbose_name_plural = "اخبار"
+        verbose_name = "?????"
+        verbose_name_plural = "????????"
 
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title, allow_unicode=True) or "project"
+            candidate = base
+            suffix = 1
+            while News.objects.filter(slug=candidate).exclude(pk=self.pk).exists():
+                candidate = f"{base}-{suffix}"
+                suffix += 1
+            self.slug = candidate
+        super().save(*args, **kwargs)
+
 
 class ContactMessage(models.Model):
+    INQUIRY_TYPE_CHOICES = (
+        ("product", "??????? ?????"),
+        ("service", "??????? ?????"),
+        ("consultation", "??????? ??????"),
+        ("other", "???? ?????"),
+    )
+
+    SERVICE_PACKAGE_CHOICES = (
+        ("normal", "???? Normal"),
+        ("vip", "???? VIP"),
+        ("cip", "???? CIP"),
+    )
+
     name = models.CharField(max_length=200)
     email = models.EmailField()
     phone = models.CharField(max_length=20, blank=True)
+    company = models.CharField(max_length=200, blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    inquiry_type = models.CharField(max_length=20, choices=INQUIRY_TYPE_CHOICES, default="consultation")
+    service_package = models.CharField(max_length=20, choices=SERVICE_PACKAGE_CHOICES, blank=True)
+    product_interest = models.ForeignKey(
+        "store.Product",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="inquiries",
+    )
     message = models.TextField()
     STATUS_CHOICES = (
         ("new", "New"),
@@ -33,8 +72,8 @@ class ContactMessage(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        verbose_name = "پیام تماس"
-        verbose_name_plural = "پیام‌های تماس"
+        verbose_name = "??????? ??????"
+        verbose_name_plural = "??????????? ??????"
 
     def __str__(self):
         return f"{self.name} - {self.email}"
@@ -80,18 +119,18 @@ class DailyVisitStat(models.Model):
 
 
 class ShippingSettings(models.Model):
-    shipping_fee = models.PositiveIntegerField(default=0, verbose_name="هزینه ارسال (تومان)")
+    shipping_fee = models.PositiveIntegerField(default=0, verbose_name="????? ?????? (?????)")
     free_shipping_min_total = models.PositiveIntegerField(
-        default=0, verbose_name="حداقل مبلغ برای ارسال رایگان (تومان)"
+        default=0, verbose_name="????? ???? ???? ????? ?????? (?????)"
     )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "تنظیمات ارسال"
-        verbose_name_plural = "تنظیمات ارسال"
+        verbose_name = "??????? ??????"
+        verbose_name_plural = "??????? ??????"
 
     def __str__(self):
-        return "تنظیمات ارسال"
+        return "??????? ??????"
 
     @classmethod
     def get_solo(cls) -> "ShippingSettings":
@@ -100,11 +139,11 @@ class ShippingSettings(models.Model):
 
 
 class DiscountCode(models.Model):
-    code = models.CharField(max_length=50, unique=True, verbose_name="کد تخفیف")
-    source_code = models.CharField(max_length=50, blank=True, db_index=True, verbose_name="کد مبدا")
+    code = models.CharField(max_length=50, unique=True, verbose_name="?? ?????")
+    source_code = models.CharField(max_length=50, blank=True, db_index=True, verbose_name="?? ????")
     percent = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(100)],
-        verbose_name="درصد تخفیف",
+        verbose_name="???? ?????",
     )
     assigned_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -112,32 +151,32 @@ class DiscountCode(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="assigned_discount_codes",
-        verbose_name="کاربر اختصاصی",
+        verbose_name="????? ???????",
     )
-    max_uses = models.PositiveIntegerField(null=True, blank=True, verbose_name="حداکثر دفعات استفاده")
+    max_uses = models.PositiveIntegerField(null=True, blank=True, verbose_name="?????? ????? ???????")
     max_uses_per_user = models.PositiveIntegerField(
-        null=True, blank=True, verbose_name="حداکثر دفعات استفاده برای هر کاربر"
+        null=True, blank=True, verbose_name="?????? ????? ???? ?? ?????"
     )
-    uses_count = models.PositiveIntegerField(default=0, verbose_name="دفعات استفاده")
-    is_active = models.BooleanField(default=True, verbose_name="فعال")
-    is_public = models.BooleanField(default=False, verbose_name="نمایش در بنر")
-    public_message = models.CharField(max_length=200, blank=True, verbose_name="متن بنر (اختیاری)")
-    valid_from = models.DateTimeField(null=True, blank=True, verbose_name="شروع اعتبار")
-    valid_until = models.DateTimeField(null=True, blank=True, verbose_name="پایان اعتبار")
-    min_items_subtotal = models.PositiveIntegerField(null=True, blank=True, verbose_name="حداقل جمع کالاها (تومان)")
-    max_items_subtotal = models.PositiveIntegerField(null=True, blank=True, verbose_name="حداکثر جمع کالاها (تومان)")
+    uses_count = models.PositiveIntegerField(default=0, verbose_name="????? ???????")
+    is_active = models.BooleanField(default=True, verbose_name="????")
+    is_public = models.BooleanField(default=False, verbose_name="????? ?????")
+    public_message = models.CharField(max_length=200, blank=True, verbose_name="??? ?????")
+    valid_from = models.DateTimeField(null=True, blank=True, verbose_name="???? ??????")
+    valid_until = models.DateTimeField(null=True, blank=True, verbose_name="????? ??????")
+    min_items_subtotal = models.PositiveIntegerField(null=True, blank=True, verbose_name="????? ???? ??? (?????)")
+    max_items_subtotal = models.PositiveIntegerField(null=True, blank=True, verbose_name="?????? ???? ??? (?????)")
     eligible_products = models.ManyToManyField(
         "store.Product",
         blank=True,
         related_name="discount_codes",
-        verbose_name="محصولات مشمول تخفیف",
+        verbose_name="??????? ?????",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "کد تخفیف"
-        verbose_name_plural = "کدهای تخفیف"
+        verbose_name = "?? ?????"
+        verbose_name_plural = "????? ?????"
 
     def save(self, *args, **kwargs):
         self.code = (self.code or "").strip().upper().replace(" ", "")
@@ -149,7 +188,7 @@ class DiscountCode(models.Model):
     def banner_text(self) -> str:
         if self.public_message:
             return self.public_message
-        return f"کد تخفیف {self.code} فعال شد — {self.percent}٪ تخفیف روی سبد خرید شما"
+        return f"?? ????? {self.code} ?? {self.percent}% ????? ???? ????????? ?????"
 
     def __str__(self):
         return self.code
@@ -162,7 +201,7 @@ class DiscountRedemption(models.Model):
         DiscountCode,
         on_delete=models.CASCADE,
         related_name="redemptions",
-        verbose_name="کد تخفیف",
+        verbose_name="?? ?????",
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -170,15 +209,15 @@ class DiscountRedemption(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="discount_redemptions",
-        verbose_name="کاربر",
+        verbose_name="?????",
     )
-    order_id = models.PositiveIntegerField(verbose_name="شناسه سفارش")
+    order_id = models.PositiveIntegerField(verbose_name="????? ?????")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
-        verbose_name = "استفاده از کد تخفیف"
-        verbose_name_plural = "استفاده‌های کد تخفیف"
+        verbose_name = "??????? ?? ?? ?????"
+        verbose_name_plural = "??????????? ?? ?????"
         constraints = [
             models.UniqueConstraint(
                 fields=["discount_code", "order_id"], name="uniq_discount_code_order"
@@ -190,22 +229,22 @@ class DiscountRedemption(models.Model):
 
 
 class PaymentSettings(models.Model):
-    card_number = models.CharField(max_length=32, blank=True, verbose_name="شماره کارت")
-    card_holder = models.CharField(max_length=120, blank=True, verbose_name="نام صاحب کارت")
-    telegram_username = models.CharField(max_length=64, blank=True, verbose_name="آیدی تلگرام (با @)")
-    whatsapp_number = models.CharField(max_length=20, blank=True, verbose_name="شماره واتساپ")
-    company_phone = models.CharField(max_length=32, blank=True, verbose_name="شماره تماس")
-    company_email = models.EmailField(blank=True, verbose_name="ایمیل سایت")
-    company_address = models.TextField(blank=True, verbose_name="آدرس")
-    company_website = models.URLField(blank=True, verbose_name="وبسایت")
+    card_number = models.CharField(max_length=32, blank=True, verbose_name="????? ????")
+    card_holder = models.CharField(max_length=120, blank=True, verbose_name="??? ???? ????")
+    telegram_username = models.CharField(max_length=64, blank=True, verbose_name="??????? ?????? (???? @)")
+    whatsapp_number = models.CharField(max_length=20, blank=True, verbose_name="????? ??????")
+    company_phone = models.CharField(max_length=32, blank=True, verbose_name="???? ????")
+    company_email = models.EmailField(blank=True, verbose_name="????? ????")
+    company_address = models.TextField(blank=True, verbose_name="????")
+    company_website = models.URLField(blank=True, verbose_name="??????")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "تنظیمات پرداخت"
-        verbose_name_plural = "تنظیمات پرداخت"
+        verbose_name = "??????? ??????"
+        verbose_name_plural = "??????? ??????"
 
     def __str__(self):
-        return "تنظیمات پرداخت"
+        return "??????? ??????"
 
     @classmethod
     def get_solo(cls) -> "PaymentSettings":

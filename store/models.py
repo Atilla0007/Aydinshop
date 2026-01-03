@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
+from django.utils.text import slugify
 
 from .validators import product_image_validators, receipt_file_validators
 
@@ -17,7 +18,6 @@ def order_receipt_upload_to(instance, filename: str) -> str:
     ext = (Path(filename).suffix or "").lower()
     if not ext:
         ext = ".bin"
-    # Basic sanitization: keep short alnum extensions only.
     if len(ext) > 10 or any(ch for ch in ext[1:] if not ch.isalnum()):
         ext = ".bin"
 
@@ -38,17 +38,31 @@ def product_image_upload_to(instance, filename: str) -> str:
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
 
     class Meta:
-        verbose_name = "دسته‌بندی"
-        verbose_name_plural = "دسته‌بندی‌ها"
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.name, allow_unicode=True) or "category"
+            candidate = base
+            suffix = 1
+            while Category.objects.filter(slug=candidate).exclude(pk=self.pk).exists():
+                candidate = f"{base}-{suffix}"
+                suffix += 1
+            self.slug = candidate
+        super().save(*args, **kwargs)
+
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=220, blank=True)
+    summary = models.CharField(max_length=300, blank=True)
     description = models.TextField()
     price = models.IntegerField()
     is_available = models.BooleanField(default=True, db_index=True)
@@ -57,24 +71,35 @@ class Product(models.Model):
     view_count = models.PositiveIntegerField(default=0)
     sales_count = models.PositiveIntegerField(default=0)
 
-    # فیلدهای جدید
-    brand = models.CharField("برند", max_length=100, blank=True)
-    sku = models.CharField("شناسه محصول", max_length=50, blank=True)
+    brand = models.CharField("Brand", max_length=100, blank=True)
+    sku = models.CharField("SKU", max_length=50, blank=True)
     tags = models.CharField(
-        "برچسب‌ها",
+        "Tags",
         max_length=250,
         blank=True,
-        help_text="تگ‌ها را با , از هم جدا کنید"
+        help_text="Comma-separated values",
     )
+    datasheet = models.FileField(upload_to="products/datasheets/", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "محصول"
-        verbose_name_plural = "محصولات"
+        verbose_name = "Product"
+        verbose_name_plural = "Products"
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.name, allow_unicode=True) or "product"
+            candidate = base
+            suffix = 1
+            while Product.objects.filter(slug=candidate, category=self.category).exclude(pk=self.pk).exists():
+                candidate = f"{base}-{suffix}"
+                suffix += 1
+            self.slug = candidate
+        super().save(*args, **kwargs)
 
     @property
     def primary_image(self):
@@ -96,22 +121,21 @@ class ProductImage(models.Model):
 
     class Meta:
         ordering = ["-is_primary", "sort_order", "id"]
-        verbose_name = "تصویر محصول"
-        verbose_name_plural = "تصاویر محصولات"
+        verbose_name = "Product image"
+        verbose_name_plural = "Product images"
 
     def __str__(self):
         return f"{self.product.name} - {Path(self.image.name).name}"
 
 
 class ProductFeature(models.Model):
-    """ویژگی‌های فنی محصول برای نمایش و مقایسه"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="features")
     name = models.CharField(max_length=100)
     value = models.CharField(max_length=200)
 
     class Meta:
-        verbose_name = "ویژگی محصول"
-        verbose_name_plural = "ویژگی‌های محصول"
+        verbose_name = "Product feature"
+        verbose_name_plural = "Product features"
 
     def __str__(self):
         return f"{self.product.name} - {self.name}"
@@ -131,8 +155,8 @@ class ProductReview(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        verbose_name = "نظر محصول"
-        verbose_name_plural = "نظرات محصول"
+        verbose_name = "Product review"
+        verbose_name_plural = "Product reviews"
 
     def __str__(self):
         return f"{self.product.name} - {self.rating}"
@@ -144,8 +168,8 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
-        verbose_name = "آیتم سبد خرید"
-        verbose_name_plural = "آیتم‌های سبد خرید"
+        verbose_name = "Cart item"
+        verbose_name_plural = "Cart items"
 
     def total_price(self):
         return self.quantity * self.product.price
@@ -153,26 +177,27 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.user} - {self.product} ({self.quantity})"
 
+
 class Order(models.Model):
     STATUS_CHOICES = (
-        ('new', 'جدید'),
-        ('unpaid', 'در انتظار پرداخت'),
-        ('paid', 'پرداخت شده'),
-        ('sent', 'ارسال شده'),
-        ('done', 'تکمیل شده'),
-        ('canceled', 'لغو شده'),
+        ("new", "New"),
+        ("unpaid", "Unpaid"),
+        ("paid", "Paid"),
+        ("sent", "Sent"),
+        ("done", "Done"),
+        ("canceled", "Canceled"),
     )
     PAYMENT_METHOD_CHOICES = (
-        ('card_to_card', 'کارت به کارت'),
-        ('contact_admin', 'ارتباط با ادمین'),
+        ("card_to_card", "Card to card"),
+        ("contact_admin", "Contact admin"),
     )
     PAYMENT_STATUS_CHOICES = (
-        ('unpaid', 'در انتظار پرداخت'),
-        ('submitted', 'برای بررسی ارسال شد'),
-        ('approved', 'تایید شد'),
-        ('rejected', 'رد شد'),
+        ("unpaid", "Unpaid"),
+        ("submitted", "Submitted"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
     )
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="orders")
     shipping_address = models.ForeignKey(
         "ShippingAddress",
         on_delete=models.SET_NULL,
@@ -182,7 +207,7 @@ class Order(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     total_price = models.IntegerField(default=0)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
 
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
@@ -208,7 +233,7 @@ class Order(models.Model):
     free_shipping_min_total = models.PositiveIntegerField(default=0)
 
     payment_method = models.CharField(max_length=32, choices=PAYMENT_METHOD_CHOICES, blank=True)
-    payment_status = models.CharField(max_length=32, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
+    payment_status = models.CharField(max_length=32, choices=PAYMENT_STATUS_CHOICES, default="unpaid")
     receipt_file = models.FileField(
         upload_to=order_receipt_upload_to,
         null=True,
@@ -221,11 +246,11 @@ class Order(models.Model):
     sales_counted = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = "سفارش"
-        verbose_name_plural = "سفارش‌ها"
+        verbose_name = "Order"
+        verbose_name_plural = "Orders"
 
     def __str__(self):
-        return f"سفارش #{self.id} - {self.user or 'مهمان'}"
+        return f"Order #{self.id} - {self.user or 'guest'}"
 
     def mark_sales_counted(self) -> None:
         if self.sales_counted:
@@ -240,14 +265,14 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField(default=1)
     unit_price = models.IntegerField()
 
     class Meta:
-        verbose_name = "آیتم سفارش"
-        verbose_name_plural = "آیتم‌های سفارش"
+        verbose_name = "Order item"
+        verbose_name_plural = "Order items"
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
@@ -260,8 +285,8 @@ class ManualInvoiceSequence(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "شماره‌گذار پیش‌فاکتور دستی"
-        verbose_name_plural = "شماره‌گذار پیش‌فاکتور دستی"
+        verbose_name = "Manual invoice sequence"
+        verbose_name_plural = "Manual invoice sequences"
 
     def __str__(self):
         return f"Manual invoice sequence ({self.last_number})"
@@ -289,8 +314,8 @@ class ShippingAddress(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "آدرس ارسال"
-        verbose_name_plural = "آدرس‌های ارسال"
+        verbose_name = "Shipping address"
+        verbose_name_plural = "Shipping addresses"
         constraints = [
             models.UniqueConstraint(
                 fields=["user"],
