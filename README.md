@@ -9,6 +9,51 @@ The application is built on Django with a server-rendered storefront and an admi
 - Logs failed login attempts and block/unblock events to database tables that are queryable in Django Admin.
 - Uses middleware for pre-auth throttling and Django’s `user_login_failed` signal for consistent failure logging across both `/login/` and `/admin/login/`.
 
+
+# Route Audit (Planned Refactor)
+| Legacy URL | Purpose | Action | Replacement |
+| --- | --- | --- | --- |
+| `/` | Storefront landing | MODIFY | `/` (corporate home) |
+| `/contact/` | Contact form | MODIFY | `/contact/` |
+| `/news/` | News list | MODIFY | `/projects/` |
+| `/news/<id>/` | News detail | MODIFY | `/projects/<slug>/` |
+| `/faq/` | FAQ | KEEP | `/faq/` |
+| `/about/` | About | MODIFY | `/about/` |
+| `/terms/` | Terms | KEEP | `/terms/` |
+| `/privacy/` | Privacy | KEEP | `/privacy/` |
+| `/health/` | Health check | KEEP | `/health/` |
+| `/shop/` | Store listing | REDIRECT | `/catalog/` |
+| `/shop/product/<id>/` | Product detail | REDIRECT | `/catalog/<category>/<product>/` |
+| `/shop/suggest/` | Search suggest | DELETE | - |
+| `/shop/add-to-cart/<id>/` | Add to cart | DELETE | - |
+| `/shop/cart/` | Cart | DELETE | - |
+| `/shop/checkout/` | Checkout | DELETE | - |
+| `/shop/payment/...` | Payments | DELETE | - |
+| `/shop/compare/` | Compare | DELETE | - |
+| `/auth/email-otp/...` | OTP email | DELETE | - |
+| `/auth/sms-otp/...` | OTP SMS | DELETE | - |
+| `/login/` | User login | DELETE (public) | - |
+| `/signup/` | User signup | DELETE (public) | - |
+| `/profile/` | User profile | DELETE (public) | - |
+
+# Target Sitemap (Corporate)
+- `/`
+- `/about/`
+- `/services/`
+- `/services/kitchen-setup/`
+- `/services/kitchen-setup/normal/`
+- `/services/kitchen-setup/vip/`
+- `/services/kitchen-setup/cip/`
+- `/projects/`
+- `/projects/<slug>/`
+- `/catalog/`
+- `/catalog/<category-slug>/`
+- `/catalog/<category-slug>/<product-slug>/`
+- `/downloads/`
+- `/contact/`
+- `/sitemap.xml`
+- `/robots.txt`
+
 # Tech Stack
 - Python 3.12
 - Django 5.2
