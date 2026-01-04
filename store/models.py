@@ -2,6 +2,7 @@
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 
 from .validators import product_image_validators
@@ -98,6 +99,14 @@ class Product(models.Model):
             if img.is_primary:
                 return img
         return images[0]
+
+    def get_absolute_url(self):
+        if self.slug and self.category_id and self.category and self.category.slug:
+            return reverse(
+                "catalog_product",
+                kwargs={"category_slug": self.category.slug, "product_slug": self.slug},
+            )
+        return reverse("legacy_product_redirect", kwargs={"pk": self.pk})
 
 
 class ProductImage(models.Model):

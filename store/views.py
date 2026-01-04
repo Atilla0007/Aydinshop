@@ -11,6 +11,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 from django.views.decorators.http import require_GET, require_POST
 
 from .forms import ProductReviewForm
@@ -145,6 +146,18 @@ def catalog_suggest(request):
 
 def legacy_product_redirect(request, pk: int):
     product = get_object_or_404(Product, pk=pk)
+    if product.category and not product.category.slug:
+        product.category.slug = slugify(product.category.name, allow_unicode=True) or "category"
+        product.category.save(update_fields=["slug"])
+    if not product.slug:
+        base = slugify(product.name, allow_unicode=True) or f"product-{product.pk}"
+        candidate = base
+        suffix = 1
+        while Product.objects.filter(slug=candidate, category=product.category).exclude(pk=product.pk).exists():
+            candidate = f"{base}-{suffix}"
+            suffix += 1
+        product.slug = candidate
+        product.save(update_fields=["slug"])
     return redirect(
         reverse(
             "catalog_product",

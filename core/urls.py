@@ -13,7 +13,7 @@ urlpatterns = [
         name="package_detail",
     ),
     path("projects/", views.projects_list, name="projects_list"),
-    path("projects/<slug:slug>/", views.project_detail, name="project_detail"),
+    path("projects/<str:slug>/", views.project_detail, name="project_detail"),
     path("downloads/", views.downloads, name="downloads"),
     path("contact/", views.contact, name="contact"),
     path("faq/", views.faq, name="faq"),

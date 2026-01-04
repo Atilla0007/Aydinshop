@@ -77,7 +77,7 @@
       {% endif %}
 
       <div class="product-detail-cta">
-        <a href="{% url 'contact' %}?product={{ product.slug }}" class="btn btn-primary">استعلام قیمت / مشاوره خرید</a>
+        <a href="{% url 'contact' %}?product={{ product.slug|default:product.name|urlencode }}" class="btn btn-primary">استعلام قیمت / مشاوره خرید</a>
         {% if product.datasheet %}
           <a href="{{ product.datasheet.url }}" class="btn btn-outline" target="_blank" rel="noopener">دانلود دیتاشیت</a>
         {% endif %}

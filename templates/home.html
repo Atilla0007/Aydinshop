@@ -142,7 +142,7 @@
     <p class="section-subtitle">نمونه‌ای از تجهیزات پرکاربرد برای آشپزخانه‌های صنعتی.</p>
     <div class="products-grid">
       {% for product in featured_products %}
-        <article class="product-card" data-href="{% url 'catalog_product' product.category.slug product.slug %}">
+        <article class="product-card" data-href="{{ product.get_absolute_url }}">
           <div class="product-image">
             {% if product.card_image_url %}
               <img src="{{ product.card_image_url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
@@ -159,8 +159,8 @@
             <p class="product-summary">{{ product.summary|default:"تجهیزات صنعتی با کیفیت و استاندارد." }}</p>
           </div>
           <div class="product-actions">
-            <a href="{% url 'catalog_product' product.category.slug product.slug %}" class="btn btn-outline small">مشاهده جزئیات</a>
-            <a href="{% url 'contact' %}?product={{ product.slug }}" class="btn btn-primary small">استعلام قیمت</a>
+            <a href="{{ product.get_absolute_url }}" class="btn btn-outline small">مشاهده جزئیات</a>
+            <a href="{% url 'contact' %}?product={{ product.slug|default:product.name|urlencode }}" class="btn btn-primary small">استعلام قیمت</a>
           </div>
         </article>
       {% empty %}
