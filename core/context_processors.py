@@ -3,7 +3,6 @@
 from django.conf import settings
 
 from core.models import PaymentSettings
-from store.models import Category
 
 
 def site_info(request):
@@ -21,8 +20,6 @@ def site_info(request):
     if not telegram_username:
         telegram_username = (getattr(settings, "COMPANY_TELEGRAM", "") or "").strip().lstrip("@")
 
-    header_categories = Category.objects.order_by("name")
-
     return {
         "site_name": getattr(settings, "SITE_NAME", "استیرا"),
         "company_phone": company_phone,
@@ -31,5 +28,4 @@ def site_info(request):
         "company_whatsapp": whatsapp_number,
         "company_telegram": telegram_username,
         "company_website": company_website,
-        "header_categories": header_categories,
     }
