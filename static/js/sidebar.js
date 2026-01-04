@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('app-sidebar');
     const overlay = document.getElementById('sidebar-overlay');
     const toggleInput = document.getElementById('sidebar-toggle');
-    const closeBtn = document.getElementById('sidebar-close');
     const subMenus = sidebar ? sidebar.querySelectorAll('.sub-menu') : [];
     const buttons = sidebar ? sidebar.querySelectorAll('button') : [];
     const navButtons = sidebar ? sidebar.querySelectorAll('button[data-url]') : [];
@@ -113,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
             closeSidebar();
         }
     });
-    closeBtn?.addEventListener('click', closeSidebar);
     overlay?.addEventListener('click', closeSidebar);
 
     document.addEventListener('keyup', (event) => {

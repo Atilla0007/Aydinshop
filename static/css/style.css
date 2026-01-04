@@ -246,7 +246,7 @@ img {
 .main-header {
     position: sticky;
     top: 0;
-    z-index: 260;
+    z-index: 420;
     backdrop-filter: blur(16px);
     background: linear-gradient(120deg, var(--navy-dark) 0%, var(--navy) 60%, var(--accent) 100%);
     color: var(--text);
@@ -348,6 +348,7 @@ img {
     align-items: center;
     justify-content: center;
     position: relative;
+    z-index: 1;
 }
 
 #sidebar-toggle {
