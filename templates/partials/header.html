@@ -10,8 +10,10 @@
         </a>
         <div class="header__tabs">
           <a href="{% url 'home' %}" class="header__tab header__tab--active">Website</a>
-          {% if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser) %}
-            <a href="/admin/" class="header__tab">Workspace</a>
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff or request.user.is_superuser %}
+              <a href="/admin/" class="header__tab">Workspace</a>
+            {% endif %}
           {% endif %}
         </div>
       </div>
