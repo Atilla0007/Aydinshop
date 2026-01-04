@@ -7400,3 +7400,256 @@ hr,
         flex-direction: column;
     }
 }
+
+/* --- Pricing cards + premium ribbon --- */
+.pricing-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.pricing-card {
+    display: flex;
+    flex-direction: column;
+    width: min(320px, 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.3s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-6px);
+}
+
+.pricing-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.pricing-card .title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.pricing-card .price {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.pricing-card .desc {
+    margin: 0.75rem 0;
+    line-height: 1.8;
+    color: var(--muted);
+}
+
+.pricing-card .lists {
+    margin-bottom: 1.5rem;
+    flex: 1;
+    color: var(--muted);
+    list-style: none;
+    padding: 0;
+}
+
+.pricing-card .lists .list {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pricing-card .lists .list svg {
+    height: 1.4rem;
+    width: 1.4rem;
+    color: var(--accent-2);
+}
+
+.pricing-card .action {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background-color: var(--accent-2);
+    color: var(--text);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: 0.2s ease;
+}
+
+.pricing-card .action:hover {
+    opacity: 0.9;
+    box-shadow: var(--shadow-soft);
+}
+
+.premium-wrapper {
+    border-color: var(--accent-2);
+}
+
+.premium-ribbon {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.premium-ribbon::before {
+    content: "ویژه";
+    position: absolute;
+    width: 160%;
+    height: 40px;
+    background-image: linear-gradient(45deg, var(--accent-2) 0%, var(--navy) 51%, var(--accent) 100%);
+    transform: rotate(-45deg) translateY(-20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    box-shadow: var(--shadow-soft);
+}
+
+.premium-ribbon::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    z-index: -1;
+    background-image: linear-gradient(45deg, var(--accent-2) 0%, var(--accent) 100%);
+    box-shadow: 140px -140px var(--navy);
+}
+
+/* --- Cookie consent --- */
+.cookie-overlay {
+    position: fixed;
+    z-index: 9999;
+    transition: all 0.3s ease-in-out;
+}
+
+.cookie-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+@media (min-width: 769px) {
+    .cookie-overlay {
+        bottom: 30px;
+        right: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cookie-overlay {
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(5px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.cookie-card {
+    width: 300px;
+    height: auto;
+    min-height: 220px;
+    background-color: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 30px;
+    gap: 12px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    pointer-events: auto;
+    text-align: center;
+}
+
+#cookieSvg {
+    width: 50px;
+}
+
+#cookieSvg g path {
+    fill: var(--muted);
+}
+
+.cookieHeading {
+    font-size: 1.1em;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
+}
+
+.cookieDescription {
+    text-align: center;
+    font-size: 0.85em;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 12px;
+    flex-direction: row;
+    margin-top: 8px;
+}
+
+.acceptButton,
+.declineButton {
+    width: 90px;
+    height: 35px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 20px;
+}
+
+.acceptButton {
+    background-color: var(--accent-2);
+    color: var(--text);
+}
+
+.acceptButton:hover {
+    opacity: 0.9;
+}
+
+.declineButton {
+    background-color: var(--surface-2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+}
+
+.declineButton:hover {
+    filter: brightness(1.1);
+}
+
+/* --- Header top gap fix --- */
+body.body {
+    padding-top: 0;
+}
+
+.main-header {
+    margin-top: 0;
+    border-top: 0;
+}

@@ -39,17 +39,28 @@
   <div class="container">
     <h2 class="section-title">پکیج‌های پیشنهادی</h2>
     <p class="section-subtitle">براساس نیاز پروژه، یکی از پکیج‌ها را انتخاب کنید.</p>
-    <div class="packages-grid">
+    <div class="pricing-container">
       {% for key, package in packages.items %}
-        <article class="package-card">
-          <h3>{{ package.title }}</h3>
-          <p>{{ package.subtitle }}</p>
-          <ul>
-            {% for item in package.audience %}
-              <li>{{ item }}</li>
+        <article class="pricing-card{% if key == 'cip' %} premium-wrapper{% endif %}">
+          {% if key == 'cip' %}
+            <span class="premium-ribbon" aria-hidden="true"></span>
+          {% endif %}
+          <div class="pricing-header">
+            <span class="title">{{ package.type }}</span>
+            <span class="price">استعلام قیمت</span>
+          </div>
+          <p class="desc">{{ package.subtitle }}</p>
+          <ul class="lists">
+            {% for item in package.features %}
+              <li class="list">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>{{ item }}</span>
+              </li>
             {% endfor %}
           </ul>
-          <a href="{% url 'package_detail' key %}" class="btn btn-outline small">جزئیات پکیج</a>
+          <a href="{% url 'package_detail' key %}" class="action">انتخاب پکیج</a>
         </article>
       {% endfor %}
     </div>
