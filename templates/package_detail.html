@@ -1,57 +1,68 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ package.title }} | استیرا{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/package_style.css' %}">
+{% endblock %}
+
 {% block content %}
-<section class="section page-hero">
-  <div class="container">
-    <h1 class="section-title right">{{ package.title }}</h1>
-    <p class="section-subtitle right">{{ package.subtitle }}</p>
-  </div>
-</section>
+<div class="package-detail-container">
+  <section class="pkg-hero">
+    <div class="pkg-header">
+      <span class="pkg-badge">{{ package.type }}</span>
+      <h1>{{ package.title }}</h1>
+      <p class="pkg-subtitle">{{ package.subtitle }}</p>
+    </div>
+  </section>
 
-<section class="section">
-  <div class="container">
-    <div class="features-grid">
-      <div class="feature-card">
-        <h3>مناسب برای</h3>
-        <ul>
-          {% for item in package.audience %}
-            <li>{{ item }}</li>
+  <section class="pkg-content-grid">
+    <div class="pkg-main-info">
+      <div class="pkg-section">
+        <h3><i class="bx bx-info-circle" aria-hidden="true"></i> درباره این پکیج</h3>
+        <p>{{ package.description }}</p>
+      </div>
+
+      <div class="pkg-section">
+        <h3><i class="bx bx-check-double" aria-hidden="true"></i> خدمات شامل شده</h3>
+        <ul class="pkg-features-list">
+          {% for feature in package.features %}
+            <li>{{ feature }}</li>
           {% endfor %}
         </ul>
       </div>
-      {% for section_title, items in package.includes.items %}
-        <div class="feature-card">
-          <h3>{{ section_title }}</h3>
-          <ul>
-            {% for item in items %}
-              <li>{{ item }}</li>
-            {% endfor %}
-          </ul>
+
+      <div class="pkg-section">
+        <h3><i class="bx bx-group" aria-hidden="true"></i> مناسب برای</h3>
+        <ul class="pkg-target-list">
+          {% for target in package.targets %}
+            <li>{{ target }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <aside class="pkg-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-header">
+          <h4>خلاصه پروژه</h4>
         </div>
-      {% endfor %}
-      <div class="feature-card">
-        <h3>خروجی‌های تحویل</h3>
-        <ul>
-          {% for item in package.deliverables %}
-            <li>{{ item }}</li>
-          {% endfor %}
-        </ul>
+        <div class="sidebar-body">
+          <div class="info-row">
+            <span>مدت زمان تخمینی:</span>
+            <strong>{{ package.estimated_time }}</strong>
+          </div>
+          <div class="info-row">
+            <span>سطح نظارت:</span>
+            <strong>{{ package.supervision_level }}</strong>
+          </div>
+          <hr>
+          <a href="{% url 'contact' %}?package={{ package_key }}" class="btn-primary-glow">درخواست مشاوره برای این پکیج</a>
+          <p class="support-text">نیاز به راهنمایی بیشتر دارید؟ با ما تماس بگیرید.</p>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="section cta-banner">
-  <div class="container cta-inner">
-    <div>
-      <h2>برای انتخاب پکیج مناسب کمک می‌خواهید؟</h2>
-      <p>پس از نیازسنجی اولیه، برآورد و پیشنهاد اجرایی ارائه خواهد شد.</p>
-    </div>
-    <div>
-      <a href="{% url 'contact' %}?package={{ package_key }}" class="btn btn-light">درخواست مشاوره</a>
-    </div>
-  </div>
-</section>
+    </aside>
+  </section>
+</div>
 {% endblock %}
