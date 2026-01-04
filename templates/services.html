@@ -1,0 +1,64 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}خدمات استیرا{% endblock %}
+
+{% block content %}
+<section class="section page-hero">
+  <div class="container">
+    <h1 class="section-title right">خدمات استیرا</h1>
+    <p class="section-subtitle right">
+      از تامین تجهیزات تا مدیریت اجرای پروژه، همه مراحل راه‌اندازی آشپزخانه صنعتی را پوشش می‌دهیم.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>مشاوره تخصصی و نیازسنجی</h3>
+        <p>بررسی ظرفیت، منو و فرآیند کار برای تعیین دقیق تجهیزات مورد نیاز.</p>
+      </div>
+      <div class="feature-card">
+        <h3>تامین و واردات تجهیزات</h3>
+        <p>تامین تجهیزات استاندارد با تمرکز بر کیفیت، دوام و خدمات پس از فروش.</p>
+      </div>
+      <div class="feature-card">
+        <h3>طراحی چیدمان آشپزخانه</h3>
+        <p>بهینه‌سازی مسیرهای کاری و چیدمان تجهیزات برای افزایش بهره‌وری.</p>
+      </div>
+      <div class="feature-card">
+        <h3>نصب، راه‌اندازی و نظارت</h3>
+        <p>نصب تجهیزات کلیدی با نظارت فنی و کنترل کیفیت تحویل.</p>
+      </div>
+      <div class="feature-card">
+        <h3>تحویل مرحله‌ای و آموزش</h3>
+        <p>ارائه چک‌لیست راه‌اندازی و آموزش اولیه اپراتورها.</p>
+      </div>
+      <div class="feature-card">
+        <h3>پشتیبانی و خدمات پس از فروش</h3>
+        <p>پیگیری نیازهای مشتریان پس از تحویل و پاسخگویی سریع.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section packages-highlight">
+  <div class="container">
+    <h2 class="section-title">پکیج‌های راه‌اندازی</h2>
+    <p class="section-subtitle">سه پکیج برای مقیاس‌ها و نیازهای مختلف تعریف شده است.</p>
+    <div class="packages-grid">
+      {% for key, package in packages.items %}
+        <article class="package-card">
+          <h3>{{ package.title }}</h3>
+          <p>{{ package.subtitle }}</p>
+          <a href="{% url 'package_detail' key %}" class="btn btn-outline small">مشاهده جزئیات</a>
+        </article>
+      {% endfor %}
+    </div>
+    <div class="section-cta-center">
+      <a href="{% url 'kitchen_setup' %}" class="btn btn-primary">جزئیات پکیج‌ها</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

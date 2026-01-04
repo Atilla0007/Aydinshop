@@ -1,43 +1,50 @@
-# Problem
-This project is a small e-commerce backend that must reliably handle user accounts, carts, checkout, and order/payment workflows. In production, authentication endpoints are a common target for brute-force and credential-stuffing attacks; without controls, attackers can degrade availability, enumerate accounts, and compromise users.
+﻿# Problem
+The legacy project was an e-commerce storefront, but Styra needs a corporate website focused on showcasing industrial kitchen equipment, services, and project delivery. The site must eliminate public ordering flows and instead capture qualified leads for consultation and quotations while keeping a managed product catalog and portfolio.
 
 # Solution
-The application is built on Django with a server-rendered storefront and an admin panel for operations. It includes OTP-based verification flows and an authentication security layer that:
+The application is refactored into a corporate, Persian-first website with:
+- A price-less product catalog and technical pages.
+- Service and kitchen setup packages (Normal/VIP/CIP).
+- Projects/portfolio, downloads, and FAQ pages.
+- A lead-capture contact form stored in the database and visible in admin (optional email notification).
+- A staff-only manual invoice/proforma template for internal use.
 
-- Enforces rate limiting on login endpoints per IP address and per user identifier (username/email).
-- Temporarily blocks abusive IPs in a database-backed allow/deny store with an automatic cooldown-based unblock.
-- Logs failed login attempts and block/unblock events to database tables that are queryable in Django Admin.
-- Uses middleware for pre-auth throttling and Django’s `user_login_failed` signal for consistent failure logging across both `/login/` and `/admin/login/`.
+# Tech Stack
+- Python 3.12
+- Django 5.2
+- SQLite (development), MySQL/MariaDB (production)
+- Admin UI: `django-jazzmin`
+- PDF generation: `reportlab`, `arabic-reshaper`, `python-bidi`
+- Excel import: `openpyxl`
+- Static handling: `whitenoise`, `brotli`
 
+# Security Considerations
+- Security headers are applied via middleware (CSP, X-Frame-Options, Referrer-Policy, X-Content-Type-Options).
+- Login endpoints are rate-limited via `auth_security` middleware and logged for admin review.
+- Sensitive configuration (SECRET_KEY, SMTP, DB) is provided via environment variables.
 
-# Route Audit (Planned Refactor)
-| Legacy URL | Purpose | Action | Replacement |
-| --- | --- | --- | --- |
-| `/` | Storefront landing | MODIFY | `/` (corporate home) |
-| `/contact/` | Contact form | MODIFY | `/contact/` |
-| `/news/` | News list | MODIFY | `/projects/` |
-| `/news/<id>/` | News detail | MODIFY | `/projects/<slug>/` |
-| `/faq/` | FAQ | KEEP | `/faq/` |
-| `/about/` | About | MODIFY | `/about/` |
-| `/terms/` | Terms | KEEP | `/terms/` |
-| `/privacy/` | Privacy | KEEP | `/privacy/` |
-| `/health/` | Health check | KEEP | `/health/` |
-| `/shop/` | Store listing | REDIRECT | `/catalog/` |
-| `/shop/product/<id>/` | Product detail | REDIRECT | `/catalog/<category>/<product>/` |
-| `/shop/suggest/` | Search suggest | DELETE | - |
-| `/shop/add-to-cart/<id>/` | Add to cart | DELETE | - |
-| `/shop/cart/` | Cart | DELETE | - |
-| `/shop/checkout/` | Checkout | DELETE | - |
-| `/shop/payment/...` | Payments | DELETE | - |
-| `/shop/compare/` | Compare | DELETE | - |
-| `/auth/email-otp/...` | OTP email | DELETE | - |
-| `/auth/sms-otp/...` | OTP SMS | DELETE | - |
-| `/login/` | User login | DELETE (public) | - |
-| `/signup/` | User signup | DELETE (public) | - |
-| `/profile/` | User profile | DELETE (public) | - |
+# How to Run
+1) Create a virtualenv and install dependencies:
+   - `python -m venv venv`
+   - Windows: `venv\Scripts\activate`
+   - `pip install -r requirements.txt`
 
-# Target Sitemap (Corporate)
-- `/`
+2) Create `.env` next to `manage.py`:
+   - Copy `.env.example` to `.env`
+   - Configure SMTP (optional) and database settings.
+
+3) Apply migrations and create an admin user:
+   - `python manage.py makemigrations`
+   - `python manage.py migrate`
+   - `python manage.py createsuperuser`
+
+4) Run the server:
+   - `python manage.py runserver`
+   - Site: `http://127.0.0.1:8000/`
+   - Admin: `http://127.0.0.1:8000/admin/`
+
+# Site Structure
+- `/` (Home)
 - `/about/`
 - `/services/`
 - `/services/kitchen-setup/`
@@ -51,67 +58,36 @@ The application is built on Django with a server-rendered storefront and an admi
 - `/catalog/<category-slug>/<product-slug>/`
 - `/downloads/`
 - `/contact/`
+- `/faq/`
+- `/privacy/`
+- `/terms/`
 - `/sitemap.xml`
 - `/robots.txt`
 
-# Tech Stack
-- Python 3.12
-- Django 5.2
-- SQLite (development default)
-- Admin UI: `django-jazzmin`
-- OTP framework: `django-otp` (+ project OTP apps)
-- PDF generation: `reportlab`, `arabic-reshaper`, `python-bidi`
-- Excel import: `openpyxl`
+# Route Audit (Legacy)
+| Legacy URL | Purpose | Action | Replacement |
+| --- | --- | --- | --- |
+| `/` | Storefront landing | MODIFY | `/` (corporate home) |
+| `/shop/` | Store listing | REDIRECT | `/catalog/` |
+| `/shop/product/<id>/` | Product detail | REDIRECT | `/catalog/<category>/<product>/` |
+| `/shop/cart/` | Cart | DELETE | - |
+| `/shop/checkout/` | Checkout | DELETE | - |
+| `/shop/payment/...` | Payments | DELETE | - |
+| `/login/` | User login | REDIRECT | `/contact/` |
+| `/signup/` | User signup | REDIRECT | `/contact/` |
 
-# Security Considerations
-- Brute-force and credential stuffing:
-  - `auth_security.middleware.LoginProtectionMiddleware` enforces per-IP and per-identifier limits and returns `429` with `Retry-After` when exceeded.
-  - `auth_security.models.AuthIPBlock` stores blocked IPs with timestamps; cooldown expiry auto-unblocks and is audited via events.
-- Auditability and monitoring:
-  - Failed attempts are stored in `auth_security.models.AuthLoginAttempt` with IP, identifier, timestamp, and reason.
-  - Block/unblock events are stored in `auth_security.models.AuthIPEvent` and exposed as separate admin views via proxy models.
-- Proxy/IP correctness:
-  - Client IP extraction can trust `X-Forwarded-For` only when `AUTH_SECURITY_TRUST_X_FORWARDED_FOR=true` (do not enable unless your reverse proxy strips/sets this header).
-- Secrets and credentials:
-  - SMTP and other secrets must be provided via `.env` and are not hardcoded in Python files.
+# Admin Content
+Manage the following in Django Admin:
+- Products, Categories, Product Images, Product Features
+- Projects (portfolio)
+- Downloads
+- Contact messages (leads)
+- Site contact settings (PaymentSettings)
 
-# How to Run
-1) Create a virtualenv and install dependencies:
-   - `python -m venv venv`
-   - Windows: `venv\\Scripts\\activate`
-   - `pip install -r requirements.txt`
+# Lead Notifications
+If SMTP is configured in `.env`, contact form submissions are emailed to the company email and all superusers. If not configured, submissions are still stored in the database.
 
-2) Create `.env` next to `manage.py`:
-   - Copy `.env.example` to `.env`
-   - Configure SMTP (recommended for real emails):
-     - `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`
-     - `EMAIL_HOST=smtp.gmail.com`
-     - `EMAIL_PORT=587`
-     - `EMAIL_USE_TLS=true`
-     - `EMAIL_HOST_USER=your_email@gmail.com`
-     - `EMAIL_HOST_PASSWORD=your_app_password`
-     - `DEFAULT_FROM_EMAIL=Your App <your_email@gmail.com>`
-
-3) Apply migrations and create an admin user:
-   - `python manage.py migrate`
-   - `python manage.py createsuperuser`
-
-4) Run the server:
-   - `python manage.py runserver`
-   - Site: `http://127.0.0.1:8000/`
-   - Admin: `http://127.0.0.1:8000/admin/`
-
-5) Verify email sending (optional):
-   - `python manage.py send_test_email --to your_email@gmail.com`
-
-6) Authentication security tuning (optional):
-   - `AUTH_SECURITY_LOGIN_IP_MAX_ATTEMPTS=10`
-   - `AUTH_SECURITY_LOGIN_IP_WINDOW_SECONDS=600`
-   - `AUTH_SECURITY_LOGIN_IP_BLOCK_AFTER_ATTEMPTS=10`
-   - `AUTH_SECURITY_IP_BLOCK_SECONDS=1800`
-   - `AUTH_SECURITY_LOGIN_IDENTIFIER_MAX_ATTEMPTS=5`
-   - `AUTH_SECURITY_LOGIN_IDENTIFIER_WINDOW_SECONDS=600`
-
-7) Run tests:
-   - `python manage.py test`
-
+# Manual Invoice (Staff Only)
+Manual invoice/proforma templates are available for staff at:
+- `/catalog/invoice/manual/`
+- `/shop/invoice/manual/` (legacy redirect)

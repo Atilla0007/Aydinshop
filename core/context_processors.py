@@ -1,8 +1,8 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from django.conf import settings
 
-from core.models import DiscountCode, PaymentSettings
+from core.models import PaymentSettings
 
 
 def site_info(request):
@@ -29,19 +29,3 @@ def site_info(request):
         "company_telegram": telegram_username,
         "company_website": company_website,
     }
-
-
-def public_promo(request):
-    try:
-        match = getattr(request, "resolver_match", None)
-        if not match or match.url_name != "home":
-            return {"public_promo": None}
-    except Exception:
-        return {"public_promo": None}
-
-    promo = (
-        DiscountCode.objects.filter(is_public=True, is_active=True)
-        .order_by("-updated_at")
-        .first()
-    )
-    return {"public_promo": promo}

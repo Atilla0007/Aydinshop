@@ -1,4 +1,4 @@
-{% load static %}{% load jalali %}
+﻿{% load static %}{% load jalali %}
 <!doctype html>
 <html lang="fa" dir="rtl">
   <head>
@@ -360,19 +360,19 @@
     <div class="toolbar no-print">
       <a class="btn secondary" href="{% url 'home' %}">بازگشت به صفحه اصلی</a>
       <button class="btn" type="button" id="printBtn">دانلود PDF</button>
-      <button class="btn secondary" type="button" id="calcTotalsBtn">محاسبه جمع‌ها</button>
+      <button class="btn secondary" type="button" id="calcTotalsBtn">محاسبه جمع</button>
       <div class="toolbar-group">
-        <select id="productSelect" aria-label="افزودن محصول از سایت">
-          <option value="">افزودن محصول از سایت...</option>
+        <select id="productSelect" aria-label="افزودن محصول از لیست">
+          <option value="">افزودن محصول از لیست...</option>
           {% for p in products %}
             <option value="{{ p.id }}" data-name="{{ p.name }}" data-price="{{ p.price }}">
-              {{ p.name }} — {{ p.price|money }} تومان
+              {{ p.name }} - {{ p.price|money }} تومان
             </option>
           {% endfor %}
         </select>
         <button class="btn secondary" type="button" id="addProductBtn">افزودن محصول</button>
       </div>
-      <button class="btn secondary" type="button" id="addRowBtn">افزودن ردیف خالی</button>
+      <button class="btn secondary" type="button" id="addRowBtn">افزودن ردیف</button>
       <a class="btn secondary" href="?download=1&invoice_number={{ invoice_number|urlencode }}" rel="nofollow">دانلود HTML</a>
     </div>
 
@@ -409,11 +409,11 @@
             {% endif %}
           </ul>
 
-          <h2>خریدار / تحویل&zwnj;گیرنده</h2>
+          <h2>خریدار / تحویل‌گیرنده</h2>
           <ul>
             <li contenteditable="true" data-hide-empty="1" data-placeholder="نام و نام خانوادگی"></li>
+            <li contenteditable="true" data-hide-empty="1" data-placeholder="نام مجموعه"></li>
             <li contenteditable="true" data-hide-empty="1" data-placeholder="شماره تماس"></li>
-            <li contenteditable="true" data-hide-empty="1" data-placeholder="آدرس کامل"></li>
           </ul>
         </div>
 
@@ -429,11 +429,11 @@
             </tr>
             <tr class="hide-in-print">
               <th>جمع کالاها</th>
-              <td id="summaryItemsSubtotal" contenteditable="true">۰ تومان</td>
+              <td id="summaryItemsSubtotal" contenteditable="true">- تومان</td>
             </tr>
             <tr class="hide-in-print">
               <th>مبلغ نهایی</th>
-              <td id="summaryGrandTotal" contenteditable="true">۰ تومان</td>
+              <td id="summaryGrandTotal" contenteditable="true">- تومان</td>
             </tr>
           </table>
         </div>
@@ -445,7 +445,7 @@
             <tr>
               <th>کالا / خدمات</th>
               <th style="width: 120px">تعداد</th>
-              <th style="width: 220px">مبلغ (تومان)</th>
+              <th style="width: 220px">قیمت واحد (تومان)</th>
               <th class="no-print actions-col"></th>
             </tr>
           </thead>
@@ -457,12 +457,12 @@
                   contenteditable="true"
                   data-role="desc"
                   data-hide-empty="1"
-                  data-placeholder="توضیح کوتاه (اختیاری)"
+                  data-placeholder="توضیحات (اختیاری)"
                   style="color: var(--muted); margin-top: 4px"
                 ></p>
               </td>
-              <td contenteditable="true" data-role="qty">۱</td>
-              <td contenteditable="true" data-role="price">۰</td>
+              <td contenteditable="true" data-role="qty">1</td>
+              <td contenteditable="true" data-role="price">0</td>
               <td class="no-print actions-col">
                 <button class="remove-row" type="button" title="حذف ردیف">×</button>
               </td>
@@ -471,29 +471,29 @@
         </table>
 
         <div class="hint no-print">
-          نکته: روی هر قسمت که خط‌چین دارد کلیک کنید و متن/عدد را ویرایش کنید. سپس «چاپ / خروجی PDF» را بزنید.
+          نکته: مبلغ‌ها را به صورت عددی وارد کنید. دکمه «محاسبه جمع» برای بروزرسانی جمع‌ها استفاده می‌شود.
         </div>
       </div>
 
-                        <div class="inv-footer">
-        <div><!-- بخش توضیحات / شرایط --></div>
+      <div class="inv-footer">
+        <div><!-- فضای خالی --></div>
         <div>
           <table>
             <tr>
               <th>جمع کالاها</th>
-              <td id="footerItemsSubtotal" contenteditable="true">۰ تومان</td>
+              <td id="footerItemsSubtotal" contenteditable="true">0 تومان</td>
             </tr>
             <tr>
               <th>تخفیف</th>
-              <td id="footerDiscount" contenteditable="true">۰ تومان</td>
+              <td id="footerDiscount" contenteditable="true">0 تومان</td>
             </tr>
             <tr>
               <th>هزینه ارسال</th>
-              <td id="footerShipping" contenteditable="true">۰ تومان</td>
+              <td id="footerShipping" contenteditable="true">0 تومان</td>
             </tr>
             <tr>
               <th>مبلغ نهایی</th>
-              <td id="footerGrandTotal" contenteditable="true">۰ تومان</td>
+              <td id="footerGrandTotal" contenteditable="true">0 تومان</td>
             </tr>
           </table>
         </div>
@@ -505,7 +505,7 @@
           class="notes-box"
           contenteditable="true"
           data-role="invoice-notes"
-          data-placeholder="در صورت نیاز توضیحات تکمیلی را اینجا وارد کنید."
+          data-placeholder="در صورت نیاز توضیحات تکمیلی را درج کنید."
         ></div>
       </div>
       <div class="inv-signatures">
@@ -522,6 +522,6 @@
 
     </div>
 
-        <script src="{% static 'js/manual-invoice.js' %}" defer></script>
+    <script src="{% static 'js/manual-invoice.js' %}" defer></script>
   </body>
 </html>

@@ -1,74 +1,47 @@
-{% load static %}
+﻿{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}استیرا | فروشگاه آنلاین{% endblock %}</title>
+  <title>{% block title %}استیرا | تجهیزات آشپزخانه صنعتی{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{% block meta_description %}استیرا ارائه‌دهنده تجهیزات آشپزخانه صنعتی، طراحی و راه‌اندازی کامل آشپزخانه رستوران و کافه.{% endblock %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="icon" href="{% static 'img/logo-styra.png' %}" type="image/png">
-  {% block extra_css %}{% endblock %}
   <link rel="stylesheet" href="{% static 'vendor/boxicons/css/boxicons.min.css' %}">
+  {% block extra_css %}{% endblock %}
 </head>
-<body class="body" data-user-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
-
-{% if request.resolver_match.url_name == 'home' and public_promo %}
-<div class="top-banner" data-banner-code="{{ public_promo.code }}">
-  <div class="container top-banner-inner">
-    <div class="top-banner-text">{{ public_promo.banner_text }}</div>
-    <button type="button" class="top-banner-copy" data-banner-copy>کپی کد</button>
-  </div>
-</div>
-{% endif %}
+<body class="body">
 
 <header class="main-header">
   <div class="container nav-container">
-    <button id="sidebar-toggle" class="btn sidebar-toggle-btn" aria-label="باز کردن منو">
-      <span class="icon" aria-hidden="true">
-        <svg viewBox="0 0 175 80" width="40" height="40" role="presentation">
-          <rect width="80" height="15" fill="#f0f0f0" rx="10"></rect>
-          <rect y="30" width="80" height="15" fill="#f0f0f0" rx="10"></rect>
-          <rect y="60" width="80" height="15" fill="#f0f0f0" rx="10"></rect>
-        </svg>
-      </span>
-      <span class="text">MENU</span>
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="باز کردن منو">
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
 
-    <a href="{% url 'home' %}" class="logo">
+    <a href="{% url 'home' %}" class="logo" aria-label="استیرا">
       <picture>
         <source srcset="{% static 'img/logo-styra.webp' %}" type="image/webp">
-        <img src="{% static 'img/logo-styra.png' %}" alt="لوگوی استیرا" class="logo-img" decoding="async" loading="eager" />
+        <img src="{% static 'img/logo-styra.png' %}" alt="استیرا" class="logo-img" decoding="async" loading="eager" />
       </picture>
       <span class="logo-text light">استیرا</span>
     </a>
 
-    <div class="nav-actions">
-      <a href="{% url 'cart' %}" class="btn btn-light small">سبد خرید</a>
+    <nav class="nav-links">
+      <a href="{% url 'home' %}">خانه</a>
+      <a href="{% url 'about' %}">درباره استیرا</a>
+      <a href="{% url 'services' %}">خدمات</a>
+      <a href="{% url 'kitchen_setup' %}">پکیج‌ها</a>
+      <a href="{% url 'projects_list' %}">پروژه‌ها</a>
+      <a href="{% url 'catalog' %}">کاتالوگ</a>
+      <a href="{% url 'downloads' %}">دانلودها</a>
+      <a href="{% url 'contact' %}">تماس</a>
+    </nav>
 
-      {% if user.is_authenticated %}
-        <div class="user-menu" data-user-menu>
-          <button type="button" class="user-menu-trigger" aria-haspopup="menu" aria-expanded="false">
-            <span class="user-name">{{ user.username }}</span>
-            <i class='bx bx-chevron-down'></i>
-          </button>
-          <div class="user-menu-dropdown" role="menu">
-            <a href="{% url 'profile' %}" role="menuitem"><i class='bx bx-user'></i> پروفایل</a>
-            {% if user.is_staff %}
-              <a href="{% url 'manual_invoice' %}?kind=proforma" role="menuitem"><i class='bx bxs-receipt'></i> ساخت پیش‌فاکتور</a>
-              <a href="{% url 'manual_invoice' %}?kind=invoice" role="menuitem"><i class='bx bxs-receipt'></i> ساخت فاکتور</a>
-              <a href="{% url 'admin:analytics-dashboard' %}" role="menuitem"><i class='bx bx-chart'></i> داشبورد تحلیل</a>
-            {% endif %}
-            <a href="{% url 'logout' %}" role="menuitem"><i class='bx bx-log-out'></i> خروج</a>
-          </div>
-        </div>
-      {% else %}
-        <a href="{% url 'login' %}" class="user-profile user-profile-login" aria-label="User Login Button">
-          <span class="user-profile-inner">
-            <i class='bx bx-user' aria-hidden="true"></i>
-            <p>ورود</p>
-          </span>
-        </a>
-      {% endif %}
+    <div class="nav-actions">
+      <a href="{% url 'contact' %}" class="btn btn-primary small">درخواست مشاوره</a>
     </div>
   </div>
 </header>
@@ -78,44 +51,58 @@
   <header class="sidebar-header">
     <button id="sidebar-close" class="close-btn sidebar-close-btn" aria-label="بستن منو">×</button>
   </header>
+  {% with path=request.path %}
   <ul>
     <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'home' %}" class="active">
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'home' %}" class="{% if path == '/' %}active{% endif %}">
         <i class="bx bx-home"></i>
         <p>خانه</p>
       </button>
     </li>
     <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'shop' %}">
-        <i class="bx bx-cart"></i>
-        <p>فروشگاه</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'news_list' %}">
-        <i class="bx bx-news"></i>
-        <p>اخبار</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'about' %}">
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'about' %}" class="{% if path|slice:':7' == '/about/' %}active{% endif %}">
         <i class="bx bx-info-circle"></i>
-        <p>درباره ما</p>
+        <p>درباره استیرا</p>
       </button>
     </li>
     <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'faq' %}">
-        <i class="bx bx-help-circle"></i>
-        <p>سوالات متداول</p>
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'services' %}" class="{% if path|slice:':10' == '/services/' %}active{% endif %}">
+        <i class="bx bx-briefcase"></i>
+        <p>خدمات</p>
       </button>
     </li>
     <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'contact' %}">
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'kitchen_setup' %}" class="{% if path|slice:':23' == '/services/kitchen-setup/' %}active{% endif %}">
+        <i class="bx bx-package"></i>
+        <p>پکیج‌ها</p>
+      </button>
+    </li>
+    <li>
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'projects_list' %}" class="{% if path|slice:':10' == '/projects/' %}active{% endif %}">
+        <i class="bx bx-buildings"></i>
+        <p>پروژه‌ها</p>
+      </button>
+    </li>
+    <li>
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'catalog' %}" class="{% if path|slice:':9' == '/catalog/' %}active{% endif %}">
+        <i class="bx bx-category"></i>
+        <p>کاتالوگ</p>
+      </button>
+    </li>
+    <li>
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'downloads' %}" class="{% if path|slice:':11' == '/downloads/' %}active{% endif %}">
+        <i class="bx bx-download"></i>
+        <p>دانلودها</p>
+      </button>
+    </li>
+    <li>
+      <button type="button" onclick="gotoPage(this)" data-url="{% url 'contact' %}" class="{% if path|slice:':9' == '/contact/' %}active{% endif %}">
         <i class="bx bx-phone"></i>
-        <p>ارتباط با ما</p>
+        <p>تماس با ما</p>
       </button>
     </li>
   </ul>
+  {% endwith %}
   <div class="sidebar-spacer" aria-hidden="true"></div>
 </aside>
 
@@ -127,18 +114,21 @@
   <div class="container footer-top">
     <div class="footer-brand">
       <h4>استیرا</h4>
-      <p>تجربه خرید آسان با پشتیبانی سریع، قیمت‌های منصفانه و ارسال مطمئن.</p>
+      <p>استیرا تأمین‌کننده تجهیزات آشپزخانه صنعتی و ارائه‌دهنده خدمات طراحی و راه‌اندازی کامل برای رستوران‌ها و کافه‌هاست.</p>
     </div>
     <div class="footer-column">
-      <h4>لینک‌های مفید</h4>
-      <a href="{% url 'shop' %}">فروشگاه</a>
-      <a href="{% url 'news_list' %}">اخبار</a>
-      <a href="{% url 'faq' %}">سوالات متداول</a>
+      <h4>لینک‌های سریع</h4>
+      <a href="{% url 'services' %}">خدمات</a>
+      <a href="{% url 'projects_list' %}">پروژه‌ها</a>
+      <a href="{% url 'catalog' %}">کاتالوگ</a>
+      <a href="{% url 'downloads' %}">دانلودها</a>
     </div>
     <div class="footer-column">
-      <h4>ارتباط با ما</h4>
-      <a href="{% url 'contact' %}">فرم تماس</a>
-      <a href="{% url 'contact' %}">پشتیبانی مشتریان</a>
+      <h4>دسترسی</h4>
+      <a href="{% url 'faq' %}">سؤالات متداول</a>
+      <a href="{% url 'privacy' %}">حریم خصوصی</a>
+      <a href="{% url 'terms' %}">قوانین و مقررات</a>
+      <a href="{% url 'contact' %}">تماس با ما</a>
     </div>
     <div class="footer-column">
       <h4>اطلاعات تماس</h4>
@@ -149,7 +139,7 @@
         <p>ایمیل: <a href="mailto:{{ company_email }}">{{ company_email }}</a></p>
       {% endif %}
       {% if company_website %}
-        <p>وبسایت: <a href="{{ company_website }}" target="_blank" rel="noopener" dir="ltr">{{ company_website }}</a></p>
+        <p>وب‌سایت: <a href="{{ company_website }}" target="_blank" rel="noopener" dir="ltr">{{ company_website }}</a></p>
       {% endif %}
       {% if company_whatsapp %}
         <p>واتساپ: <a href="https://wa.me/{{ company_whatsapp|cut:'+' }}" dir="ltr" target="_blank" rel="noopener">{{ company_whatsapp }}</a></p>
@@ -163,56 +153,16 @@
     </div>
   </div>
   <div class="container footer-bottom">
-    <p>تمام حقوق برای استیرا محفوظ است.</p>
+    <p>© استیرا - تمامی حقوق محفوظ است.</p>
   </div>
 </footer>
 
-<div id="mini-cart-overlay" class="mini-cart-overlay" aria-hidden="true"></div>
-<aside
-  id="mini-cart-drawer"
-  class="mini-cart-drawer"
-  data-preview-url="{% url 'cart_preview' %}"
-  data-remove-url="{% url 'cart_remove' %}"
-  aria-label="سبد خرید"
-  aria-hidden="true"
->
-  <div class="mini-cart-header">
-    <span class="mini-cart-title">سبد خرید</span>
-    <button type="button" id="mini-cart-close" class="close-btn mini-cart-close-btn" aria-label="بستن">×</button>
-  </div>
-  <div id="mini-cart-alert" class="mini-cart-alert" role="status" aria-live="polite"></div>
-  <div id="mini-cart-items" class="mini-cart-items">
-    <p class="mini-cart-empty">سبد خرید شما خالی است.</p>
-  </div>
-  <div class="mini-cart-footer">
-    <div class="mini-cart-total-row">
-      <span>مجموع:</span>
-      <strong id="mini-cart-total">0</strong>
-      <span>تومان</span>
-    </div>
-    <div class="mini-cart-actions">
-      <a href="{% url 'cart' %}" class="btn btn-outline small">دیدن سبد خرید</a>
-      {% if user.is_authenticated %}
-        <a href="{% url 'checkout' %}" class="btn btn-primary small">تسویه حساب</a>
-      {% else %}
-        <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-primary small">تسویه حساب</a>
-      {% endif %}
-    </div>
-  </div>
-</aside>
 <button type="button" id="scroll-top-btn" class="scroll-top-btn" aria-label="بازگشت به بالا">
   <i class="bx bx-up-arrow-alt" aria-hidden="true"></i>
 </button>
-<script src="{% static 'js/mini-cart.js' %}" defer></script>
-{% if request.resolver_match.url_name == 'home' and public_promo %}
-<script src="{% static 'js/banner.js' %}" defer></script>
-{% endif %}
+
 <script src="{% static 'js/sidebar.js' %}" defer></script>
-<script src="{% static 'js/theme.js' %}" defer></script>
 <script src="{% static 'js/site-ui.js' %}" defer></script>
-{% if user.is_authenticated %}
-<script src="{% static 'js/user-menu.js' %}" defer></script>
-{% endif %}
 {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,32 +1,20 @@
-from datetime import timedelta
+﻿from datetime import timedelta
 import logging
-import secrets
 
 from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
-from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
-from django.db.models import Avg, Sum
-from django.db.models.functions import Coalesce
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
-from django.urls import path
 from django.utils import timezone
-
-from accounts.models import UserProfile
-from accounts.sms import send_sms
-from store.models import Order, Product
 
 from .models import (
     ContactMessage,
     DailyVisitStat,
-    DiscountCode,
-    DiscountRedemption,
     Download,
     News,
     PaymentSettings,
-    ShippingSettings,
     SiteVisit,
 )
 
@@ -34,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 @admin.register(News)
-class NewsAdmin(admin.ModelAdmin):
+class ProjectAdmin(admin.ModelAdmin):
     list_display = ("title", "slug", "created_at")
     search_fields = ("title", "summary", "text")
 
@@ -43,12 +31,6 @@ class NewsAdmin(admin.ModelAdmin):
 class DownloadAdmin(admin.ModelAdmin):
     list_display = ("title", "category", "created_at")
     search_fields = ("title", "category", "description")
-
-
-@admin.register(DailyVisitStat)
-class DailyVisitStatAdmin(admin.ModelAdmin):
-    list_display = ("date", "total_hits", "unique_sessions")
-    list_filter = ("date",)
 
 
 @admin.register(ContactMessage)
@@ -72,20 +54,19 @@ class ContactMessageAdmin(admin.ModelAdmin):
     actions = ["send_reply"]
 
     class ReplyForm(forms.Form):
-        subject = forms.CharField(required=False, label="Email subject")
+        subject = forms.CharField(required=False, label="موضوع پاسخ")
         message = forms.CharField(
             required=False,
             widget=forms.Textarea(attrs={"rows": 6}),
-            label="Reply message",
+            label="متن پیام",
         )
-        send_email = forms.BooleanField(required=False, initial=True, label="Send email")
-        send_sms = forms.BooleanField(required=False, label="Send SMS")
+        send_email = forms.BooleanField(required=False, initial=True, label="ارسال ایمیل")
 
     def _default_reply_message(self) -> str:
         return (
-            "پیام شما دریافت شد و توسط تیم استیرا بررسی می‌شود. "
-            "در صورت نیاز به اطلاعات تکمیلی با شما تماس می‌گیریم. "
-            "از همراهی شما سپاسگزاریم."
+            "پیام شما دریافت شد و در حال بررسی است. "
+            "کارشناسان استیرا به‌زودی برای هماهنگی و ارائه مشاوره با شما تماس خواهند گرفت. "
+            "اگر توضیح تکمیلی دارید، همین ایمیل را پاسخ دهید."
         )
 
     def send_reply(self, request, queryset):
@@ -101,14 +82,9 @@ class ContactMessageAdmin(admin.ModelAdmin):
                     message_text = self._default_reply_message()
 
                 send_email_flag = bool(form.cleaned_data.get("send_email"))
-                send_sms_flag = bool(form.cleaned_data.get("send_sms"))
-
                 email_sent = 0
-                sms_sent = 0
                 email_failed = 0
-                sms_failed = 0
                 skipped_email = 0
-                skipped_sms = 0
 
                 brand = getattr(settings, "SITE_NAME", "Styra")
                 now = timezone.now()
@@ -142,23 +118,12 @@ class ContactMessageAdmin(admin.ModelAdmin):
                         else:
                             skipped_email += 1
 
-                    if send_sms_flag:
-                        if msg.phone:
-                            try:
-                                send_sms(msg.phone, message_text)
-                                sms_sent += 1
-                            except Exception:
-                                sms_failed += 1
-                                logger.exception("Failed to send contact reply SMS to %s", msg.phone)
-                        else:
-                            skipped_sms += 1
-
                 queryset.update(status="replied", replied_at=now)
                 self.message_user(
                     request,
                     (
-                        f"Reply sent. Email sent: {email_sent}, failed: {email_failed}, skipped: {skipped_email}. "
-                        f"SMS sent: {sms_sent}, failed: {sms_failed}, skipped: {skipped_sms}."
+                        "پاسخ‌ها ارسال شد. "
+                        f"ارسال موفق: {email_sent}، ناموفق: {email_failed}، بدون ایمیل: {skipped_email}."
                     ),
                     level=messages.SUCCESS,
                 )
@@ -178,321 +143,34 @@ class ContactMessageAdmin(admin.ModelAdmin):
             "admin/contactmessage_reply.html",
             {
                 "form": form,
-                "title": "Reply to contact messages",
+                "title": "ارسال پاسخ به پیام‌های تماس",
                 "action_name": "send_reply",
                 "queryset": queryset,
             },
         )
 
-    send_reply.short_description = "Reply to selected messages"
+    send_reply.short_description = "ارسال پاسخ ایمیلی به پیام‌های انتخاب‌شده"
 
 
-@admin.register(ShippingSettings)
-class ShippingSettingsAdmin(admin.ModelAdmin):
-    list_display = ("id", "shipping_fee", "free_shipping_min_total", "updated_at")
-    list_display_links = ("id",)
-    list_editable = ("shipping_fee", "free_shipping_min_total")
-
-    def has_add_permission(self, request):
-        return not ShippingSettings.objects.exists()
-
-    def has_delete_permission(self, request, obj=None):
-        return False
+@admin.register(DailyVisitStat)
+class DailyVisitStatAdmin(admin.ModelAdmin):
+    list_display = ("date", "total_hits", "unique_sessions")
+    list_filter = ("date",)
 
 
-@admin.register(DiscountCode)
-class DiscountCodeAdmin(admin.ModelAdmin):
-    list_display = (
-        "code",
-        "source_code",
-        "percent",
-        "is_active",
-        "is_public",
-        "assigned_user",
-        "valid_until",
-        "min_items_subtotal",
-        "max_items_subtotal",
-        "uses_count",
-        "max_uses",
-        "max_uses_per_user",
-        "updated_at",
-    )
-    list_editable = ("is_active", "is_public")
-    search_fields = ("code", "assigned_user__username", "assigned_user__email")
-    list_filter = ("is_active", "is_public", "valid_until")
-    filter_horizontal = ("eligible_products",)
-    actions = ["generate_personal_codes"]
-
-    class PersonalCodeForm(forms.Form):
-        audience = forms.ChoiceField(
-            choices=(
-                ("all", "All users"),
-                ("buyers", "Users with previous orders"),
-            ),
-            label="Audience",
-        )
-        sms_template = forms.CharField(
-            required=False,
-            widget=forms.Textarea(attrs={"rows": 3}),
-            label="SMS template",
-            help_text="Placeholders: {code} and {percent}",
-        )
-
-    def _generate_unique_code(self, base_code: str) -> str:
-        base = (base_code or "").strip().upper().replace(" ", "")
-        max_len = 50
-        for _ in range(10):
-            suffix = secrets.token_hex(3).upper()
-            prefix = base[: max_len - 1 - len(suffix)] if base else "OFF"
-            candidate = f"{prefix}-{suffix}"
-            if not DiscountCode.objects.filter(code=candidate).exists():
-                return candidate
-        raise RuntimeError("Failed to generate unique discount code")
-
-    def generate_personal_codes(self, request, queryset):
-        if queryset.count() != 1:
-            self.message_user(request, "Please select exactly one base discount code.", level=messages.ERROR)
-            return
-
-        discount = queryset.first()
-        form = None
-        if "apply" in request.POST:
-            form = self.PersonalCodeForm(request.POST)
-            if form.is_valid():
-                audience = form.cleaned_data["audience"]
-                sms_template = form.cleaned_data["sms_template"].strip() if form.cleaned_data["sms_template"] else ""
-                if not sms_template:
-                    sms_template = (
-                        "استیرا | کد تخفیف اختصاصی شما: {code} ({percent}٪ تخفیف). "
-                        "برای خرید بعدی استفاده کنید: styra.ir"
-                    )
-
-                User = get_user_model()
-                if audience == "buyers":
-                    buyer_ids = (
-                        Order.objects.filter(user__isnull=False)
-                        .values_list("user_id", flat=True)
-                        .distinct()
-                    )
-                    users_qs = User.objects.filter(id__in=buyer_ids, is_active=True)
-                else:
-                    users_qs = User.objects.filter(is_active=True)
-
-                profiles = (
-                    UserProfile.objects.select_related("user")
-                    .filter(user__in=users_qs)
-                    .exclude(phone__isnull=True)
-                    .exclude(phone="")
-                )
-
-                created = 0
-                skipped_existing = 0
-                skipped_no_phone = users_qs.count() - profiles.count()
-                sms_sent = 0
-                sms_failed = 0
-
-                for profile in profiles:
-                    user = profile.user
-                    existing = DiscountCode.objects.filter(
-                        source_code=discount.code,
-                        assigned_user=user,
-                    ).exists()
-                    if existing:
-                        skipped_existing += 1
-                        continue
-
-                    code = self._generate_unique_code(discount.code)
-                    personal = DiscountCode.objects.create(
-                        code=code,
-                        source_code=discount.code,
-                        percent=discount.percent,
-                        assigned_user=user,
-                        is_active=discount.is_active,
-                        is_public=False,
-                        public_message="",
-                        valid_from=discount.valid_from,
-                        valid_until=discount.valid_until,
-                        min_items_subtotal=discount.min_items_subtotal,
-                        max_items_subtotal=discount.max_items_subtotal,
-                        max_uses=discount.max_uses,
-                        max_uses_per_user=discount.max_uses_per_user,
-                        uses_count=0,
-                    )
-                    personal.eligible_products.set(discount.eligible_products.all())
-                    created += 1
-
-                    try:
-                        message = sms_template.format(code=personal.code, percent=personal.percent)
-                    except Exception:
-                        message = (
-                            f"استیرا | کد تخفیف اختصاصی شما: {personal.code} ({personal.percent}٪ تخفیف). "
-                            "برای خرید بعدی استفاده کنید: styra.ir"
-                        )
-
-                    try:
-                        send_sms(profile.phone, message)
-                        sms_sent += 1
-                    except Exception:
-                        sms_failed += 1
-                        logger.exception("Failed to send discount SMS to %s", profile.phone)
-
-                self.message_user(
-                    request,
-                    (
-                        f"Created {created} personal codes. "
-                        f"SMS sent: {sms_sent}, failed: {sms_failed}. "
-                        f"Skipped (existing): {skipped_existing}. "
-                        f"Skipped (no phone): {skipped_no_phone}."
-                    ),
-                    level=messages.SUCCESS,
-                )
-                return
-        if form is None:
-            form = self.PersonalCodeForm(
-                initial={
-                    "sms_template": (
-                        "استیرا | کد تخفیف اختصاصی شما: {code} ({percent}٪ تخفیف). "
-                        "برای خرید بعدی استفاده کنید: styra.ir"
-                    )
-                }
-            )
-
-        return TemplateResponse(
-            request,
-            "admin/discountcode_generate_personal.html",
-            {
-                "discount": discount,
-                "form": form,
-                "title": "Generate personal discount codes",
-                "action_name": "generate_personal_codes",
-                "queryset": queryset,
-            },
-        )
-
-    generate_personal_codes.short_description = "Generate personal codes and send SMS"
-
-
-@admin.register(DiscountRedemption)
-class DiscountRedemptionAdmin(admin.ModelAdmin):
-    list_display = ("created_at", "discount_code", "user", "order_id")
-    search_fields = ("discount_code__code", "user__username", "user__email")
-    list_filter = ("created_at",)
+@admin.register(SiteVisit)
+class SiteVisitAdmin(admin.ModelAdmin):
+    list_display = ("session_key", "user", "visited_on", "created_at")
+    list_filter = ("visited_on",)
+    search_fields = ("session_key", "user__username", "user__email")
 
 
 @admin.register(PaymentSettings)
 class PaymentSettingsAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "company_phone",
-        "company_email",
-        "company_website",
-        "card_number",
-        "card_holder",
-        "telegram_username",
-        "whatsapp_number",
-        "updated_at",
-    )
-    list_display_links = ("id",)
-    list_editable = (
-        "company_phone",
-        "company_email",
-        "company_website",
-        "card_number",
-        "card_holder",
-        "telegram_username",
-        "whatsapp_number",
-    )
+    list_display = ("company_phone", "company_email", "company_website", "updated_at")
 
     def has_add_permission(self, request):
         return not PaymentSettings.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-
-def _format_int(value) -> str:
-    try:
-        return f"{int(value):,}"
-    except (TypeError, ValueError):
-        return "0"
-
-
-def _build_admin_analytics(period_days: int = 30) -> dict:
-    now = timezone.now()
-    period_start = now - timedelta(days=period_days)
-
-    paid_orders = Order.objects.filter(status__in=["paid", "sent", "done"], payment_status="approved")
-    paid_period = paid_orders.filter(created_at__gte=period_start)
-
-    sales_period = paid_period.aggregate(total=Sum("total_price"))["total"] or 0
-    sales_total = paid_orders.aggregate(total=Sum("total_price"))["total"] or 0
-    avg_basket = paid_period.aggregate(avg=Avg("total_price"))["avg"] or 0
-    orders_period = paid_period.count()
-
-    visits_period = (
-        SiteVisit.objects.filter(visited_on__gte=period_start.date())
-        .values("session_key")
-        .distinct()
-        .count()
-    )
-
-    total_hits = DailyVisitStat.objects.aggregate(total=Coalesce(Sum("total_hits"), 0))["total"] or 0
-    avg_daily_hits = (
-        DailyVisitStat.objects.filter(date__gte=period_start.date())
-        .aggregate(avg=Avg("total_hits"))["avg"] or 0
-    )
-    daily_stats = list(
-        DailyVisitStat.objects.filter(date__gte=period_start.date())
-        .order_by("date")
-        .values("date", "total_hits", "unique_sessions")
-    )
-
-    conversion_rate = (orders_period / visits_period * 100) if visits_period else 0.0
-
-    top_viewed = list(
-        Product.objects.order_by("-view_count", "-created_at")
-        .values("name", "view_count")[:5]
-    )
-    top_sold = list(
-        Product.objects.order_by("-sales_count", "-created_at")
-        .values("name", "sales_count")[:5]
-    )
-
-    return {
-        "period_days": period_days,
-        "sales_period": _format_int(sales_period),
-        "sales_total": _format_int(sales_total),
-        "avg_basket": _format_int(avg_basket),
-        "orders_period": _format_int(orders_period),
-        "visits_period": _format_int(visits_period),
-        "total_hits": _format_int(total_hits),
-        "avg_daily_hits": _format_int(avg_daily_hits),
-        "daily_stats": daily_stats,
-        "conversion_rate": f"{conversion_rate:.1f}%",
-        "top_viewed": top_viewed,
-        "top_sold": top_sold,
-        "generated_at": now,
-    }
-
-
-def analytics_view(request):
-    context = {
-        **admin.site.each_context(request),
-        "title": "Analytics dashboard",
-        "analytics": _build_admin_analytics(),
-    }
-    return TemplateResponse(request, "admin/analytics_dashboard.html", context)
-
-
-def _wrap_admin_urls(original_get_urls):
-    def get_urls():
-        urls = original_get_urls()
-        custom_urls = [
-            path("analytics/", admin.site.admin_view(analytics_view), name="analytics-dashboard"),
-        ]
-        return custom_urls + urls
-
-    return get_urls
-
-
-admin.site.get_urls = _wrap_admin_urls(admin.site.get_urls)

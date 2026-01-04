@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.shortcuts import render
 
 from .services import LoginProtectionService, TooManyRequests, get_client_ip, normalize_identifier
 
@@ -73,11 +72,7 @@ class LoginProtectionMiddleware:
         return path in configured
 
     def _too_many_response(self, request, *, status_code: int, retry_after_seconds: int, message: str) -> HttpResponse:
-        if request.path == "/login/":
-            next_url = request.POST.get("next") or request.GET.get("next")
-            resp = render(request, "accounts/login.html", {"error": message, "next": next_url}, status=status_code)
-        else:
-            resp = HttpResponse(message, status=status_code)
+        resp = HttpResponse(message, status=status_code)
         if retry_after_seconds and status_code == 429:
             resp["Retry-After"] = str(int(retry_after_seconds))
         return resp

@@ -1,0 +1,42 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} | استیرا{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title right">{{ project.title }}</h1>
+    {% if project.summary %}
+      <p class="section-subtitle right">{{ project.summary }}</p>
+    {% endif %}
+
+    {% if project.cover_image %}
+      <div class="project-cover" style="margin: 1.5rem 0;">
+        <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" loading="lazy" decoding="async">
+      </div>
+    {% endif %}
+
+    <div class="about-copy">
+      {{ project.text|linebreaks }}
+    </div>
+  </div>
+</section>
+
+{% if latest %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">پروژه‌های بیشتر</h2>
+    <div class="news-grid">
+      {% for item in latest %}
+        <article class="news-card">
+          <a href="{% url 'project_detail' item.slug %}">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.summary|default:item.text|truncatechars:150 }}</p>
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

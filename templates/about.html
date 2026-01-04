@@ -1,96 +1,59 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}درباره استیرا | فروشگاه آنلاین{% endblock %}
+﻿{% extends 'base.html' %}
+
+{% block title %}درباره استیرا{% endblock %}
 
 {% block content %}
 <section class="section about-section">
   <div class="container">
     <div class="about-hero">
       <div>
-        <h1>درباره استیرا</h1>
-        <p class="section-subtitle">
-          استیرا یک فروشگاه تخصصی تجهیزات فروشگاهی و صنعتی است که با تمرکز بر اصالت کالا،
-          قیمت‌گذاری شفاف و پشتیبانی واقعی شکل گرفته است. هدف ما ساده‌کردن مسیر خرید تجهیزات
-          برای کسب‌وکارهای رستورانی، فروشگاهی و صنعتی است؛ از انتخاب و مشاوره فنی تا ارسال سریع
-          و خدمات پس از فروش.
+        <h1 class="section-title right">درباره استیرا</h1>
+        <p class="section-subtitle right">
+          استیرا با تمرکز بر واردات، تولید و تامین تجهیزات آشپزخانه صنعتی، شریک اجرایی برندهای غذایی در سراسر ایران است.
         </p>
         <div class="about-copy">
-          <p>
-            در استیرا، کیفیت محصول و رضایت مشتری اولویت اول است. تیم ما قبل از خرید با شما همراه
-            می‌شود تا بهترین گزینه‌ها را انتخاب کنید و پس از ثبت سفارش نیز وضعیت ارسال، پشتیبانی
-            فنی و پیگیری‌های لازم به‌صورت منظم انجام می‌شود.
-          </p>
-          <p>
-            ما تلاش می‌کنیم تجربه‌ای حرفه‌ای و مطمئن برای تجهیز فروشگاه شما بسازیم؛ تجربه‌ای که
-            در آن شفافیت قیمت، پاسخ‌گویی سریع و تحویل به‌موقع در کنار هم قرار می‌گیرد.
-          </p>
+          <p>ما از مرحله نیازسنجی تا تحویل نهایی کنار مشتریان هستیم؛ با هدف ایجاد آشپزخانه‌ای کارآمد، استاندارد و ایمن که جریان کار را روان‌تر کند.</p>
+          <p>تجربه پروژه‌های متعدد در رستوران‌ها، کافه‌ها و فودکورت‌ها به ما کمک کرده تا فرآیند تصمیم‌گیری و اجرا را ساده‌تر و قابل پیش‌بینی کنیم.</p>
+          <p>رویکرد ما بر شفافیت، کنترل کیفیت و مدیریت زمان استوار است تا خروجی هر پروژه با انتظارات کسب‌وکار هم‌راستا باشد.</p>
         </div>
       </div>
       <div class="about-highlights">
         <div class="about-card">
-          <h3>ماموریت ما</h3>
-          <p>
-            تأمین تجهیزات باکیفیت و ارائه مشاوره تخصصی برای کمک به رشد کسب‌وکار شما؛ با ارائه
-            اطلاعات فنی دقیق و پیشنهادهای متناسب با نیاز واقعی.
-          </p>
+          <h3>چشم‌انداز</h3>
+          <p>تبدیل شدن به مرجع قابل اعتماد در تامین و راه‌اندازی آشپزخانه‌های صنعتی در ایران.</p>
         </div>
         <div class="about-card">
-          <h3>تعهد به کیفیت</h3>
-          <p>
-            تمام محصولات با ضمانت اصالت عرضه می‌شوند و پیش از ارسال، کنترل کیفیت انجام می‌شود
-            تا خیالتان بابت خرید مطمئن باشد.
-          </p>
+          <h3>ماموریت</h3>
+          <p>ارائه راهکارهای کاربردی، ایمن و مقرون‌به‌صرفه برای تجهیز و بهره‌برداری آشپزخانه‌ها.</p>
         </div>
         <div class="about-card">
-          <h3>پشتیبانی مداوم</h3>
-          <p>
-            تیم پشتیبانی استیرا در تمام مراحل خرید و پس از آن همراه شماست؛ پاسخ‌گویی سریع،
-            پیگیری دقیق و راهنمایی حرفه‌ای از تعهدات ماست.
-          </p>
+          <h3>ارزش‌ها</h3>
+          <p>شفافیت، تعهد اجرایی، کیفیت کالا و احترام به زمان مشتری.</p>
         </div>
       </div>
     </div>
 
     <div class="about-contact">
-      <h2 class="section-title right">راه‌های ارتباطی</h2>
+      <h2 class="section-title right">ارتباط با استیرا</h2>
       <div class="contact-grid">
         {% if company_phone %}
-          <a class="contact-pill" href="tel:{{ company_phone }}" dir="ltr">
-            <i class="bx bx-phone"></i>
-            {{ company_phone }}
-          </a>
+          <a class="contact-pill" href="tel:{{ company_phone }}" dir="ltr"><i class="bx bx-phone"></i>{{ company_phone }}</a>
         {% endif %}
         {% if company_email %}
-          <a class="contact-pill" href="mailto:{{ company_email }}">
-            <i class="bx bx-envelope"></i>
-            {{ company_email }}
-          </a>
-        {% endif %}
-        {% if company_website %}
-          <a class="contact-pill" href="{{ company_website }}" target="_blank" rel="noopener" dir="ltr">
-            <i class="bx bx-globe"></i>
-            {{ company_website }}
-          </a>
-        {% endif %}
-        {% if company_whatsapp %}
-          <a class="contact-pill" href="https://wa.me/{{ company_whatsapp|cut:'+' }}" target="_blank" rel="noopener">
-            <i class="bx bxl-whatsapp"></i>
-            واتساپ
-          </a>
+          <a class="contact-pill" href="mailto:{{ company_email }}"><i class="bx bx-mail-send"></i>{{ company_email }}</a>
         {% endif %}
         {% if company_telegram %}
-          <a class="contact-pill" href="https://t.me/{{ company_telegram }}" target="_blank" rel="noopener">
-            <i class="bx bxl-telegram"></i>
-            تلگرام
-          </a>
+          <a class="contact-pill" href="https://t.me/{{ company_telegram }}" target="_blank" rel="noopener"><i class="bx bxl-telegram"></i>@{{ company_telegram }}</a>
+        {% endif %}
+        {% if company_whatsapp %}
+          <a class="contact-pill" href="https://wa.me/{{ company_whatsapp|cut:'+' }}" target="_blank" rel="noopener" dir="ltr"><i class="bx bxl-whatsapp"></i>{{ company_whatsapp }}</a>
         {% endif %}
       </div>
-
       {% if company_address %}
-        <div class="about-address">
-          <h3>آدرس</h3>
-          <p>{{ company_address|linebreaksbr }}</p>
-        </div>
+      <div class="about-address">
+        <h3>آدرس</h3>
+        <p>{{ company_address|linebreaksbr }}</p>
+      </div>
       {% endif %}
     </div>
   </div>

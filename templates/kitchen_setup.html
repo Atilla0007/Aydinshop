@@ -1,0 +1,70 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}راه‌اندازی آشپزخانه صنعتی{% endblock %}
+
+{% block content %}
+<section class="section page-hero">
+  <div class="container">
+    <h1 class="section-title right">راه‌اندازی آشپزخانه صنعتی</h1>
+    <p class="section-subtitle right">
+      از نیازسنجی تا تحویل نهایی، فرآیند راه‌اندازی آشپزخانه را مرحله‌به‌مرحله مدیریت می‌کنیم.
+    </p>
+  </div>
+</section>
+
+<section class="section steps-section">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>۱. نیازسنجی و تحلیل منو</h3>
+        <p>بررسی ظرفیت، منو و مدل کسب‌وکار برای تعیین تجهیزات اصلی.</p>
+      </div>
+      <div class="feature-card">
+        <h3>۲. طراحی چیدمان و فرآیند</h3>
+        <p>بهینه‌سازی مسیرهای کاری و چیدمان تجهیزات براساس استانداردهای اجرایی.</p>
+      </div>
+      <div class="feature-card">
+        <h3>۳. تامین و هماهنگی اجرا</h3>
+        <p>تامین تجهیزات، هماهنگی خرید، حمل، نصب و نظارت فنی.</p>
+      </div>
+      <div class="feature-card">
+        <h3>۴. تحویل و آموزش</h3>
+        <p>تحویل مرحله‌ای، تست عملکرد و آموزش اولیه اپراتورها.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section packages-highlight">
+  <div class="container">
+    <h2 class="section-title">پکیج‌های پیشنهادی</h2>
+    <p class="section-subtitle">براساس نیاز پروژه، یکی از پکیج‌ها را انتخاب کنید.</p>
+    <div class="packages-grid">
+      {% for key, package in packages.items %}
+        <article class="package-card">
+          <h3>{{ package.title }}</h3>
+          <p>{{ package.subtitle }}</p>
+          <ul>
+            {% for item in package.audience %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+          <a href="{% url 'package_detail' key %}" class="btn btn-outline small">جزئیات پکیج</a>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section cta-banner">
+  <div class="container cta-inner">
+    <div>
+      <h2>برای شروع پروژه آماده‌ایم</h2>
+      <p>برای دریافت مشاوره و برآورد اولیه، همین حالا با ما تماس بگیرید.</p>
+    </div>
+    <div>
+      <a href="{% url 'contact' %}" class="btn btn-light">درخواست مشاوره</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

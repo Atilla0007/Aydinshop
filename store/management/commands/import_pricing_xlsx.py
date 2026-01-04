@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from core.utils.jalali import PERSIAN_DIGITS_TRANS
-from store.models import CartItem, Category, Order, Product, ProductFeature
+from store.models import Category, Product, ProductFeature
 
 
 DIGITS_TO_ASCII = str.maketrans(
@@ -162,7 +162,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--wipe",
             action="store_true",
-            help="تمام محصولات/دسته‌ها و سفارش‌ها را پاک می‌کند و سپس ایمپورت انجام می‌دهد.",
+            help="تمام محصولات و دسته‌ها را پاک می‌کند و سپس ایمپورت انجام می‌دهد.",
         )
         parser.add_argument(
             "--dry-run",
@@ -216,9 +216,6 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             if wipe:
-                CartItem.objects.all().delete()
-                # Delete orders first to avoid PROTECT on OrderItem.product.
-                Order.objects.all().delete()
                 ProductFeature.objects.all().delete()
                 Product.objects.all().delete()
                 Category.objects.all().delete()

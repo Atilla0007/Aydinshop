@@ -1,0 +1,51 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} | کاتالوگ استیرا{% endblock %}
+
+{% block content %}
+<section class="section page-hero">
+  <div class="container">
+    <h1 class="section-title right">{{ category.name }}</h1>
+    <p class="section-subtitle right">برای دریافت قیمت و موجودی محصولات این دسته، با ما تماس بگیرید.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <form method="get" class="catalog-search">
+      <input type="search" name="q" value="{{ search_term }}" placeholder="جستجوی محصول در این دسته">
+      <button class="btn btn-outline" type="submit">جستجو</button>
+      <a class="btn btn-ghost" href="{% url 'catalog_category' category.slug %}">پاک کردن</a>
+    </form>
+
+    <div class="products-grid">
+      {% for product in products %}
+        <article class="product-card" data-href="{% url 'catalog_product' category.slug product.slug %}">
+          <div class="product-image">
+            {% if product.card_image_url %}
+              <img src="{{ product.card_image_url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+            {% else %}
+              <picture>
+                <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
+                <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+              </picture>
+            {% endif %}
+          </div>
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="product-domain">{{ product.category.name }}</p>
+            <p class="product-summary">{{ product.summary|default:"تجهیزات صنعتی با کیفیت و استاندارد." }}</p>
+          </div>
+          <div class="product-actions">
+            <a href="{% url 'catalog_product' category.slug product.slug %}" class="btn btn-outline small">مشاهده جزئیات</a>
+            <a href="{% url 'contact' %}?product={{ product.slug }}" class="btn btn-primary small">استعلام قیمت</a>
+          </div>
+        </article>
+      {% empty %}
+        <p class="empty-text">محصولی برای نمایش در این دسته ثبت نشده است.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

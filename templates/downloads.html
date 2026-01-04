@@ -1,0 +1,33 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}دانلودها | استیرا{% endblock %}
+
+{% block content %}
+<section class="section page-hero">
+  <div class="container">
+    <h1 class="section-title right">دانلودها</h1>
+    <p class="section-subtitle right">کاتالوگ‌ها، بروشورها و فایل‌های فنی تجهیزات.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="downloads-grid">
+      {% for item in downloads %}
+        <article class="download-card">
+          <h3>{{ item.title }}</h3>
+          {% if item.category %}
+            <p>{{ item.category }}</p>
+          {% endif %}
+          {% if item.description %}
+            <p>{{ item.description }}</p>
+          {% endif %}
+          <a class="btn btn-outline small" href="{{ item.file.url }}" target="_blank" rel="noopener">دانلود فایل</a>
+        </article>
+      {% empty %}
+        <p class="empty-text">در حال حاضر فایلی برای دانلود ثبت نشده است.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

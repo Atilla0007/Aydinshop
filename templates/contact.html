@@ -1,52 +1,97 @@
+﻿{% extends 'base.html' %}
 
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}تماس با ما{% endblock %}
+{% block title %}تماس با استیرا{% endblock %}
 
 {% block content %}
+<section class="section page-hero">
+  <div class="container">
+    <h1 class="section-title right">تماس با ما</h1>
+    <p class="section-subtitle right">برای دریافت مشاوره، استعلام قیمت یا همکاری با ما در ارتباط باشید.</p>
+  </div>
+</section>
+
 <section class="section">
-    <div class="container contact-container">
-        <div class="contact-form-wrapper">
-            <h1>تماس با ما</h1>
-            <p>اگر سوالی دارید یا نیاز به مشاوره دارید، فرم زیر را تکمیل کنید تا در کوتاه‌ترین زمان با شما در تماس باشیم.</p>
-            {% if success %}
-              <div class="form-success">پیام شما با موفقیت ارسال شد. به زودی با شما تماس می‌گیریم.</div>
-            {% endif %}
-            <form method="post">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                <label>نام و نام خانوادگی</label>
-                {{ form.name }}
-                <label>ایمیل</label>
-                {{ form.email }}
-                <label>شماره موبایل</label>
-                {{ form.phone }}
-                <label>متن پیام</label>
-                {{ form.message }}
-                <button type="submit" class="btn btn-primary">ارسال پیام</button>
-            </form>
-        </div>
-        <div class="contact-info">
-            <h2>اطلاعات تماس</h2>
-            {% if company_phone %}
-              <p>شماره تماس: <a href="tel:{{ company_phone }}" dir="ltr">{{ company_phone }}</a></p>
-            {% endif %}
-            {% if company_email %}
-              <p>ایمیل: <a href="mailto:{{ company_email }}">{{ company_email }}</a></p>
-            {% endif %}
-            {% if company_website %}
-              <p>وبسایت: <a href="{{ company_website }}" target="_blank" rel="noopener" dir="ltr">{{ company_website }}</a></p>
-            {% endif %}
-            {% if company_whatsapp %}
-              <p>واتساپ: <a href="https://wa.me/{{ company_whatsapp|cut:'+' }}" dir="ltr" target="_blank" rel="noopener">{{ company_whatsapp }}</a></p>
-            {% endif %}
-            {% if company_telegram %}
-              <p>تلگرام: <a href="https://t.me/{{ company_telegram }}" target="_blank" rel="noopener">@{{ company_telegram }}</a></p>
-            {% endif %}
-            {% if company_address %}
-              <p>آدرس: {{ company_address|linebreaksbr }}</p>
-            {% endif %}
-        </div>
+  <div class="container contact-layout">
+    <div class="contact-info">
+      <h2 class="section-title right">اطلاعات تماس</h2>
+      <ul>
+        {% if company_phone %}
+          <li>تلفن: <a href="tel:{{ company_phone }}" dir="ltr">{{ company_phone }}</a></li>
+        {% endif %}
+        {% if company_email %}
+          <li>ایمیل: <a href="mailto:{{ company_email }}">{{ company_email }}</a></li>
+        {% endif %}
+        {% if company_telegram %}
+          <li>تلگرام: <a href="https://t.me/{{ company_telegram }}" target="_blank" rel="noopener">@{{ company_telegram }}</a></li>
+        {% endif %}
+        {% if company_whatsapp %}
+          <li>واتساپ: <a href="https://wa.me/{{ company_whatsapp|cut:'+' }}" dir="ltr" target="_blank" rel="noopener">{{ company_whatsapp }}</a></li>
+        {% endif %}
+        {% if company_address %}
+          <li>آدرس: {{ company_address|linebreaksbr }}</li>
+        {% endif %}
+      </ul>
+      <p class="contact-note">کارشناسان ما در ساعات اداری پاسخگوی شما هستند و در سریع‌ترین زمان بازخورد ارسال می‌کنند.</p>
     </div>
+
+    <div class="contact-form-wrap">
+      <h2 class="section-title right">فرم درخواست مشاوره</h2>
+      {% if success %}
+        <div class="form-success">پیام شما ثبت شد. در اسرع وقت با شما تماس می‌گیریم.</div>
+      {% endif %}
+      <form method="post" class="contact-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="form-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="form-row">
+          <label for="id_name">نام و نام خانوادگی</label>
+          {{ form.name }}
+          {{ form.name.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_email">ایمیل</label>
+          {{ form.email }}
+          {{ form.email.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_phone">شماره تماس</label>
+          {{ form.phone }}
+          {{ form.phone.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_company">نام مجموعه</label>
+          {{ form.company }}
+          {{ form.company.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_city">شهر</label>
+          {{ form.city }}
+          {{ form.city.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_inquiry_type">نوع درخواست</label>
+          {{ form.inquiry_type }}
+          {{ form.inquiry_type.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_service_package">پکیج خدماتی (اختیاری)</label>
+          {{ form.service_package }}
+          {{ form.service_package.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_product_interest">محصول مورد نظر (اختیاری)</label>
+          {{ form.product_interest }}
+          {{ form.product_interest.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_message">پیام</label>
+          {{ form.message }}
+          {{ form.message.errors }}
+        </div>
+        <button class="btn btn-primary" type="submit">ارسال درخواست</button>
+      </form>
+    </div>
+  </div>
 </section>
 {% endblock %}

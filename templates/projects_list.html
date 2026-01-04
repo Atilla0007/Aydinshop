@@ -1,0 +1,30 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}پروژه‌ها | استیرا{% endblock %}
+
+{% block content %}
+<section class="section page-hero">
+  <div class="container">
+    <h1 class="section-title right">پروژه‌ها و نمونه کارها</h1>
+    <p class="section-subtitle right">نمونه‌ای از پروژه‌های اجرا شده توسط تیم استیرا.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="news-grid">
+      {% for project in projects %}
+        <article class="news-card">
+          <a href="{% url 'project_detail' project.slug %}">
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.summary|default:project.text|truncatechars:180 }}</p>
+            <span class="news-date">{{ project.created_at|date:"Y/m/d" }}</span>
+          </a>
+        </article>
+      {% empty %}
+        <p class="empty-text">هنوز پروژه‌ای ثبت نشده است.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

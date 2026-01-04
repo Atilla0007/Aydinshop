@@ -1,0 +1,161 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | استیرا{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container product-detail-layout">
+    <div>
+      <div class="product-gallery-main">
+        {% if gallery_images %}
+          <img id="main-gallery-image" src="{{ gallery_images.0.url }}" alt="{{ gallery_images.0.alt|default:product.name }}" loading="lazy" decoding="async">
+        {% else %}
+          <picture>
+            <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
+            <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+          </picture>
+        {% endif %}
+      </div>
+      {% if gallery_images|length > 1 %}
+        <div class="product-gallery-thumbs">
+          {% for image in gallery_images %}
+            <button class="product-thumb" type="button" data-image="{{ image.url }}" aria-label="نمایش تصویر">
+              <img src="{{ image.url }}" alt="{{ image.alt|default:product.name }}" loading="lazy" decoding="async">
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div>
+      <h1 class="section-title right">{{ product.name }}</h1>
+      <p class="section-subtitle right">{{ product.summary|default:"تجهیزات صنعتی با کیفیت و استاندارد برای آشپزخانه‌های حرفه‌ای." }}</p>
+
+      <div class="product-meta-chips">
+        <span class="chip">
+          <span class="chip-label">دسته:</span>
+          <span class="chip-value">{{ product.category.name }}</span>
+        </span>
+        {% if product.brand %}
+        <span class="chip">
+          <span class="chip-label">برند:</span>
+          <span class="chip-value">{{ product.brand }}</span>
+        </span>
+        {% endif %}
+        {% if product.sku %}
+        <span class="chip" dir="ltr">
+          <span class="chip-label">SKU:</span>
+          <span class="chip-value">{{ product.sku }}</span>
+        </span>
+        {% endif %}
+        {% if product.tags %}
+        <span class="chip chip-wide">
+          <span class="chip-label">برچسب‌ها:</span>
+          <span class="chip-value">{{ product.tags }}</span>
+        </span>
+        {% endif %}
+        <span class="chip">
+          <span class="chip-label">به‌روزرسانی:</span>
+          <span class="chip-value">{{ product.updated_at|date:"Y/m/d" }}</span>
+        </span>
+      </div>
+
+      <div class="about-copy">
+        {{ product.description|linebreaks }}
+      </div>
+
+      {% if features %}
+      <div class="feature-list">
+        <h3>مشخصات فنی</h3>
+        <ul>
+          {% for feature in features %}
+            <li>{{ feature.name }}: {{ feature.value }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="product-detail-cta">
+        <a href="{% url 'contact' %}?product={{ product.slug }}" class="btn btn-primary">استعلام قیمت / مشاوره خرید</a>
+        {% if product.datasheet %}
+          <a href="{{ product.datasheet.url }}" class="btn btn-outline" target="_blank" rel="noopener">دانلود دیتاشیت</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title right">نظرات مشتریان</h2>
+    {% if reviews %}
+      <div class="reviews-grid">
+        {% for review in reviews %}
+          <div class="review-card">
+            <div class="review-head">
+              <span>{{ review.name }}</span>
+              <span class="review-rating">امتیاز {{ review.rating }}/5</span>
+            </div>
+            {% if review.role %}
+              <div class="review-role">{{ review.role }}</div>
+            {% endif %}
+            <p>{{ review.comment }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-text">هنوز نظری ثبت نشده است.</p>
+    {% endif %}
+
+    <div class="review-form">
+      <h3>ثبت نظر</h3>
+      {% if review_submitted %}
+        <div class="form-success">نظر شما ثبت شد و پس از بررسی نمایش داده می‌شود.</div>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+          <label for="id_name">نام</label>
+          {{ review_form.name }}
+          {{ review_form.name.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_role">سمت / مجموعه (اختیاری)</label>
+          {{ review_form.role }}
+          {{ review_form.role.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_rating">امتیاز (۱ تا ۵)</label>
+          {{ review_form.rating }}
+          {{ review_form.rating.errors }}
+        </div>
+        <div class="form-row">
+          <label for="id_comment">نظر شما</label>
+          {{ review_form.comment }}
+          {{ review_form.comment.errors }}
+        </div>
+        <button class="btn btn-primary" type="submit">ارسال نظر</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    (() => {
+      const mainImage = document.getElementById('main-gallery-image');
+      const thumbs = document.querySelectorAll('.product-thumb');
+      if (!mainImage || !thumbs.length) return;
+      thumbs.forEach((thumb) => {
+        thumb.addEventListener('click', () => {
+          const url = thumb.getAttribute('data-image');
+          if (url) {
+            mainImage.src = url;
+          }
+        });
+      });
+    })();
+  </script>
+{% endblock %}

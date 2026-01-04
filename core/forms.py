@@ -1,4 +1,4 @@
-import re
+﻿import re
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -48,7 +48,7 @@ class ContactForm(forms.ModelForm):
     def clean_phone(self):
         value = (self.cleaned_data.get("phone") or "").strip()
         if value and not re.fullmatch(r"\+?\d{8,15}", value):
-            raise ValidationError("????? ???? ????? ????.")
+            raise ValidationError("شماره تماس معتبر نیست.")
         return value
 
     def clean_company(self):
@@ -60,5 +60,5 @@ class ContactForm(forms.ModelForm):
     def clean_message(self):
         value = (self.cleaned_data.get("message") or "").strip()
         if len(value) > 2000:
-            raise ValidationError("??? ???? ??? ?? ?? ???? ???.")
+            raise ValidationError("متن پیام نباید بیشتر از ۲۰۰۰ کاراکتر باشد.")
         return value

@@ -1,386 +1,212 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
-{% load jalali %}
 
-{% block title %}استیرا | فروشگاه آنلاین{% endblock %}
+{% block title %}استیرا | تجهیزات آشپزخانه صنعتی{% endblock %}
 
 {% block content %}
 <section class="hero-section">
-    <div class="container hero-container">
-        <div class="hero-text">
-            <p class="hero-badge">فروشگاه آنلاین تجهیزات</p>
-            <h1>تجربه خرید سریع و امن در <span>استیرا</span></h1>
-            <p class="hero-subtitle">
-                جدیدترین تجهیزات و لوازم فروشگاهی را با ارسال سریع و پشتیبانی دائمی تهیه کنید. قیمت شفاف، ضمانت اصالت و مشاوره رایگان برای انتخاب بهتر در دسترس شماست.
-            </p>
-            <div class="hero-actions">
-                <a href="{% url 'shop' %}" class="button shop-cta-button">
-                    <span class="button__icon-wrapper">
-                        <svg
-                          viewBox="0 0 14 15"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="button__icon-svg"
-                          width="10"
-                        >
-                          <path
-                            d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-                            fill="currentColor"
-                          ></path>
-                        </svg>
-                        <svg
-                          viewBox="0 0 14 15"
-                          fill="none"
-                          width="10"
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="button__icon-svg button__icon-svg--copy"
-                        >
-                          <path
-                            d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-                            fill="currentColor"
-                          ></path>
-                        </svg>
-                    </span>
-                    مشاهده فروشگاه
-                </a>
-                <a href="{% url 'contact' %}" class="btn btn-outline">تماس با ما</a>
-                <button type="button" class="btn btn-light small" id="open-category-popup">
-                    دسته‌بندی‌ها
-                </button>
-            </div>
-            <div class="hero-meta">
-                <span>بیش از ۱۰۰۰ کالای آماده ارسال</span>
-                <span class="dot"></span>
-                <span>ارسال سریع به سراسر کشور</span>
-            </div>
-        </div>
-        <div class="hero-image">
-            <div class="hero-image-main">
-                <picture>
-                    <source srcset="{% static 'img/hero-shop.webp' %}" type="image/webp">
-                    <img src="{% static 'img/hero-shop.jpg' %}" alt="فروشگاه استیرا" decoding="async" loading="eager" />
-                </picture>
-                <div class="hero-floating-card">
-                    <span class="card-label">موجودی فعال</span>
-                    <strong>1,000+</strong>
-                </div>
-            </div>
-        </div>
+  <div class="container hero-container">
+    <div class="hero-text">
+      <p class="hero-badge">تجهیزات آشپزخانه صنعتی و راه‌اندازی کامل</p>
+      <h1>تجربه خرید مطمئن و راه‌اندازی حرفه‌ای<br><span>برای رستوران و کافه شما</span></h1>
+      <p class="hero-subtitle">
+        استیرا از تامین تجهیزات تا طراحی و اجرای آشپزخانه‌های صنعتی را با
+        مشاوره تخصصی، کنترل کیفیت و تحویل مرحله‌ای مدیریت می‌کند.
+      </p>
+      <div class="hero-actions">
+        <a href="{% url 'contact' %}" class="btn btn-primary">درخواست مشاوره</a>
+        <a href="{% url 'catalog' %}" class="btn btn-outline">مشاهده کاتالوگ</a>
+      </div>
+      <div class="hero-meta">
+        <span>ارسال و نصب سراسری</span>
+        <span class="dot"></span>
+        <span>پشتیبانی و خدمات پس از فروش</span>
+      </div>
     </div>
-    <div class="hero-bg-overlay"></div>
+    <div class="hero-image">
+      <div class="hero-image-main">
+        <picture>
+          <source srcset="{% static 'img/hero-shop.webp' %}" type="image/webp">
+          <img src="{% static 'img/hero-shop.jpg' %}" alt="تجهیزات آشپزخانه صنعتی" decoding="async" loading="eager">
+        </picture>
+        <div class="hero-floating-card">
+          <span class="card-label">موجودی فعال</span>
+          <strong>+1000</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-bg-overlay"></div>
 </section>
 
 <section class="section why-us">
-    <div class="container">
-        <h2 class="section-title">چرا استیرا را انتخاب کنیم؟</h2>
-        <p class="section-subtitle">
-            کیفیت، سرعت و پشتیبانی واقعی؛ هر چه برای خرید مطمئن نیاز دارید در یک فروشگاه جمع شده است.
-        </p>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon circle navy"><i class="bx bx-shield"></i></div>
-                <h3>تنوع محصولات</h3>
-                <p>از تجهیزات فروشگاهی تا لوازم مصرفی را در یک جا مقایسه و خرید کنید.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon circle green"><i class="bx bx-cart"></i></div>
-                <h3>ارسال سریع</h3>
-                <p>تحویل سریع به سراسر کشور با بسته‌بندی ایمن و امکان پیگیری سفارش.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon circle yellow"><i class="bx bx-time"></i></div>
-                <h3>پشتیبانی ۲۴/۷</h3>
-                <p>تیم پشتیبانی همیشه آماده پاسخ‌گویی و راهنمایی انتخاب محصول مناسب است.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon circle orange"><i class="bx bx-support"></i></div>
-                <h3>ضمانت اصالت</h3>
-                <p>تمام محصولات با ضمانت اصالت و امکان مرجوعی طبق شرایط فروش ارائه می‌شوند.</p>
-            </div>
-        </div>
+  <div class="container">
+    <h2 class="section-title">چرا استیرا انتخاب حرفه‌ای‌هاست؟</h2>
+    <p class="section-subtitle">
+      ترکیب تامین مطمئن، مهندسی چیدمان و نظارت اجرایی باعث شده پروژه‌های استیرا در زمان و بودجه کنترل‌شده تحویل شوند.
+    </p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon circle navy"><i class="bx bx-layer"></i></div>
+        <h3>تامین مطمئن تجهیزات</h3>
+        <p>همکاری مستقیم با تامین‌کنندگان معتبر برای تضمین کیفیت و اصالت کالا.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon circle green"><i class="bx bx-map"></i></div>
+        <h3>طراحی و چیدمان بهینه</h3>
+        <p>طراحی مسیر کاری آشپزخانه برای افزایش سرعت، ایمنی و بهره‌وری.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon circle yellow"><i class="bx bx-time-five"></i></div>
+        <h3>تحویل مرحله‌ای و کنترل کیفیت</h3>
+        <p>نظارت اجرایی و تحویل مرحله‌ای مطابق زمان‌بندی توافق‌شده.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon circle orange"><i class="bx bx-support"></i></div>
+        <h3>پشتیبانی و خدمات</h3>
+        <p>همراهی پس از نصب، آموزش اولیه و پاسخگویی سریع.</p>
+      </div>
     </div>
+  </div>
 </section>
 
-<section class="section best-products">
-    <div class="container">
-        <h2 class="section-title">پرفروش‌ترین‌ها</h2>
-        <p class="section-subtitle">
-            محبوب‌ترین کالاهای انتخاب‌شده توسط مشتریان ما را ببینید و سریع خرید کنید.
-        </p>
-
-        <div class="products-grid home-products-grid">
-            {% for product in home_featured_products %}
-            <div class="product-card{% if not product.is_available %} unavailable{% endif %}" data-product-card data-href="{% url 'product_detail' product.id %}">
-                <div class="product-image">
-                    {% if product.card_image_url %}
-                            <img src="{{ product.card_image_url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
-                        {% else %}
-                            <picture>
-                                <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
-                                <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
-                            </picture>
-                        {% endif %}
-                    {% if not product.is_available %}
-                        <span class="product-badge unavailable">ناموجود</span>
-                    {% endif %}
-                    {% if forloop.counter == 1 %}
-                        <span class="product-badge best">پرفروش</span>
-                    {% elif forloop.counter == 2 %}
-                        <span class="product-badge viewed">پربازدید</span>
-                    {% elif forloop.counter == 3 %}
-                        <span class="product-badge new">جدید</span>
-                    {% endif %}
-                </div>
-                <div class="product-info">
-                    <h3>{{ product.name }}</h3>
-                    <p class="product-domain">{{ product.domain }}</p>
-                    <p class="product-price">{{ product.price|money }} تومان</p>
-                </div>
-
-                <div class="product-card-cart" data-no-card-nav>
-                    <div class="checkbox-container">
-                        <div class="checkbox-wrapper">
-                            <input
-                                class="checkbox"
-                                id="home-cart-toggle-{{ product.id }}"
-                                type="checkbox"
-                                data-cart-toggle
-                                data-product-id="{{ product.id }}"
-                                data-add-url="{% if product.is_available %}{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}&qty=1{% endif %}"
-                                data-remove-url="{% url 'cart_remove' %}"
-                                {% if product.id in cart_product_ids %}checked{% endif %}
-                                {% if not product.is_available %}disabled aria-disabled="true"{% endif %}
-                            />
-                            <label class="checkbox-label" for="home-cart-toggle-{{ product.id }}">
-                                <div class="checkbox-flip">
-                                    <div class="checkbox-front" aria-hidden="true">
-                                        <svg fill="white" height="28" width="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="checkbox-back" aria-hidden="true">
-                                        <svg fill="white" height="28" width="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z" class="icon-path"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <p class="empty-text">هنوز محصولی ثبت نشده است.</p>
-            {% endfor %}
-        </div>
-
-        {% if home_more_products %}
-        <div class="home-products-toggle" data-home-products-toggle-anchor="top">
-            <button type="button" class="btn btn-outline home-products-toggle-btn" data-home-products-toggle aria-expanded="false">
-                نمایش محصولات بیشتر
-            </button>
-        </div>
-
-        <div class="products-grid home-products-extra" data-home-products-extra>
-            {% for product in home_more_products %}
-            <div class="product-card{% if not product.is_available %} unavailable{% endif %}" data-product-card data-href="{% url 'product_detail' product.id %}">
-                <div class="product-image">
-                    {% if product.card_image_url %}
-                            <img src="{{ product.card_image_url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
-                        {% else %}
-                            <picture>
-                                <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
-                                <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
-                            </picture>
-                        {% endif %}
-                    {% if not product.is_available %}
-                        <span class="product-badge unavailable">ناموجود</span>
-                    {% endif %}
-                </div>
-                <div class="product-info">
-                    <h3>{{ product.name }}</h3>
-                    <p class="product-domain">{{ product.domain }}</p>
-                    <p class="product-price">{{ product.price|money }} تومان</p>
-                </div>
-
-                <div class="product-card-cart" data-no-card-nav>
-                    <div class="checkbox-container">
-                        <div class="checkbox-wrapper">
-                            <input
-                                class="checkbox"
-                                id="home-more-cart-toggle-{{ product.id }}"
-                                type="checkbox"
-                                data-cart-toggle
-                                data-product-id="{{ product.id }}"
-                                data-add-url="{% if product.is_available %}{% url 'add_to_cart' product.id %}?next={{ request.get_full_path|urlencode }}&qty=1{% endif %}"
-                                data-remove-url="{% url 'cart_remove' %}"
-                                {% if product.id in cart_product_ids %}checked{% endif %}
-                                {% if not product.is_available %}disabled aria-disabled="true"{% endif %}
-                            />
-                            <label class="checkbox-label" for="home-more-cart-toggle-{{ product.id }}">
-                                <div class="checkbox-flip">
-                                    <div class="checkbox-front" aria-hidden="true">
-                                        <svg fill="white" height="28" width="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M19 13H12V19H11V13H5V12H11V6H12V12H19V13Z" class="icon-path"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="checkbox-back" aria-hidden="true">
-                                        <svg fill="white" height="28" width="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9 19l-7-7 1.41-1.41L9 16.17l11.29-11.3L22 6l-13 13z" class="icon-path"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        <div class="home-products-toggle home-products-toggle--after" data-home-products-toggle-anchor="bottom"></div>
-        {% endif %}
-
-        <div class="section-cta-center">
-            <a href="{% url 'shop' %}" class="btn btn-outline">مشاهده همه محصولات</a>
-        </div>
+<section class="section services-highlight">
+  <div class="container">
+    <h2 class="section-title">خدمات اصلی استیرا</h2>
+    <p class="section-subtitle">
+      از مشاوره تا اجرا، تمام مراحل راه‌اندازی آشپزخانه صنعتی را یکپارچه مدیریت می‌کنیم.
+    </p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>مشاوره و نیازسنجی</h3>
+        <p>تحلیل منو، ظرفیت و بودجه برای پیشنهاد دقیق تجهیزات.</p>
+      </div>
+      <div class="feature-card">
+        <h3>تامین تجهیزات</h3>
+        <p>خرید، واردات یا تولید تجهیزات متناسب با استاندارد پروژه.</p>
+      </div>
+      <div class="feature-card">
+        <h3>طراحی و اجرا</h3>
+        <p>چیدمان، هماهنگی نصب و تحویل مرحله‌ای با نظارت فنی.</p>
+      </div>
+      <div class="feature-card">
+        <h3>پشتیبانی تخصصی</h3>
+        <p>آموزش اولیه، چک‌لیست بهره‌برداری و پیگیری پس از تحویل.</p>
+      </div>
     </div>
+  </div>
 </section>
 
-<div class="home-more-toggle-wrap">
-    <div class="container">
-        <button type="button" class="btn btn-outline home-more-toggle" data-home-more-toggle aria-expanded="false">مشاهده ادامه محتوا</button>
+<section class="section packages-highlight">
+  <div class="container">
+    <h2 class="section-title">پکیج‌های راه‌اندازی آشپزخانه</h2>
+    <p class="section-subtitle">با توجه به مقیاس پروژه، پکیج مناسب خود را انتخاب کنید.</p>
+    <div class="packages-grid">
+      <article class="package-card">
+        <h3>Normal</h3>
+        <p>راه‌اندازی پایه برای پروژه‌های اقتصادی و سریع.</p>
+        <ul>
+          <li>نیازسنجی و لیست تجهیزات</li>
+          <li>تامین و هماهنگی خرید</li>
+          <li>نصب و راه‌اندازی ضروری</li>
+        </ul>
+        <a href="{% url 'package_detail' 'normal' %}" class="btn btn-outline small">جزئیات پکیج</a>
+      </article>
+      <article class="package-card">
+        <h3>VIP</h3>
+        <p>مدیریت دقیق‌تر فرآیند و تحویل با استاندارد اجرایی.</p>
+        <ul>
+          <li>طراحی چیدمان و مسیر کاری</li>
+          <li>هماهنگی تامین‌کنندگان</li>
+          <li>آموزش و تحویل مرحله‌ای</li>
+        </ul>
+        <a href="{% url 'package_detail' 'vip' %}" class="btn btn-outline small">جزئیات پکیج</a>
+      </article>
+      <article class="package-card">
+        <h3>CIP</h3>
+        <p>تحویل کامل پروژه از طراحی تا آماده‌سازی افتتاح.</p>
+        <ul>
+          <li>طراحی معماری و فنی کامل</li>
+          <li>مدیریت پروژه و کنترل کیفیت</li>
+          <li>تحویل نهایی و چک‌لیست افتتاح</li>
+        </ul>
+        <a href="{% url 'package_detail' 'cip' %}" class="btn btn-outline small">جزئیات پکیج</a>
+      </article>
     </div>
-</div>
+  </div>
+</section>
 
-<div class="home-more-sections" data-home-more>
-
-<section class="section steps">
-    <div class="container">
-        <h2 class="section-title">مراحل خرید آسان</h2>
-        <p class="section-subtitle">
-            در چند گام ساده محصول را انتخاب، پرداخت و درب منزل تحویل بگیرید.
-        </p>
-
-        <div class="steps-line">
-            <div class="step-item">
-                <div class="step-circle">1</div>
-                <h3>انتخاب محصول</h3>
-                <p>محصول مورد نظر را جستجو و ویژگی‌ها و قیمت‌ها را مقایسه کنید.</p>
-            </div>
-            <div class="step-item">
-                <div class="step-circle">2</div>
-                <h3>افزودن به سبد</h3>
-                <p>کالاهای انتخابی را به سبد اضافه کنید و آدرس و ارسال را تعیین نمایید.</p>
-            </div>
-            <div class="step-item">
-                <div class="step-circle">3</div>
-                <h3>پرداخت امن</h3>
-                <p>پرداخت آنلاین مطمئن و دریافت فاکتور الکترونیک پس از تکمیل سفارش.</p>
-            </div>
-            <div class="step-item">
-                <div class="step-circle">4</div>
-                <h3>تحویل سریع</h3>
-                <p>ارسال سریع و امکان پیگیری لحظه‌ای تا تحویل در آدرس شما.</p>
-            </div>
-        </div>
+<section class="section catalog-highlight">
+  <div class="container">
+    <h2 class="section-title">منتخب تجهیزات کاتالوگ</h2>
+    <p class="section-subtitle">نمونه‌ای از تجهیزات پرکاربرد برای آشپزخانه‌های صنعتی.</p>
+    <div class="products-grid">
+      {% for product in featured_products %}
+        <article class="product-card" data-href="{% url 'catalog_product' product.category.slug product.slug %}">
+          <div class="product-image">
+            {% if product.card_image_url %}
+              <img src="{{ product.card_image_url }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+            {% else %}
+              <picture>
+                <source srcset="{% static 'img/product-placeholder.webp' %}" type="image/webp">
+                <img src="{% static 'img/product-placeholder.jpg' %}" alt="{{ product.name }}" loading="lazy" decoding="async">
+              </picture>
+            {% endif %}
+          </div>
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="product-domain">{{ product.category.name }}</p>
+            <p class="product-summary">{{ product.summary|default:"تجهیزات صنعتی با کیفیت و استاندارد." }}</p>
+          </div>
+          <div class="product-actions">
+            <a href="{% url 'catalog_product' product.category.slug product.slug %}" class="btn btn-outline small">مشاهده جزئیات</a>
+            <a href="{% url 'contact' %}?product={{ product.slug }}" class="btn btn-primary small">استعلام قیمت</a>
+          </div>
+        </article>
+      {% empty %}
+        <p class="empty-text">در حال حاضر محصولی برای نمایش ثبت نشده است.</p>
+      {% endfor %}
     </div>
+    <div class="section-cta-center">
+      <a href="{% url 'catalog' %}" class="btn btn-outline">مشاهده همه محصولات</a>
+    </div>
+  </div>
+</section>
+
+<section class="section projects-highlight">
+  <div class="container">
+    <h2 class="section-title">پروژه‌های منتخب</h2>
+    <p class="section-subtitle">نمونه‌ای از پروژه‌های اجراشده توسط تیم استیرا.</p>
+    <div class="news-grid">
+      {% for project in projects %}
+        <article class="news-card">
+          <a href="{% url 'project_detail' project.slug %}">
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.summary|default:project.text|truncatechars:160 }}</p>
+            <span class="news-date">{{ project.created_at|date:"Y/m/d" }}</span>
+          </a>
+        </article>
+      {% empty %}
+        <p class="empty-text">در حال حاضر پروژه‌ای برای نمایش ثبت نشده است.</p>
+      {% endfor %}
+    </div>
+    <div class="section-cta-center">
+      <a href="{% url 'projects_list' %}" class="btn btn-outline small">مشاهده همه پروژه‌ها</a>
+    </div>
+  </div>
 </section>
 
 <section class="section cta-banner">
-    <div class="container cta-inner">
-        <div>
-            <h2>برای دریافت مشاوره رایگان تماس بگیرید</h2>
-            <p>کارشناسان ما آماده‌اند تا بهترین تجهیزات را متناسب با نیاز شما پیشنهاد دهند.</p>
-        </div>
-        <div>
-            <a href="{% url 'shop' %}" class="btn btn-light">شروع خرید</a>
-        </div>
+  <div class="container cta-inner">
+    <div>
+      <h2>برای مشاوره تخصصی آماده‌ایم</h2>
+      <p>برای انتخاب تجهیزات یا طراحی آشپزخانه صنعتی، همین حالا با تیم استیرا در ارتباط باشید.</p>
     </div>
-</section>
-
-<section class="section support">
-    <div class="container support-container">
-        <div class="support-image">
-            <picture>
-                <source srcset="{% static 'img/support.webp' %}" type="image/webp">
-                <img src="{% static 'img/support.jpg' %}" alt="پشتیبانی مشتریان" loading="lazy" decoding="async">
-            </picture>
-        </div>
-        <div class="support-content">
-            <h2 class="section-title right">پشتیبانی واقعی کنار شماست</h2>
-            <p class="section-subtitle right">
-                هر زمان سوالی داشتید، تیم پشتیبانی ما از طریق چت، تماس یا ایمیل پاسخ‌گوست.
-            </p>
-            <div class="support-options">
-                <div class="support-card green">
-                    <h3>پشتیبانی تلفنی</h3>
-                    <p>برای دریافت راهنمایی سریع، با کارشناسان ما تماس بگیرید.</p>
-                </div>
-                <div class="support-card yellow">
-                    <h3>مشاوره تخصصی</h3>
-                    <p>برای انتخاب محصول مناسب، مشاوره فنی و تخصصی دریافت کنید.</p>
-                </div>
-                <div class="support-card orange">
-                    <h3>تیکت و ایمیل</h3>
-                    <p>در صورت نیاز درخواست خود را ثبت کنید تا پیگیری شود.</p>
-                </div>
-            </div>
-            <div class="support-actions">
-                <a href="{% url 'faq' %}" class="btn btn-outline">سوالات متداول</a>
-                <a href="{% url 'contact' %}" class="btn btn-primary">تماس با ما</a>
-            </div>
-        </div>
+    <div>
+      <a href="{% url 'contact' %}" class="btn btn-light">درخواست مشاوره</a>
     </div>
+  </div>
 </section>
-
-<section class="section customer-reviews">
-    <div class="container">
-        <h2 class="section-title">نظرات مشتریان</h2>
-        <p class="section-subtitle">بخشی از بازخورد خریداران از تجربه خرید از استیرا.</p>
-
-        <div class="reviews-grid">
-            {% for review in latest_reviews %}
-            <div class="review-card">
-                <div class="review-head">
-                    <strong>{{ review.name }}</strong>
-                    <span class="review-rating">{{ review.rating }}/5</span>
-                </div>
-                <p>{{ review.comment|truncatechars:160 }}</p>
-                <span class="review-product">محصول: {{ review.product.name }}</span>
-            </div>
-            {% empty %}
-            <p class="empty-text">هنوز نظری ثبت نشده است.</p>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<section class="section latest-news">
-    <div class="container">
-        <h2 class="section-title">آخرین اخبار</h2>
-        <div class="news-grid">
-            {% for item in news %}
-            <article class="news-card">
-                <a href="{% url 'news_detail' item.pk %}">
-                    <h3>{{ item.title }}</h3>
-                    <p>{{ item.text|truncatechars:220 }}</p>
-                    <span class="news-date">{{ item.created_at|jalali:"Y/m/d" }}</span>
-                </a>
-            </article>
-            {% empty %}
-            <p class="empty-text">هنوز خبری ثبت نشده است.</p>
-            {% endfor %}
-        </div>
-        <div class="section-cta-center">
-            <a href="{% url 'news_list' %}" class="btn btn-outline small">مشاهده همه اخبار</a>
-        </div>
-    </div>
-</section>
-</div>
 {% endblock %}
 
-{% block extra_js %}
-  <script src="{% static 'js/shop.js' %}" defer></script>
-  <script src="{% static 'js/home.js' %}" defer></script>
-{% endblock %}
+{% block extra_js %}{% endblock %}

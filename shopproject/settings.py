@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,12 +74,9 @@ INSTALLED_APPS=[
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_otp',
     'auth_security',
     'core',
     'store',
-    'accounts',
-    'otp_email',
 ]
 MIDDLEWARE=[
     'django.middleware.security.SecurityMiddleware',
@@ -93,13 +90,12 @@ MIDDLEWARE=[
     'django.middleware.csrf.CsrfViewMiddleware',
     'auth_security.middleware.LoginProtectionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_otp.middleware.OTPMiddleware',
     'core.middleware.AdminEnglishMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 ROOT_URLCONF='shopproject.urls'
-TEMPLATES=[{'BACKEND':'django.template.backends.django.DjangoTemplates','DIRS':[BASE_DIR/'templates'],'APP_DIRS':True,'OPTIONS':{'context_processors':['django.template.context_processors.debug','django.template.context_processors.request','django.contrib.auth.context_processors.auth','django.contrib.messages.context_processors.messages','core.context_processors.site_info','core.context_processors.public_promo']}}]
+TEMPLATES=[{'BACKEND':'django.template.backends.django.DjangoTemplates','DIRS':[BASE_DIR/'templates'],'APP_DIRS':True,'OPTIONS':{'context_processors':['django.template.context_processors.debug','django.template.context_processors.request','django.contrib.auth.context_processors.auth','django.contrib.messages.context_processors.messages','core.context_processors.site_info']}}]
 
 # تنظیم ASGI
 ASGI_APPLICATION = 'shopproject.asgi.application'
@@ -150,7 +146,7 @@ MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(BASE_DIR / "media")))
 LOGIN_REDIRECT_URL='/'
 LOGOUT_REDIRECT_URL='/'
 
-LOGIN_URL = '/login/'
+LOGIN_URL = f"/{ADMIN_PATH}login/"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -249,11 +245,8 @@ RECEIPT_PURGE_DELAY_SECONDS = int(os.getenv('RECEIPT_PURGE_DELAY_SECONDS', '7200
 
 # Authentication security (login brute-force protection)
 _default_admin_login = f"/{ADMIN_PATH}login/"
-AUTH_SECURITY_LOGIN_PATHS = os.getenv("AUTH_SECURITY_LOGIN_PATHS", f"/login/,{_default_admin_login}")
-AUTH_SECURITY_PROTECTED_PATHS = os.getenv(
-    "AUTH_SECURITY_PROTECTED_PATHS",
-    "/auth/email-otp/verify/,/password-reset/,/password_reset/",
-)
+AUTH_SECURITY_LOGIN_PATHS = os.getenv("AUTH_SECURITY_LOGIN_PATHS", f"/{ADMIN_PATH}login/")
+AUTH_SECURITY_PROTECTED_PATHS = os.getenv("AUTH_SECURITY_PROTECTED_PATHS", "")
 AUTH_SECURITY_TRUST_X_FORWARDED_FOR = _env_bool("AUTH_SECURITY_TRUST_X_FORWARDED_FOR", False)
 AUTH_SECURITY_LOGIN_IP_MAX_ATTEMPTS = int(os.getenv("AUTH_SECURITY_LOGIN_IP_MAX_ATTEMPTS", "10"))
 AUTH_SECURITY_LOGIN_IP_WINDOW_SECONDS = int(os.getenv("AUTH_SECURITY_LOGIN_IP_WINDOW_SECONDS", "600"))
@@ -273,18 +266,5 @@ SECURE_REFERRER_POLICY = os.getenv("SECURE_REFERRER_POLICY", "same-origin")
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# Email OTP settings
-EMAIL_OTP_LENGTH = int(os.getenv('EMAIL_OTP_LENGTH', '6'))
-EMAIL_OTP_TTL_SECONDS = int(os.getenv('EMAIL_OTP_TTL_SECONDS', '300'))
-EMAIL_OTP_RESEND_COOLDOWN_SECONDS = int(os.getenv('EMAIL_OTP_RESEND_COOLDOWN_SECONDS', '60'))
-EMAIL_OTP_MAX_SEND_PER_WINDOW = int(os.getenv('EMAIL_OTP_MAX_SEND_PER_WINDOW', '3'))
-EMAIL_OTP_SEND_WINDOW_SECONDS = int(os.getenv('EMAIL_OTP_SEND_WINDOW_SECONDS', '600'))
-EMAIL_OTP_MAX_VERIFY_ATTEMPTS = int(os.getenv('EMAIL_OTP_MAX_VERIFY_ATTEMPTS', '5'))
 
-# SMS OTP settings (provider can be configured via SMS_BACKEND)
-SMS_OTP_LENGTH = int(os.getenv('SMS_OTP_LENGTH', '6'))
-SMS_OTP_TTL_SECONDS = int(os.getenv('SMS_OTP_TTL_SECONDS', '300'))
-SMS_OTP_RESEND_COOLDOWN_SECONDS = int(os.getenv('SMS_OTP_RESEND_COOLDOWN_SECONDS', '60'))
-SMS_OTP_MAX_SEND_PER_WINDOW = int(os.getenv('SMS_OTP_MAX_SEND_PER_WINDOW', '3'))
-SMS_OTP_SEND_WINDOW_SECONDS = int(os.getenv('SMS_OTP_SEND_WINDOW_SECONDS', '600'))
-SMS_OTP_MAX_VERIFY_ATTEMPTS = int(os.getenv('SMS_OTP_MAX_VERIFY_ATTEMPTS', '5'))
+
