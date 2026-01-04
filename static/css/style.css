@@ -7444,6 +7444,17 @@ hr,
     font-size: 2.2rem;
     font-weight: 700;
     color: var(--text);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.pricing-card .price:hover {
+    color: var(--accent-2);
 }
 
 .pricing-card .desc {
@@ -7468,9 +7479,10 @@ hr,
 }
 
 .pricing-card .lists .list svg {
-    height: 1.4rem;
-    width: 1.4rem;
+    width: 20px;
+    height: 20px;
     color: var(--accent-2);
+    flex-shrink: 0;
 }
 
 .pricing-card .action {
@@ -7569,15 +7581,14 @@ hr,
 
 .cookie-card {
     width: 300px;
-    height: auto;
-    min-height: 220px;
+    height: 220px;
     background-color: var(--surface);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px 30px;
-    gap: 12px;
+    gap: 13px;
     border-radius: 20px;
     box-shadow: var(--shadow-soft);
     border: 1px solid var(--border);
@@ -7594,7 +7605,7 @@ hr,
 }
 
 .cookieHeading {
-    font-size: 1.1em;
+    font-size: 1.2em;
     font-weight: 800;
     color: var(--text);
     margin: 0;
@@ -7602,23 +7613,24 @@ hr,
 
 .cookieDescription {
     text-align: center;
-    font-size: 0.85em;
+    font-size: 0.7em;
+    font-weight: 600;
     color: var(--muted);
-    line-height: 1.6;
+    line-height: 1.4;
     margin: 0;
 }
 
 .buttonContainer {
     display: flex;
-    gap: 12px;
+    gap: 20px;
     flex-direction: row;
     margin-top: 8px;
 }
 
 .acceptButton,
 .declineButton {
-    width: 90px;
-    height: 35px;
+    width: 80px;
+    height: 30px;
     border: none;
     cursor: pointer;
     font-weight: 600;

@@ -55,7 +55,7 @@
           {% endif %}
           <div class="pricing-header">
             <span class="title">{{ package.type }}</span>
-            <span class="price">استعلام قیمت</span>
+            <a class="price" href="{% url 'contact' %}?package={{ key }}">استعلام قیمت</a>
           </div>
           <p class="desc">{{ package.subtitle }}</p>
           <ul class="lists">
