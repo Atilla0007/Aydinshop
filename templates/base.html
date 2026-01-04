@@ -15,11 +15,14 @@
 
 <header class="main-header">
   <div class="container nav-container">
-    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="باز کردن منو">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+    <div id="menuToggle" class="sidebar-toggle" aria-label="باز کردن منو">
+      <input id="sidebar-toggle" type="checkbox" aria-label="باز کردن منو">
+      <label class="toggle" for="sidebar-toggle" aria-hidden="true">
+        <div class="bar bar--top"></div>
+        <div class="bar bar--middle"></div>
+        <div class="bar bar--bottom"></div>
+      </label>
+    </div>
 
     <a href="{% url 'home' %}" class="logo" aria-label="استیرا">
       <picture>
@@ -28,17 +31,6 @@
       </picture>
       <span class="logo-text light">استیرا</span>
     </a>
-
-    <nav class="nav-links">
-      <a href="{% url 'home' %}">خانه</a>
-      <a href="{% url 'about' %}">درباره استیرا</a>
-      <a href="{% url 'services' %}">خدمات</a>
-      <a href="{% url 'kitchen_setup' %}">پکیج‌ها</a>
-      <a href="{% url 'projects_list' %}">پروژه‌ها</a>
-      <a href="{% url 'catalog' %}">کاتالوگ</a>
-      <a href="{% url 'downloads' %}">دانلودها</a>
-      <a href="{% url 'contact' %}">تماس</a>
-    </nav>
 
     <div class="nav-actions">
       <a href="{% url 'contact' %}" class="btn btn-primary small">درخواست مشاوره</a>
