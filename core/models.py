@@ -69,7 +69,7 @@ class ContactMessage(models.Model):
     )
 
     SERVICE_PACKAGE_CHOICES = (
-        ("normal", "پکیج Normal"),
+        ("basic", "پکیج Basic"),
         ("vip", "پکیج VIP"),
         ("cip", "پکیج CIP"),
     )

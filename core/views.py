@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 
 PACKAGE_DATA = {
-    "normal": {
-        "title": "پکیج Normal (راه‌اندازی پایه)",
+    "basic": {
+        "title": "پکیج Basic (راه‌اندازی پایه)",
         "subtitle": "مناسب کسب‌وکارهایی که به یک راه‌اندازی استاندارد و قابل اتکا با زمان‌بندی مشخص نیاز دارند.",
         "audience": [
             "رستوران‌ها و کافه‌های نوپا",
@@ -152,7 +152,7 @@ def kitchen_setup(request):
 def package_detail(request, package_slug: str):
     package_key = slugify(package_slug, allow_unicode=True)
     if package_key not in PACKAGE_DATA:
-        package_key = "normal"
+        package_key = "basic"
     return render(
         request,
         "package_detail.html",
@@ -326,7 +326,7 @@ def sitemap_xml(request):
         "/about/",
         "/services/",
         "/services/kitchen-setup/",
-        "/services/kitchen-setup/normal/",
+        "/services/kitchen-setup/basic/",
         "/services/kitchen-setup/vip/",
         "/services/kitchen-setup/cip/",
         "/projects/",

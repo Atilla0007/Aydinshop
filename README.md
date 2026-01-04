@@ -4,7 +4,7 @@ The legacy project was an e-commerce storefront, but Styra needs a corporate web
 # Solution
 The application is refactored into a corporate, Persian-first website with:
 - A price-less product catalog and technical pages.
-- Service and kitchen setup packages (Normal/VIP/CIP).
+- Service and kitchen setup packages (Basic/VIP/CIP).
 - Projects/portfolio, downloads, and FAQ pages.
 - A lead-capture contact form stored in the database and visible in admin (optional email notification).
 - A staff-only manual invoice/proforma template for internal use.
@@ -48,7 +48,7 @@ The application is refactored into a corporate, Persian-first website with:
 - `/about/`
 - `/services/`
 - `/services/kitchen-setup/`
-- `/services/kitchen-setup/normal/`
+- `/services/kitchen-setup/basic/`
 - `/services/kitchen-setup/vip/`
 - `/services/kitchen-setup/cip/`
 - `/projects/`
