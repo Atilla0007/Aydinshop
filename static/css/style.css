@@ -7653,3 +7653,14 @@ body.body {
     margin-top: 0;
     border-top: 0;
 }
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.main-header {
+    top: 0;
+    position: sticky;
+}

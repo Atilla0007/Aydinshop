@@ -101,37 +101,30 @@
   <div class="container">
     <h2 class="section-title">پکیج‌های راه‌اندازی آشپزخانه</h2>
     <p class="section-subtitle">با توجه به مقیاس پروژه، پکیج مناسب خود را انتخاب کنید.</p>
-    <div class="packages-grid">
-      <article class="package-card">
-        <h3>Basic</h3>
-        <p>راه‌اندازی پایه برای پروژه‌های اقتصادی و سریع.</p>
-        <ul>
-          <li>نیازسنجی و لیست تجهیزات</li>
-          <li>تامین و هماهنگی خرید</li>
-          <li>نصب و راه‌اندازی ضروری</li>
-        </ul>
-        <a href="{% url 'package_detail' 'basic' %}" class="btn btn-outline small">جزئیات پکیج</a>
-      </article>
-      <article class="package-card">
-        <h3>VIP</h3>
-        <p>مدیریت دقیق‌تر فرآیند و تحویل با استاندارد اجرایی.</p>
-        <ul>
-          <li>طراحی چیدمان و مسیر کاری</li>
-          <li>هماهنگی تامین‌کنندگان</li>
-          <li>آموزش و تحویل مرحله‌ای</li>
-        </ul>
-        <a href="{% url 'package_detail' 'vip' %}" class="btn btn-outline small">جزئیات پکیج</a>
-      </article>
-      <article class="package-card">
-        <h3>CIP</h3>
-        <p>تحویل کامل پروژه از طراحی تا آماده‌سازی افتتاح.</p>
-        <ul>
-          <li>طراحی معماری و فنی کامل</li>
-          <li>مدیریت پروژه و کنترل کیفیت</li>
-          <li>تحویل نهایی و چک‌لیست افتتاح</li>
-        </ul>
-        <a href="{% url 'package_detail' 'cip' %}" class="btn btn-outline small">جزئیات پکیج</a>
-      </article>
+    <div class="pricing-container">
+      {% for key, package in packages.items %}
+        <article class="pricing-card{% if key == 'cip' %} premium-wrapper{% endif %}">
+          {% if key == 'cip' %}
+            <span class="premium-ribbon" aria-hidden="true"></span>
+          {% endif %}
+          <div class="pricing-header">
+            <span class="title">{{ package.type }}</span>
+            <span class="price">استعلام قیمت</span>
+          </div>
+          <p class="desc">{{ package.subtitle }}</p>
+          <ul class="lists">
+            {% for item in package.features %}
+              <li class="list">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>{{ item }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+          <a href="{% url 'package_detail' key %}" class="action">انتخاب پکیج</a>
+        </article>
+      {% endfor %}
     </div>
   </div>
 </section>
