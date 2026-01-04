@@ -7,93 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{% block meta_description %}استیرا ارائه‌دهنده تجهیزات آشپزخانه صنعتی، طراحی و راه‌اندازی کامل آشپزخانه رستوران و کافه.{% endblock %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/header.css' %}">
   <link rel="icon" href="{% static 'img/logo-styra.png' %}" type="image/png">
   <link rel="stylesheet" href="{% static 'vendor/boxicons/css/boxicons.min.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
 <body class="body">
-
-<header class="main-header">
-  <div class="container nav-container">
-    <div id="menuToggle" class="sidebar-toggle" aria-label="باز کردن منو">
-      <input id="sidebar-toggle" type="checkbox" aria-label="باز کردن منو">
-      <label class="toggle" for="sidebar-toggle" aria-hidden="true">
-        <div class="bar bar--top"></div>
-        <div class="bar bar--middle"></div>
-        <div class="bar bar--bottom"></div>
-      </label>
-    </div>
-
-    <a href="{% url 'home' %}" class="logo" aria-label="استیرا">
-      <picture>
-        <source srcset="{% static 'img/logo-styra.webp' %}" type="image/webp">
-        <img src="{% static 'img/logo-styra.png' %}" alt="استیرا" class="logo-img" decoding="async" loading="eager" />
-      </picture>
-      <span class="logo-text light">استیرا</span>
-    </a>
-
-    <div class="nav-actions">
-      <a href="{% url 'contact' %}" class="btn btn-primary small">درخواست مشاوره</a>
-    </div>
-  </div>
-</header>
-
-<div id="sidebar-overlay" class="sidebar-overlay"></div>
-<aside id="app-sidebar" class="sidebar">
-  {% with path=request.path %}
-  <ul>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'home' %}" class="{% if path == '/' %}active{% endif %}">
-        <i class="bx bx-home"></i>
-        <p>خانه</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'about' %}" class="{% if path|slice:':7' == '/about/' %}active{% endif %}">
-        <i class="bx bx-info-circle"></i>
-        <p>درباره استیرا</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'services' %}" class="{% if path|slice:':10' == '/services/' %}active{% endif %}">
-        <i class="bx bx-briefcase"></i>
-        <p>خدمات</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'kitchen_setup' %}" class="{% if path|slice:':23' == '/services/kitchen-setup/' %}active{% endif %}">
-        <i class="bx bx-package"></i>
-        <p>پکیج‌ها</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'projects_list' %}" class="{% if path|slice:':10' == '/projects/' %}active{% endif %}">
-        <i class="bx bx-buildings"></i>
-        <p>پروژه‌ها</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'catalog' %}" class="{% if path|slice:':9' == '/catalog/' %}active{% endif %}">
-        <i class="bx bx-category"></i>
-        <p>کاتالوگ</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'downloads' %}" class="{% if path|slice:':11' == '/downloads/' %}active{% endif %}">
-        <i class="bx bx-download"></i>
-        <p>دانلودها</p>
-      </button>
-    </li>
-    <li>
-      <button type="button" onclick="gotoPage(this)" data-url="{% url 'contact' %}" class="{% if path|slice:':9' == '/contact/' %}active{% endif %}">
-        <i class="bx bx-phone"></i>
-        <p>تماس با ما</p>
-      </button>
-    </li>
-  </ul>
-  {% endwith %}
-  <div class="sidebar-spacer" aria-hidden="true"></div>
-</aside>
+{% include "partials/header.html" %}
 
 <main>
   {% block content %}{% endblock %}
@@ -150,7 +70,7 @@
   <i class="bx bx-up-arrow-alt" aria-hidden="true"></i>
 </button>
 
-<script src="{% static 'js/sidebar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
 <script src="{% static 'js/site-ui.js' %}" defer></script>
 {% block extra_js %}{% endblock %}
 </body>
