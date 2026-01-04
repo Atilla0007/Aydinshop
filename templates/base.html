@@ -15,14 +15,11 @@
 
 <header class="main-header">
   <div class="container nav-container">
-    <div id="menuToggle" class="sidebar-toggle" aria-label="باز کردن منو">
-      <input id="sidebar-toggle" type="checkbox" aria-label="باز کردن منو">
-      <label class="toggle" for="sidebar-toggle" aria-hidden="true">
-        <div class="bar bar--top"></div>
-        <div class="bar bar--middle"></div>
-        <div class="bar bar--bottom"></div>
-      </label>
-    </div>
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="باز کردن منو" type="button">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
     <a href="{% url 'home' %}" class="logo" aria-label="استیرا">
       <picture>
@@ -40,6 +37,9 @@
 
 <div id="sidebar-overlay" class="sidebar-overlay"></div>
 <aside id="app-sidebar" class="sidebar">
+  <header class="sidebar-header">
+    <button id="sidebar-close" class="close-btn sidebar-close-btn" aria-label="بستن منو" type="button">×</button>
+  </header>
   {% with path=request.path %}
   <ul>
     <li>

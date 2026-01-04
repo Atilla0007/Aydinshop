@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('app-sidebar');
     const overlay = document.getElementById('sidebar-overlay');
-    const toggleInput = document.getElementById('sidebar-toggle');
+    const toggle = document.getElementById('sidebar-toggle');
+    const closeBtn = document.getElementById('sidebar-close');
     const subMenus = sidebar ? sidebar.querySelectorAll('.sub-menu') : [];
     const buttons = sidebar ? sidebar.querySelectorAll('button') : [];
     const navButtons = sidebar ? sidebar.querySelectorAll('button[data-url]') : [];
@@ -11,9 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.add('open');
         overlay?.classList.add('show');
         document.body.classList.add('sidebar-open');
-        if (toggleInput && !toggleInput.checked) {
-            toggleInput.checked = true;
-        }
     };
 
     const closeSidebar = () => {
@@ -21,9 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.remove('open');
         overlay?.classList.remove('show');
         document.body.classList.remove('sidebar-open');
-        if (toggleInput && toggleInput.checked) {
-            toggleInput.checked = false;
-        }
     };
 
     const resetSidebarState = () => {
@@ -104,14 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
         gotoPage(button);
     });
 
-    toggleInput?.addEventListener('change', () => {
+    toggle?.addEventListener('click', () => {
         if (!sidebar) return;
-        if (toggleInput.checked) {
-            openSidebar();
-        } else {
+        if (sidebar.classList.contains('open')) {
             closeSidebar();
+        } else {
+            openSidebar();
         }
     });
+    closeBtn?.addEventListener('click', closeSidebar);
     overlay?.addEventListener('click', closeSidebar);
 
     document.addEventListener('keyup', (event) => {
