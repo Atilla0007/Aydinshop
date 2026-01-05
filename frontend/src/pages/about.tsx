@@ -85,19 +85,19 @@ export function About() {
                 </div>
               </div>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent mix-blend-overlay" />
-              <img 
-                src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=2000" 
-                alt="Professional Kitchen"
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-              />
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent mix-blend-overlay" />
+                <img 
+                  src="/static/designer/images/interior-design-left-image.jpg" 
+                  alt="Professional Kitchen"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                />
+              </motion.div>
           </div>
         </div>
       </section>

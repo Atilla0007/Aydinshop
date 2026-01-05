@@ -107,19 +107,19 @@ export function Home() {
               </div>
             </motion.div>
             
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative aspect-square rounded-3xl overflow-hidden border border-white/10"
-            >
-              <img 
-                src="https://images.unsplash.com/photo-1556910103-1c02745a300e?q=80&w=2070&auto=format&fit=crop" 
-                alt="Kitchen Design"
-                className="w-full h-full object-cover opacity-60"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-transparent" />
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative aspect-square rounded-3xl overflow-hidden border border-white/10"
+              >
+                <img 
+                  src="/static/img/hero-shop.jpg" 
+                  alt="Kitchen Design"
+                  className="w-full h-full object-cover opacity-60"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-transparent" />
+              </motion.div>
           </div>
         </div>
       </section>

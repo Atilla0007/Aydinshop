@@ -4,38 +4,38 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const categories = [
-  {
-    id: "cooking",
-    title: "تجهیزات پخت",
-    icon: Flame,
-    description: "انواع اجاق، فر، گریل و سرخ‌کن‌های صنعتی با بالاترین بازدهی پخت.",
-    image: "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?auto=format&fit=crop&q=80&w=1000",
-    count: "۴۵ محصول"
-  },
-  {
-    id: "cooling",
-    title: "تجهیزات سرمایشی",
-    icon: Snowflake,
-    description: "یخچال‌ها و فریزرهای ایستاده و میزی، تاپینگ و سردخانه‌های زیر صفر و بالای صفر.",
-    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1000",
-    count: "۳۲ محصول"
-  },
-  {
-    id: "prep",
-    title: "آماده‌سازی",
-    icon: UtensilsCrossed,
-    description: "میز کار، سینک، چرخ‌گوشت، اسلایسر و تمامی ملزومات آماده‌سازی مواد اولیه.",
-    image: "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&q=80&w=1000",
-    count: "۲۸ محصول"
-  },
-  {
-    id: "coffee",
-    title: "کافی‌شاپ",
-    icon: Coffee,
-    description: "دستگاه‌های اسپرسو، آسیاب قهوه، بلندر و تجهیزات تخصصی بار گرم و سرد.",
-    image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=1000",
-    count: "۱۹ محصول"
-  }
+    {
+      id: "cooking",
+      title: "تجهیزات پخت",
+      icon: Flame,
+      description: "انواع اجاق، فر، گریل و سرخ‌کن‌های صنعتی با بالاترین بازدهی پخت.",
+      image: "/static/img/products/cooking.jpg",
+      count: "۴۵ محصول"
+    },
+    {
+      id: "cooling",
+      title: "تجهیزات سرمایشی",
+      icon: Snowflake,
+      description: "یخچال‌ها و فریزرهای ایستاده و میزی، تاپینگ و سردخانه‌های زیر صفر و بالای صفر.",
+      image: "/static/img/products/cooling.jpg",
+      count: "۳۲ محصول"
+    },
+    {
+      id: "prep",
+      title: "آماده‌سازی",
+      icon: UtensilsCrossed,
+      description: "میز کار، سینک، چرخ‌گوشت، اسلایسر و تمامی ملزومات آماده‌سازی مواد اولیه.",
+      image: "/static/img/products/prep.jpg",
+      count: "۲۸ محصول"
+    },
+    {
+      id: "coffee",
+      title: "کافی‌شاپ",
+      icon: Coffee,
+      description: "دستگاه‌های اسپرسو، آسیاب قهوه، بلندر و تجهیزات تخصصی بار گرم و سرد.",
+      image: "/static/img/products/coffee.jpg",
+      count: "۱۹ محصول"
+    }
 ];
 
 export function Catalog() {

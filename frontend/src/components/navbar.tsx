@@ -16,8 +16,8 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center p-6">
       <div className="flex items-center gap-8 px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-        <Link to="/" className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-rose-300">
-          STYRA
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/static/img/logo-styra.png" alt="STYRA" className="h-8 w-auto" />
         </Link>
         
         <div className="hidden md:flex items-center gap-6">
