@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { name: "صفحه اصلی", path: "/" },
+  { name: "محصولات", path: "/catalog/" },
   { name: "خدمات", path: "/services" },
   { name: "درباره ما", path: "/about" },
   { name: "تماس با ما", path: "/contact" },
