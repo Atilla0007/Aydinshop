@@ -156,21 +156,21 @@ function HeroGeometric({
             <span className="text-sm text-white/60 tracking-wide">{badge}</span>
           </motion.div>
 
-          <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
-            <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">
-                {title1}
-              </span>
-              <br />
-              <span
-                className={cn(
-                  "bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white/90 to-rose-300 "
-                )}
-              >
-                {title2}
-              </span>
-            </h1>
-          </motion.div>
+            <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
+              <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight leading-tight sm:leading-tight md:leading-[1.1]">
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">
+                  {title1}
+                </span>
+                <br />
+                <span
+                  className={cn(
+                    "bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white/90 to-rose-300 "
+                  )}
+                >
+                  {title2}
+                </span>
+              </h1>
+            </motion.div>
 
           <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
             <p className="text-base sm:text-lg md:text-xl text-white/40 mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">

@@ -49,18 +49,18 @@ export function Catalog() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-24">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-20"
-        >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 font-divan">
-            محصولات استیرا
-          </h1>
-          <p className="text-xl text-white/40 max-w-2xl mx-auto font-iran">
-            مجموعه‌ای کامل از تجهیزات آشپزخانه صنعتی با استانداردهای جهانی و گارانتی معتبر.
-          </p>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-20"
+          >
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 font-divan leading-[1.3] md:leading-[1.2]">
+              محصولات استیرا
+            </h1>
+            <p className="text-xl text-white/40 max-w-2xl mx-auto font-iran leading-loose">
+              مجموعه‌ای کامل از تجهیزات آشپزخانه صنعتی با استانداردهای جهانی و گارانتی معتبر.
+            </p>
+          </motion.div>
 
         {/* Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

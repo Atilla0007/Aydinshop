@@ -42,20 +42,20 @@ export function About() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(225,29,72,0.05)_0,transparent_70%)]" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-4xl mx-auto"
-          >
-            <h1 className="text-5xl md:text-8xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
-              داستان استیرا
-            </h1>
-            <p className="text-xl md:text-2xl text-white/60 leading-relaxed">
-              ما در استیرا فقط تجهیزات نمی‌فروشیم؛ ما آینده کسب‌وکار شما را طراحی می‌کنیم. 
-              با ترکیبی از هنر طراحی و مهندسی دقیق، قلب تپنده رستوران شما را می‌سازیم.
-            </p>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-4xl mx-auto"
+            >
+              <h1 className="text-5xl md:text-8xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 leading-[1.3] md:leading-[1.2] font-divan">
+                داستان استیرا
+              </h1>
+              <p className="text-xl md:text-2xl text-white/60 leading-loose font-iran">
+                ما در استیرا فقط تجهیزات نمی‌فروشیم؛ ما آینده کسب‌وکار شما را طراحی می‌کنیم. 
+                با ترکیبی از هنر طراحی و مهندسی دقیق، قلب تپنده رستوران شما را می‌سازیم.
+              </p>
+            </motion.div>
         </div>
       </section>
 
