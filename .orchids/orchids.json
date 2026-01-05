@@ -3,6 +3,6 @@
   "createdAt": 1767649033144,
   "startupCommands": [
     "python manage.py runserver 8000",
-    "cd frontend && bun install && bun run dev"
+    "cd frontend; bun install; bun run dev"
   ]
 }

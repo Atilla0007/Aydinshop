@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 import { Home } from "@/pages/home";
 import { About } from "@/pages/about";
 import { Services } from "@/pages/services";
@@ -16,10 +17,11 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<Error404 />} />
-        </Routes>
-      </div>
-    </Router>
+            <Route path="*" element={<Error404 />} />
+          </Routes>
+          <Footer />
+        </div>
+      </Router>
   );
 }
 
