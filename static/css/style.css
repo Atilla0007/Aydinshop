@@ -7675,4 +7675,18 @@ body {
 .main-header {
     top: 0;
     position: sticky;
+    width: 100%;
+    left: 0;
+    right: 0;
+}
+
+.main-header::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: inherit;
+    pointer-events: none;
 }
