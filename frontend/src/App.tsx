@@ -6,6 +6,7 @@ import { About } from "@/pages/about";
 import { Services } from "@/pages/services";
 import { Contact } from "@/pages/contact";
 import { Catalog } from "@/pages/catalog";
+import { ProductDetail } from "@/pages/product-detail";
 import { Consultation } from "@/pages/consultation";
 import { Error404 } from "@/pages/404";
 
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/catalog/:category_slug/:product_slug" element={<ProductDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
