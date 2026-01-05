@@ -19,13 +19,13 @@
   font-style: normal;
 }
 
-body {
-  margin: 0;
-  font-family: 'IranKharazmi', system-ui, -apple-system, sans-serif;
+body, button, input, select, textarea {
+  font-family: 'IranKharazmi', system-ui, -apple-system, sans-serif !important;
 }
 
 h1, h2, h3, h4, h5, h6,
-.font-divan,
+[class*='font-divan'],
+[class*='title'],
 .section-title,
 .product-title,
 .card-title,

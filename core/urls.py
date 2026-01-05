@@ -3,7 +3,7 @@ from django.urls import include, path, re_path
 from . import views
 
 urlpatterns = [
-    path("", views.home, name="home"),
+    path("", views.react_app, name="home"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("health/", views.health_check, name="health_check"),
