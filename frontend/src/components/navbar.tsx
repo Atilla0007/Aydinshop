@@ -35,8 +35,8 @@ export function Navbar() {
           ))}
         </div>
 
-        <Button size="sm" className="rounded-full bg-rose-600 hover:bg-rose-700" asChild>
-          <Link to="/contact">مشاوره</Link>
+        <Button size="sm" className="rounded-full bg-rose-600 hover:bg-rose-700 font-iran" asChild>
+          <Link to="/consultation">مشاوره</Link>
         </Button>
       </div>
     </nav>

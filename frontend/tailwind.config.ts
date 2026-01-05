@@ -7,7 +7,7 @@ export default {
       extend: {
         fontFamily: {
           divan: ["Divan", "sans-serif"],
-          iranKharazmi: ["IranKharazmi", "sans-serif"],
+          iran: ["IranKharazmi", "sans-serif"],
         },
       },
     },

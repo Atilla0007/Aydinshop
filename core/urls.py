@@ -12,6 +12,7 @@ urlpatterns = [
     path("contact/", views.react_app, name="contact"),
     path("services/", views.react_app, name="services"),
     path("catalog/", views.react_app, name="catalog"),
+    path("consultation/", views.react_app, name="consultation"),
     path("store-old/", include("store.urls")),
     re_path(r"^(?P<path>.*)$", views.react_app, name="react_app"),
 ]

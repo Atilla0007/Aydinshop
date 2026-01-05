@@ -6,6 +6,7 @@ import { About } from "@/pages/about";
 import { Services } from "@/pages/services";
 import { Contact } from "@/pages/contact";
 import { Catalog } from "@/pages/catalog";
+import { Consultation } from "@/pages/consultation";
 import { Error404 } from "@/pages/404";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/consultation" element={<Consultation />} />
           <Route path="*" element={<Error404 />} />
         </Routes>
         <Footer />
