@@ -119,6 +119,10 @@ PACKAGE_DATA = {
 }
 
 
+def react_app(request, path=''):
+    return render(request, "index.html")
+
+
 def home(request):
     categories = Category.objects.all()
     products = Product.objects.prefetch_related("images").order_by("-created_at")[:6]
