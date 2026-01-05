@@ -2,6 +2,7 @@ import { HeroGeometric } from "@/components/ui/shape-landing-hero";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export function Home() {
   return (
@@ -72,9 +73,7 @@ export function Home() {
             <Link to="/contact">درخواست مشاوره رایگان</Link>
           </Button>
         </div>
-      </section>
-    </div>
+    </section>
   );
 }
 
-import { cn } from "@/lib/utils";
