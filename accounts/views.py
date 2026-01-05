@@ -8,6 +8,8 @@ from django.db.models import Q
 
 from store.models import Order, ShippingAddress
 
+from auth_security.ratelimit import check_rate_limit
+
 from .forms import LoginForm, SignupForm
 from .models import UserProfile
 
@@ -71,10 +73,27 @@ def signup(request):
 
     error = ""
     if request.method == "POST":
+        rate_decision = check_rate_limit(
+            request,
+            scope="signup",
+            limit=5,
+            window_seconds=600,
+            identifier=request.POST.get("email") or request.POST.get("username"),
+        )
+        if not rate_decision.allowed:
+            error = "Too many signup attempts. Please try again later."
+            form = SignupForm(request.POST)
+            return render(
+                request,
+                "accounts/signup.html",
+                {"form": form, "next": next_url, "error": error},
+                status=429,
+            )
+
         form = SignupForm(request.POST)
         if form.is_valid():
             if not request.POST.get("accept_terms"):
-                error = "برای ایجاد حساب باید با قوانین و حریم خصوصی موافقت کنید."
+                error = "Please accept the terms and conditions."
             else:
                 user = form.save()
                 profile = _get_profile(user)
@@ -96,6 +115,7 @@ def signup(request):
 
     form = SignupForm()
     return render(request, "accounts/signup.html", {"form": form, "next": next_url, "error": error})
+
 
 
 def logout_view(request):

@@ -3,6 +3,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, UserCreationForm
 
+from auth_security.ratelimit import check_rate_limit
+
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -18,6 +20,17 @@ class SignupForm(UserCreationForm):
         email = (self.cleaned_data.get("email") or "").strip().lower()
         if not email:
             return email
+
+        if self.request is not None:
+            decision = check_rate_limit(
+                self.request,
+                scope="password_reset",
+                limit=5,
+                window_seconds=600,
+                identifier=email,
+            )
+            if not decision.allowed:
+            raise forms.ValidationError("Too many password reset requests. Please try again later.")
 
         user_model = get_user_model()
         email_field = user_model.get_email_field_name()
@@ -65,6 +78,17 @@ class PasswordResetRequestForm(PasswordResetForm):
         email = (self.cleaned_data.get("email") or "").strip().lower()
         if not email:
             return email
+
+        if self.request is not None:
+            decision = check_rate_limit(
+                self.request,
+                scope="password_reset",
+                limit=5,
+                window_seconds=600,
+                identifier=email,
+            )
+            if not decision.allowed:
+            raise forms.ValidationError("Too many password reset requests. Please try again later.")
 
         user_model = get_user_model()
         email_field = user_model.get_email_field_name()

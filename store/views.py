@@ -14,14 +14,23 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.views.decorators.http import require_GET, require_POST
 
+from auth_security.ratelimit import check_rate_limit
+
 from .forms import ProductReviewForm
 from .invoice import render_manual_invoice_pdf
 from .models import Category, ManualInvoiceSequence, Product, ProductReview
 from .utils import build_gallery_images, get_primary_image_url
 
+def _sanitize_query(value: str, max_length: int = 80) -> str:
+    value = (value or "").strip()
+    value = re.sub(r"[\x00-\x1f\x7f]", "", value)
+    if len(value) > max_length:
+        value = value[:max_length]
+    return value
+
 
 def catalog_home(request):
-    query = (request.GET.get("q") or "").strip()
+    query = _sanitize_query(request.GET.get("q") or "", max_length=80)
     products = Product.objects.prefetch_related("images", "category").all()
     categories = Category.objects.all()
 
@@ -53,7 +62,7 @@ def catalog_home(request):
 
 def category_detail(request, category_slug: str):
     category = get_object_or_404(Category, slug=category_slug)
-    query = (request.GET.get("q") or "").strip()
+    query = _sanitize_query(request.GET.get("q") or "", max_length=80)
     products = (
         Product.objects.filter(category=category)
         .prefetch_related("images")
@@ -128,9 +137,24 @@ def product_detail(request, category_slug: str, product_slug: str):
 
 @require_GET
 def catalog_suggest(request):
-    query = (request.GET.get("q") or "").strip()
+    query = _sanitize_query(request.GET.get("q") or "", max_length=64)
     if len(query) < 2:
         return JsonResponse({"suggestions": []})
+
+    rate_decision = check_rate_limit(
+        request,
+        scope="catalog_suggest",
+        limit=30,
+        window_seconds=60,
+    )
+    if not rate_decision.allowed:
+        return JsonResponse(
+            {
+                "detail": "Too many search requests. Please try again later.",
+                "retry_after_seconds": rate_decision.retry_after_seconds,
+            },
+            status=429,
+        )
 
     qs = Product.objects.filter(
         Q(name__icontains=query)

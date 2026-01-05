@@ -69,6 +69,10 @@ class LoginProtectionMiddleware:
         configured = configured_login + extra
         if isinstance(configured, str):
             configured = [p.strip() for p in configured.split(",") if p.strip()]
+        admin_path = (getattr(settings, "ADMIN_PATH", "admin/") or "admin/").strip("/")
+        admin_login_path = f"/{admin_path}/login/"
+        if admin_login_path not in configured:
+            configured.append(admin_login_path)
         return path in configured
 
     def _too_many_response(self, request, *, status_code: int, retry_after_seconds: int, message: str) -> HttpResponse:

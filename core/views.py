@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 
 from django.conf import settings
@@ -16,6 +17,8 @@ from django.utils.text import slugify
 from core.utils.jalali import format_jalali
 from store.models import Category, Product, ProductReview
 from store.utils import get_primary_image_url
+
+from auth_security.ratelimit import check_rate_limit
 
 from .forms import ContactForm
 from .models import ContactMessage, Download, News
@@ -231,6 +234,22 @@ def contact(request):
 
     if request.method == "POST":
         form = ContactForm(request.POST)
+        rate_decision = check_rate_limit(
+            request,
+            scope="contact",
+            limit=5,
+            window_seconds=600,
+            identifier=request.POST.get("email") or request.POST.get("phone"),
+        )
+        if not rate_decision.allowed:
+            form.add_error(None, "Too many contact requests. Please try again later.")
+            return render(
+                request,
+                "contact.html",
+                {"form": form},
+                status=429,
+            )
+
         if form.is_valid():
             message = form.save()
 
@@ -364,6 +383,18 @@ def robots_txt(request):
 
 
 def health_check(request):
+    token = (os.getenv("HEALTH_CHECK_TOKEN") or "").strip()
+    if token:
+        provided = (
+            request.headers.get("X-Health-Token")
+            or request.GET.get("token")
+            or ""
+        ).strip()
+        if provided != token:
+            return HttpResponse(status=404)
+    elif not request.user.is_staff:
+        return HttpResponse(status=404)
+
     db_ok = True
     try:
         with connections["default"].cursor() as cursor:
