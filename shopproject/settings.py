@@ -36,7 +36,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
 
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-unsafe-change-me")
-DEBUG = _env_bool("DEBUG", False)
+DEBUG = _env_bool("DEBUG", True)
 
 _allowed_hosts = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
 if _allowed_hosts:
