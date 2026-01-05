@@ -7601,7 +7601,7 @@ hr,
 }
 
 #cookieSvg g path {
-    fill: var(--muted);
+    fill: var(--text);
 }
 
 .cookieHeading {
