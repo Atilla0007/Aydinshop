@@ -67,6 +67,7 @@ USE_I18N=True
 USE_TZ=True
 
 INSTALLED_APPS=[
+    'corsheaders',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -79,6 +80,7 @@ INSTALLED_APPS=[
     'store',
 ]
 MIDDLEWARE=[
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'core.middleware.SecurityHeadersMiddleware',
     'core.middleware.ExceptionLoggingMiddleware',
@@ -256,6 +258,8 @@ AUTH_SECURITY_LOGIN_IP_BLOCK_AFTER_ATTEMPTS = int(
 AUTH_SECURITY_IP_BLOCK_SECONDS = int(os.getenv("AUTH_SECURITY_IP_BLOCK_SECONDS", "1800"))
 AUTH_SECURITY_LOGIN_IDENTIFIER_MAX_ATTEMPTS = int(os.getenv("AUTH_SECURITY_LOGIN_IDENTIFIER_MAX_ATTEMPTS", "5"))
 AUTH_SECURITY_LOGIN_IDENTIFIER_WINDOW_SECONDS = int(os.getenv("AUTH_SECURITY_LOGIN_IDENTIFIER_WINDOW_SECONDS", "600"))
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Security headers
 CSP_DEFAULT = os.getenv(

@@ -22,4 +22,5 @@ urlpatterns = [
     path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("health/", views.health_check, name="health_check"),
+    path("api/", include("core.api_urls")),
 ]
