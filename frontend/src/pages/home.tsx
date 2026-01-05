@@ -73,7 +73,7 @@ export function Home() {
             <Link to="/contact">درخواست مشاوره رایگان</Link>
           </Button>
         </div>
-    </section>
+      </section>
+    </div>
   );
 }
-

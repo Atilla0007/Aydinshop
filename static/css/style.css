@@ -117,7 +117,7 @@ html {
 
 body.body {
     margin: 0;
-    font-family: "IranKharazmi", "DivanFaNum", "Divan", system-ui, -apple-system, sans-serif;
+    font-family: "IranKharazmi", system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
     direction: rtl;
@@ -125,18 +125,25 @@ body.body {
     overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: "Divan", sans-serif;
+h1, h2, h3, h4, h5, h6,
+.section-title,
+.hero-text h1,
+.product-title,
+.footer-heading,
+.card-head h2,
+.news-card h3,
+.pricing-header .title,
+.logo-text,
+.brand-title {
+    font-family: "Divan", sans-serif !important;
 }
 
-body,
-body.body,
 button,
 input,
 select,
 textarea,
 option {
-    font-family: "IranKharazmi", "DivanFaNum", "Divan", system-ui, -apple-system, sans-serif;
+    font-family: "IranKharazmi", sans-serif;
 }
 
 .visually-hidden {

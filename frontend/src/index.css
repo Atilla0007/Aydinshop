@@ -24,6 +24,11 @@ body {
   font-family: 'IranKharazmi', system-ui, -apple-system, sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Divan', sans-serif;
+h1, h2, h3, h4, h5, h6,
+.font-divan,
+.section-title,
+.product-title,
+.card-title,
+.hero-title {
+  font-family: 'Divan', sans-serif !important;
 }
