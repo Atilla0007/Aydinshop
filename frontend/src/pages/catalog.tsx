@@ -54,10 +54,10 @@ export function Catalog() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-20"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 font-divan leading-[1.3] md:leading-[1.2]">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 font-divan leading-[1.6] md:leading-[1.5]">
               محصولات استیرا
             </h1>
-            <p className="text-xl text-white/40 max-w-2xl mx-auto font-iran leading-loose">
+            <p className="text-xl text-white/40 max-w-2xl mx-auto font-iran leading-[2.6]">
               مجموعه‌ای کامل از تجهیزات آشپزخانه صنعتی با استانداردهای جهانی و گارانتی معتبر.
             </p>
           </motion.div>

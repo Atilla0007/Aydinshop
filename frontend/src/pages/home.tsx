@@ -88,10 +88,10 @@ export function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-                <h2 className="text-4xl md:text-5xl font-divan font-bold mb-6 leading-[1.3] md:leading-[1.2]">
+                <h2 className="text-4xl md:text-5xl font-divan font-bold mb-6 leading-[1.6] md:leading-[1.5]">
                   تخصص ما، <span className="text-rose-500">تمایز</span> آشپزخانه شماست
                 </h2>
-                <p className="text-lg text-white/60 leading-loose mb-8 text-justify font-iran">
+                <p className="text-lg text-white/60 leading-[2.6] mb-8 text-justify font-iran">
                 استیرا استیل با بهره‌گیری از دانش روز مهندسی و تجربه سال‌ها فعالیت در صنعت تجهیزات آشپزخانه، راهکارهای هوشمندانه‌ای برای بهینه‌سازی فضاهای پخت و پز ارائه می‌دهد. ما فراتر از فروشنده تجهیزات، مشاور و شریک استراتژیک شما در مسیر موفقیت هستیم.
               </p>
               <div className="grid grid-cols-2 gap-6">

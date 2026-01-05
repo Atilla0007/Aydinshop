@@ -53,21 +53,22 @@ export function Contact() {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-7xl font-bold mb-6 font-divan leading-tight"
-            >
-              با ما در تماس باشید
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-white/40 max-w-2xl mx-auto font-iran leading-loose"
-            >
-              تیم متخصص ما آماده شنیدن ایده‌های شما و تبدیل آن‌ها به واقعیت است.
-            </motion.p>
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-5xl md:text-7xl font-bold mb-6 font-divan leading-[1.6]"
+              >
+                با ما در تماس باشید
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-xl text-white/40 max-w-2xl mx-auto font-iran leading-[2.8]"
+              >
+                تیم متخصص ما آماده شنیدن ایده‌های شما و تبدیل آن‌ها به واقعیت است.
+              </motion.p>
+
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">

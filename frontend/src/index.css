@@ -21,6 +21,11 @@
 
 body, button, input, select, textarea {
   font-family: 'IranKharazmi', system-ui, -apple-system, sans-serif !important;
+  line-height: 2;
+}
+
+.font-iran {
+  line-height: 2.4 !important;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -31,4 +36,5 @@ h1, h2, h3, h4, h5, h6,
 .card-title,
 .hero-title {
   font-family: 'Divan', sans-serif !important;
+  line-height: 1.5 !important;
 }

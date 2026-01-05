@@ -48,13 +48,14 @@ export function About() {
               transition={{ duration: 0.8 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <h1 className="text-5xl md:text-8xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 leading-[1.3] md:leading-[1.2] font-divan">
-                داستان استیرا
-              </h1>
-              <p className="text-xl md:text-2xl text-white/60 leading-loose font-iran">
-                ما در استیرا فقط تجهیزات نمی‌فروشیم؛ ما آینده کسب‌وکار شما را طراحی می‌کنیم. 
-                با ترکیبی از هنر طراحی و مهندسی دقیق، قلب تپنده رستوران شما را می‌سازیم.
-              </p>
+                <h1 className="text-5xl md:text-8xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 leading-[1.6] md:leading-[1.4] font-divan">
+                  داستان استیرا
+                </h1>
+                <p className="text-xl md:text-2xl text-white/60 leading-[2.6] font-iran">
+                  ما در استیرا فقط تجهیزات نمی‌فروشیم؛ ما آینده کسب‌وکار شما را طراحی می‌کنیم. 
+                  با ترکیبی از هنر طراحی و مهندسی دقیق، قلب تپنده رستوران شما را می‌سازیم.
+                </p>
+
             </motion.div>
         </div>
       </section>
