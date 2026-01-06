@@ -4,6 +4,7 @@ import { Search, ArrowLeft, Loader2 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import axios from "axios";
+import { scrollToTop } from "@/utils/scroll";
 
 interface Category {
   id: number;
@@ -220,7 +221,10 @@ export function Catalog() {
             {totalPages > 1 && (
               <div className="flex justify-center items-center gap-4">
                 <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  onClick={() => {
+                    setPage((p) => Math.max(1, p - 1));
+                    scrollToTop();
+                  }}
                   disabled={page === 1}
                   className="px-6 py-3 rounded-full border border-white/10 bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed hover:border-rose-500/50 transition-all font-iran"
                 >
@@ -230,7 +234,10 @@ export function Catalog() {
                   صفحه {page} از {totalPages}
                 </span>
                 <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() => {
+                    setPage((p) => Math.min(totalPages, p + 1));
+                    scrollToTop();
+                  }}
                   disabled={page === totalPages}
                   className="px-6 py-3 rounded-full border border-white/10 bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed hover:border-rose-500/50 transition-all font-iran"
                 >
