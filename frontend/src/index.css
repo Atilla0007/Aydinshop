@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Divan';
+  src: url('./fonts/Divan-Black.woff2') format('woff2'),
+       url('./fonts/Divan-Black.woff') format('woff'),
+       url('./fonts/Divan-Black.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'IranKharazmi';
+  src: url('./fonts/IRAN-Kharazmi.woff') format('woff'),
+       url('./fonts/IRAN-Kharazmi.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body, button, input, select, textarea {
+  font-family: 'IranKharazmi', system-ui, -apple-system, sans-serif !important;
+  line-height: 2;
+}
+
+.font-iran {
+  line-height: 2.4 !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+[class*='font-divan'],
+[class*='title'],
+.section-title,
+.product-title,
+.card-title,
+.hero-title {
+  font-family: 'Divan', sans-serif !important;
+  line-height: 1.5 !important;
+}
