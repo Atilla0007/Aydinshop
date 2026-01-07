@@ -73,7 +73,7 @@ export function Home() {
   return (
     <div className="relative min-h-screen bg-[#030303] text-white overflow-x-hidden">
       <HeroGeometric 
-        badge="Styra Steel" 
+        badge="styra" 
         title1="طراحی و تجهیز" 
         title2="آشپزخانه‌های صنعتی" 
       />

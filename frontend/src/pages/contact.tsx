@@ -107,51 +107,51 @@ export function Contact() {
                     <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
                       <Phone size={24} />
                     </div>
-                    <div>
-                      <p className="text-sm text-white/40 mb-1 font-iran">شماره تماس مستقیم</p>
-                      <p className="text-2xl font-bold dir-ltr">۰۹۱۴ ۹۹۱ ۱۳۸۳</p>
+                      <div>
+                        <p className="text-sm text-white/40 mb-1 font-iran">شماره تماس مستقیم</p>
+                        <p className="text-2xl font-bold dir-ltr text-white/90">۰۹۱۴ ۹۹۱ ۱۳۸۳</p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
-                      <Mail size={24} />
+                    <div className="flex items-start gap-5">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+                        <Mail size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/40 mb-1 font-iran">ایمیل سازمانی</p>
+                        <p className="text-xl font-bold text-white/90">styra.steel@gmail.com</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-white/40 mb-1 font-iran">ایمیل سازمانی</p>
-                      <p className="text-xl font-bold">styra.steel@gmail.com</p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
-                      <MapPin size={24} />
+                    <div className="flex items-start gap-5">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+                        <MapPin size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/40 mb-1 font-iran">آدرس دفتر مرکزی</p>
+                        <p className="text-lg font-bold leading-loose font-iran text-white/90">تبریز، آبرسان، فلکه دانشگاه، برج بلور، طبقه سوم اداری، واحد D</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-white/40 mb-1 font-iran">آدرس دفتر مرکزی</p>
-                      <p className="text-lg font-bold leading-loose font-iran">تبریز، آبرسان، فلکه دانشگاه، برج بلور، طبقه سوم اداری، واحد D</p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
-                      <MapPin size={24} />
+                    <div className="flex items-start gap-5">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+                        <MapPin size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/40 mb-1 font-iran">آدرس کارخانه</p>
+                        <p className="text-lg font-bold leading-loose font-iran text-white/90">تهران، فردوسیه، خیابان شهریار</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-white/40 mb-1 font-iran">آدرس کارخانه</p>
-                      <p className="text-lg font-bold leading-loose font-iran">تهران، فردوسیه، خیابان شهریار</p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
-                      <Clock size={24} />
+                    <div className="flex items-start gap-5">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+                        <Clock size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/40 mb-1 font-iran">ساعات کاری</p>
+                        <p className="text-lg font-bold font-iran text-white/90">شنبه تا چهارشنبه ۹:۰۰ - ۱۸:۰۰</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-white/40 mb-1 font-iran">ساعات کاری</p>
-                      <p className="text-lg font-bold font-iran">شنبه تا چهارشنبه ۹:۰۰ - ۱۸:۰۰</p>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="mt-12 pt-10 border-t border-white/5">

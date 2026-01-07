@@ -25,12 +25,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
           {/* Brand Column */}
           <div className="lg:col-span-4 space-y-8">
-            <Link to="/" className="inline-block">
-              <span className="text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
-                STYRA
-              </span>
-              <span className="block text-xs text-rose-500 font-bold tracking-[0.2em] mt-1 uppercase">
-                Steel Industry
+            <Link to="/" className="inline-block flex items-center gap-3">
+              <img src="/static/img/logo-styra.png" alt="styra" className="h-10 w-auto" />
+              <span className="text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50 font-divan">
+                styra
               </span>
             </Link>
             <p className="text-white/40 leading-relaxed text-lg max-w-sm">
@@ -120,37 +118,37 @@ export function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-white/30 mb-1">تلفن مستقیم</p>
-                  <p className="font-bold text-lg dir-ltr">۰۹۱۴ ۹۹۱ ۱۳۸۳</p>
+                    <p className="font-bold text-lg dir-ltr text-white/90">۰۹۱۴ ۹۹۱ ۱۳۸۳</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0 group-hover:scale-110 transition-transform">
-                  <Clock size={18} />
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0 group-hover:scale-110 transition-transform">
+                    <Clock size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/30 mb-1">ساعات پاسخگویی</p>
+                    <p className="font-bold text-white/90">همه روزه ۹:۰۰ الی ۲۱:۰۰</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-white/30 mb-1">ساعات پاسخگویی</p>
-                  <p className="font-bold">همه روزه ۹:۰۰ الی ۲۱:۰۰</p>
-                </div>
-              </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0 group-hover:scale-110 transition-transform">
-                  <MapPin size={18} />
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0 group-hover:scale-110 transition-transform">
+                    <MapPin size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/30 mb-1">آدرس دفتر مرکزی</p>
+                    <p className="font-bold text-sm text-white/90">تبریز، آبرسان، فلکه دانشگاه، برج بلور، طبقه سوم اداری، واحد D</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-white/30 mb-1">آدرس دفتر مرکزی</p>
-                  <p className="font-bold text-sm">تبریز، آبرسان، فلکه دانشگاه، برج بلور، طبقه سوم اداری، واحد D</p>
-                </div>
-              </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0 group-hover:scale-110 transition-transform">
-                  <MapPin size={18} />
-                </div>
-                <div>
-                  <p className="text-xs text-white/30 mb-1">آدرس کارخانه</p>
-                  <p className="font-bold text-sm">تهران، فردوسیه، خیابان شهریار</p>
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0 group-hover:scale-110 transition-transform">
+                    <MapPin size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/30 mb-1">آدرس کارخانه</p>
+                    <p className="font-bold text-sm text-white/90">تهران، فردوسیه، خیابان شهریار</p>
                 </div>
               </div>
             </div>
@@ -161,7 +159,7 @@ export function Footer() {
         <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-right">
             <p className="text-white/20 text-sm">
-              © {currentYear} STYRA STEEL INDUSTRY. ALL RIGHTS RESERVED.
+              © {currentYear} styra. ALL RIGHTS RESERVED.
             </p>
             <span className="hidden md:block w-1 h-1 bg-white/10 rounded-full" />
             <p className="text-white/20 text-sm">
@@ -170,11 +168,9 @@ export function Footer() {
           </div>
           
           <div className="flex gap-8">
-            {["قوانین", "حریم خصوصی", "سوالات متداول"].map((item) => (
-              <a key={item} href="#" className="text-white/20 hover:text-white text-xs transition-colors">
-                {item}
-              </a>
-            ))}
+            <Link to="/rules" className="text-white/20 hover:text-white text-xs transition-colors">قوانین</Link>
+            <Link to="/privacy" className="text-white/20 hover:text-white text-xs transition-colors">حریم خصوصی</Link>
+            <Link to="/faq" className="text-white/20 hover:text-white text-xs transition-colors">سوالات متداول</Link>
           </div>
         </div>
       </div>

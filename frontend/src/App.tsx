@@ -10,6 +10,9 @@ import { Contact } from "@/pages/contact";
 import { Catalog } from "@/pages/catalog";
 import { ProductDetail } from "@/pages/product-detail";
 import { Consultation } from "@/pages/consultation";
+import { Rules } from "@/pages/rules";
+import { Privacy } from "@/pages/privacy";
+import { FAQ } from "@/pages/faq";
 import { Error404 } from "@/pages/404";
 
 function App() {
@@ -31,6 +34,9 @@ function App() {
           <Route path="/services/:serviceId" element={<ServiceDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/consultation" element={<Consultation />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="*" element={<Error404 />} />
         </Routes>
         <Footer />

@@ -39,7 +39,8 @@ export function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4 md:p-6">
         <div className="flex items-center justify-between md:justify-start w-full max-w-7xl md:w-auto gap-4 md:gap-8 px-4 md:px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/static/img/logo-styra.png" alt="STYRA" className="h-8 w-auto" />
+            <img src="/static/img/logo-styra.png" alt="styra" className="h-8 w-auto" />
+            <span className="text-xl font-bold text-white font-divan">styra</span>
           </Link>
           
           {/* Desktop Nav */}
@@ -105,7 +106,10 @@ export function Navbar() {
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center mb-12">
-                  <img src="/static/img/logo-styra.png" alt="STYRA" className="h-8 w-auto" />
+                  <div className="flex items-center gap-2">
+                    <img src="/static/img/logo-styra.png" alt="styra" className="h-8 w-auto" />
+                    <span className="text-xl font-bold text-white font-divan">styra</span>
+                  </div>
                   <button onClick={() => setIsOpen(false)} className="text-white/40 hover:text-white">
                     <X size={24} />
                   </button>
