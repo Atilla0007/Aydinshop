@@ -11,29 +11,51 @@ export function Consultation() {
     phone: "",
     email: "",
     company: "",
+    city: "",
     message: "",
     inquiry_type: "consultation",
   });
 
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
+    setErrorMessage("");
     try {
-      await axios.post("/api/contact/", formData);
-      setStatus("success");
-      setFormData({
-        name: "",
-        phone: "",
-        email: "",
-        company: "",
-        message: "",
-        inquiry_type: "consultation",
-      });
-    } catch (error) {
+      const response = await axios.post("/api/contact/", formData);
+      if (response.data.status === "success") {
+        setStatus("success");
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          company: "",
+          city: "",
+          message: "",
+          inquiry_type: "consultation",
+        });
+      } else {
+        setStatus("error");
+        setErrorMessage(response.data.message || "خطایی در ارسال پیام رخ داد");
+      }
+    } catch (error: any) {
       console.error("Submission error:", error);
       setStatus("error");
+      
+      if (error.response?.data?.errors) {
+        // Show first error from backend
+        const errors = error.response.data.errors;
+        const firstError = Object.values(errors)[0] as string;
+        setErrorMessage(firstError || "خطایی در ارسال پیام رخ داد");
+      } else if (error.response?.data?.message) {
+        setErrorMessage(error.response.data.message);
+      } else if (error.response?.data?.error) {
+        setErrorMessage(error.response.data.error);
+      } else {
+        setErrorMessage("خطایی در ارسال پیام رخ داد. لطفا دوباره تلاش کنید یا با شماره تماس شرکت در ارتباط باشید.");
+      }
     }
   };
 
@@ -169,6 +191,18 @@ export function Consultation() {
                     </div>
 
                     <div className="space-y-2">
+                      <label className="text-sm text-white/40 mr-2">ایمیل (الزامی)</label>
+                      <Input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-rose-500 text-lg"
+                        placeholder="info@example.com"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
                       <label className="text-sm text-white/40 mr-2">نام مجموعه یا رستوران</label>
                       <Input
                         value={formData.company}
@@ -179,8 +213,19 @@ export function Consultation() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm text-white/40 mr-2">توضیحات کوتاه (اختیاری)</label>
+                      <label className="text-sm text-white/40 mr-2">شهر (اختیاری)</label>
+                      <Input
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-rose-500 text-lg"
+                        placeholder="مثال: تهران"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm text-white/40 mr-2">توضیحات کوتاه (الزامی)</label>
                       <textarea
+                        required
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         rows={4}
@@ -207,9 +252,9 @@ export function Consultation() {
                       )}
                     </Button>
 
-                    {status === "error" && (
-                      <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm text-center">
-                        خطایی رخ داد. لطفا دوباره تلاش کنید یا با ما تماس بگیرید.
+                    {status === "error" && errorMessage && (
+                      <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm text-center font-iran">
+                        {errorMessage}
                       </div>
                     )}
                   </form>

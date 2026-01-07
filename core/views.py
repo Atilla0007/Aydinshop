@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+import json
 import logging
 import os
 from pathlib import Path
@@ -329,6 +330,150 @@ def contact(request):
         form = ContactForm(initial=initial)
 
     return render(request, "contact.html", {"form": form})
+
+
+def contact_api(request):
+    """
+    API endpoint for handling JSON form submissions from frontend.
+    Returns JSON responses instead of HTML.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    def _admin_emails():
+        return list(
+            User.objects.filter(is_superuser=True, email__isnull=False)
+            .exclude(email="")
+            .values_list("email", flat=True)
+        )
+
+    def _send_email_message(message: EmailMultiAlternatives) -> None:
+        try:
+            message.send(fail_silently=False)
+            return
+        except Exception:
+            if not getattr(settings, "DEBUG", False):
+                logger.exception("Failed to send contact email")
+                return
+
+        try:
+            base_dir = Path(getattr(settings, "BASE_DIR", Path.cwd()))
+            file_path = base_dir / "tmp" / "emails"
+            file_path.mkdir(parents=True, exist_ok=True)
+            connection = get_connection(
+                "django.core.mail.backends.filebased.EmailBackend",
+                fail_silently=True,
+                file_path=str(file_path),
+            )
+            message.connection = connection
+            message.send(fail_silently=True)
+        except Exception:
+            logger.exception("Failed to send contact email (filebased fallback)")
+
+    # Get JSON data from request
+    try:
+        if request.content_type == "application/json":
+            data = json.loads(request.body)
+        else:
+            # Fallback to form data
+            data = request.POST.dict()
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+    # Check rate limit
+    identifier = data.get("email") or data.get("phone") or ""
+    rate_decision = check_rate_limit(
+        request,
+        scope="contact",
+        limit=5,
+        window_seconds=600,
+        identifier=identifier,
+    )
+    if not rate_decision.allowed:
+        return JsonResponse(
+            {"error": "Too many contact requests. Please try again later."},
+            status=429,
+        )
+
+    # Create form instance with data
+    form = ContactForm(data)
+    
+    if not form.is_valid():
+        # Return validation errors
+        errors = {}
+        for field, error_list in form.errors.items():
+            errors[field] = error_list[0] if error_list else "Invalid value"
+        return JsonResponse({"error": "Validation failed", "errors": errors}, status=400)
+
+    # Save the message
+    message = form.save()
+
+    # Send email to admins
+    support_email = (getattr(settings, "COMPANY_EMAIL", "") or "").strip()
+    if not support_email:
+        support_email = (getattr(settings, "DEFAULT_FROM_EMAIL", "") or "").strip()
+
+    admin_emails = _admin_emails()
+    bcc_emails = sorted({email for email in admin_emails if email and email != support_email})
+
+    if support_email:
+        created_at = format_jalali(message.created_at, "Y/m/d - H:i")
+        base_url = (getattr(settings, "SITE_BASE_URL", "") or "").strip().rstrip("/")
+        admin_prefix = getattr(settings, "ADMIN_PATH", "admin/").strip("/")
+        admin_root = f"/{admin_prefix}/"
+        admin_url = (
+            f"{base_url}{admin_root}core/contactmessage/{message.id}/change/"
+            if base_url
+            else f"{admin_root}core/contactmessage/{message.id}/change/"
+        )
+
+        brand = getattr(settings, "SITE_NAME", "استیرا")
+        subject = f"پیام جدید فرم تماس | {message.name}"
+        text_body = (
+            "پیام جدیدی از فرم تماس دریافت شد.\n\n"
+            f"نام: {message.name}\n"
+            f"ایمیل: {message.email}\n"
+            f"شماره تماس: {message.phone or '-'}\n"
+            f"نام مجموعه: {message.company or '-'}\n"
+            f"شهر: {message.city or '-'}\n"
+            f"نوع درخواست: {message.get_inquiry_type_display()}\n"
+            f"پکیج: {message.get_service_package_display() if message.service_package else '-'}\n"
+            f"محصول موردنظر: {message.product_interest or '-'}\n"
+            f"تاریخ ثبت: {created_at}\n\n"
+            f"پیام:\n{message.message}"
+        )
+        html_body = render_to_string(
+            "emails/contact_message.html",
+            {
+                "title": "پیام جدید فرم تماس",
+                "preheader": f"پیام جدید از {message.name}",
+                "brand": brand,
+                "subtitle": "این پیام از طریق فرم تماس سایت دریافت شده است.",
+                "name": message.name,
+                "email": message.email,
+                "phone": message.phone,
+                "created_at": created_at,
+                "message_text": message.message,
+                "admin_url": admin_url,
+                "footer": "برای پاسخ‌گویی سریع‌تر، از طریق پنل مدیریت اقدام کنید.",
+            },
+        )
+
+        try:
+            email_message = EmailMultiAlternatives(
+                subject=subject,
+                body=text_body,
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                to=[support_email],
+                bcc=bcc_emails,
+                reply_to=[message.email],
+            )
+            email_message.attach_alternative(html_body, "text/html")
+            _send_email_message(email_message)
+        except Exception:
+            logger.exception("Failed to build/send contact email")
+
+    return JsonResponse({"status": "success", "message": "پیام شما با موفقیت ارسال شد"})
 
 
 def faq(request):
