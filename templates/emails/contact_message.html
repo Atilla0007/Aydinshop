@@ -23,6 +23,38 @@
         <div style="margin-top:4px; font-size:14px; font-weight:700; color:#F4F4F9; direction:ltr; text-align:left;">{{ phone|default:"-" }}</div>
       </td>
     </tr>
+    {% if company %}
+    <tr>
+      <td style="padding:0 14px 10px;">
+        <div style="font-size:12px; color:#7B878E;">نام مجموعه</div>
+        <div style="margin-top:4px; font-size:14px; font-weight:700; color:#F4F4F9;">{{ company }}</div>
+      </td>
+    </tr>
+    {% endif %}
+    {% if city %}
+    <tr>
+      <td style="padding:0 14px 10px;">
+        <div style="font-size:12px; color:#7B878E;">شهر</div>
+        <div style="margin-top:4px; font-size:14px; font-weight:700; color:#F4F4F9;">{{ city }}</div>
+      </td>
+    </tr>
+    {% endif %}
+    {% if inquiry_type %}
+    <tr>
+      <td style="padding:0 14px 10px;">
+        <div style="font-size:12px; color:#7B878E;">نوع درخواست</div>
+        <div style="margin-top:4px; font-size:14px; font-weight:700; color:#F4F4F9;">{{ inquiry_type }}</div>
+      </td>
+    </tr>
+    {% endif %}
+    {% if service_package %}
+    <tr>
+      <td style="padding:0 14px 10px;">
+        <div style="font-size:12px; color:#7B878E;">پکیج</div>
+        <div style="margin-top:4px; font-size:14px; font-weight:700; color:#F4F4F9;">{{ service_package }}</div>
+      </td>
+    </tr>
+    {% endif %}
     <tr>
       <td style="padding:0 14px 10px;">
         <div style="font-size:12px; color:#7B878E;">زمان ثبت</div>

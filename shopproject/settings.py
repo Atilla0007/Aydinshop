@@ -36,7 +36,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
 
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-unsafe-change-me")
-DEBUG = _env_bool("DEBUG", False)
+DEBUG = _env_bool("DEBUG", False)  # Default to False for production safety
 
 _allowed_hosts = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
 if _allowed_hosts:
@@ -139,7 +139,10 @@ else:
     }
 
 STATIC_URL = os.getenv("STATIC_URL", "/static/")
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    BASE_DIR / 'frontend' / 'dist',  # React build output
+]
 STATIC_ROOT = Path(os.getenv("STATIC_ROOT", str(BASE_DIR / "staticfiles")))
 MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(BASE_DIR / "media")))
@@ -184,15 +187,22 @@ SMS_BACKEND = os.getenv('SMS_BACKEND', 'console')  # console | kavenegar
 KAVENEGAR_API_KEY = os.getenv('KAVENEGAR_API_KEY', '')
 KAVENEGAR_SENDER = os.getenv('KAVENEGAR_SENDER', '')
 
-# Email settings (dev defaults to file backend to avoid console issues on some Windows terminals)
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.filebased.EmailBackend')
+# Email settings - Configure via environment variables in cPanel
+# If EMAIL_HOST is set, use SMTP backend; otherwise use file backend for development
+_email_host = os.getenv('EMAIL_HOST', '').strip()
+if _email_host:
+    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+else:
+    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.filebased.EmailBackend')
+
 EMAIL_FILE_PATH = os.getenv('EMAIL_FILE_PATH', str(BASE_DIR / 'tmp' / 'emails'))
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@example.com')
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.example.com')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'styra.steel@gmail.com')
+EMAIL_HOST = _email_host or os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'styra.steel@gmail.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', '1').strip().lower() in ('1', 'true', 'yes', 'on')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', '0').strip().lower() in ('1', 'true', 'yes', 'on')
 
 LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)

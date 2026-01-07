@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
+from django.views.decorators.csrf import csrf_exempt
 
 from core.utils.jalali import format_jalali
 from store.models import Category, Product, ProductReview
@@ -254,14 +255,17 @@ def contact(request):
         if form.is_valid():
             message = form.save()
 
-            support_email = (getattr(settings, "COMPANY_EMAIL", "") or "").strip()
-            if not support_email:
-                support_email = (getattr(settings, "DEFAULT_FROM_EMAIL", "") or "").strip()
-
             admin_emails = _admin_emails()
-            bcc_emails = sorted({email for email in admin_emails if email and email != support_email})
+            
+            # Use COMPANY_EMAIL as the main recipient, fallback to DEFAULT_FROM_EMAIL
+            company_email = (getattr(settings, "COMPANY_EMAIL", "") or "").strip()
+            if not company_email:
+                company_email = (getattr(settings, "DEFAULT_FROM_EMAIL", "") or "").strip()
+            
+            # Get from_email - use COMPANY_EMAIL or DEFAULT_FROM_EMAIL
+            from_email = company_email or getattr(settings, "DEFAULT_FROM_EMAIL", "styra.steel@gmail.com")
 
-            if support_email:
+            if company_email or admin_emails:
                 created_at = format_jalali(message.created_at, "Y/m/d - H:i")
                 base_url = (getattr(settings, "SITE_BASE_URL", "") or "").strip().rstrip("/")
                 admin_prefix = getattr(settings, "ADMIN_PATH", "admin/").strip("/")
@@ -297,6 +301,10 @@ def contact(request):
                         "name": message.name,
                         "email": message.email,
                         "phone": message.phone,
+                        "company": message.company,
+                        "city": message.city,
+                        "inquiry_type": message.get_inquiry_type_display(),
+                        "service_package": message.get_service_package_display() if message.service_package else None,
                         "created_at": created_at,
                         "message_text": message.message,
                         "admin_url": admin_url,
@@ -305,18 +313,30 @@ def contact(request):
                 )
 
                 try:
-                    email_message = EmailMultiAlternatives(
-                        subject=subject,
-                        body=text_body,
-                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
-                        to=[support_email],
-                        bcc=bcc_emails,
-                        reply_to=[message.email],
-                    )
-                    email_message.attach_alternative(html_body, "text/html")
-                    _send_email_message(email_message)
-                except Exception:
+                    # Send to company email and BCC all admin emails
+                    to_emails = [company_email] if company_email else []
+                    bcc_emails = sorted({email for email in admin_emails if email and email != company_email})
+                    
+                    # If no company email, send to first admin email
+                    if not to_emails and admin_emails:
+                        to_emails = [admin_emails[0]]
+                        bcc_emails = admin_emails[1:] if len(admin_emails) > 1 else []
+                    
+                    if to_emails or bcc_emails:
+                        email_message = EmailMultiAlternatives(
+                            subject=subject,
+                            body=text_body,
+                            from_email=from_email,
+                            to=to_emails if to_emails else None,
+                            bcc=bcc_emails if bcc_emails else None,
+                            reply_to=[message.email],
+                        )
+                        email_message.attach_alternative(html_body, "text/html")
+                        _send_email_message(email_message)
+                        logger.info(f"Contact email sent to {len(to_emails)} recipients and {len(bcc_emails)} BCC recipients")
+                except Exception as e:
                     logger.exception("Failed to build/send contact email")
+                    # Don't fail the request if email fails
 
             return render(
                 request,
@@ -332,6 +352,15 @@ def contact(request):
     return render(request, "contact.html", {"form": form})
 
 
+@csrf_exempt
+def user_status_api(request):
+    """API endpoint to check if user is staff (for navbar)."""
+    return JsonResponse({
+        "is_staff": request.user.is_authenticated and request.user.is_staff,
+    })
+
+
+@csrf_exempt
 def contact_api(request):
     """
     API endpoint for handling JSON form submissions from frontend.
@@ -409,14 +438,18 @@ def contact_api(request):
     message = form.save()
 
     # Send email to admins
-    support_email = (getattr(settings, "COMPANY_EMAIL", "") or "").strip()
-    if not support_email:
-        support_email = (getattr(settings, "DEFAULT_FROM_EMAIL", "") or "").strip()
-
     admin_emails = _admin_emails()
-    bcc_emails = sorted({email for email in admin_emails if email and email != support_email})
-
-    if support_email:
+    
+    # Use COMPANY_EMAIL as the main recipient, fallback to DEFAULT_FROM_EMAIL
+    company_email = (getattr(settings, "COMPANY_EMAIL", "") or "").strip()
+    if not company_email:
+        company_email = (getattr(settings, "DEFAULT_FROM_EMAIL", "") or "").strip()
+    
+    # Get from_email - use COMPANY_EMAIL or DEFAULT_FROM_EMAIL
+    from_email = company_email or getattr(settings, "DEFAULT_FROM_EMAIL", "styra.steel@gmail.com")
+    
+    # Send to all admin emails if we have them
+    if admin_emails or company_email:
         created_at = format_jalali(message.created_at, "Y/m/d - H:i")
         base_url = (getattr(settings, "SITE_BASE_URL", "") or "").strip().rstrip("/")
         admin_prefix = getattr(settings, "ADMIN_PATH", "admin/").strip("/")
@@ -452,6 +485,10 @@ def contact_api(request):
                 "name": message.name,
                 "email": message.email,
                 "phone": message.phone,
+                "company": message.company,
+                "city": message.city,
+                "inquiry_type": message.get_inquiry_type_display(),
+                "service_package": message.get_service_package_display() if message.service_package else None,
                 "created_at": created_at,
                 "message_text": message.message,
                 "admin_url": admin_url,
@@ -460,18 +497,30 @@ def contact_api(request):
         )
 
         try:
-            email_message = EmailMultiAlternatives(
-                subject=subject,
-                body=text_body,
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
-                to=[support_email],
-                bcc=bcc_emails,
-                reply_to=[message.email],
-            )
-            email_message.attach_alternative(html_body, "text/html")
-            _send_email_message(email_message)
-        except Exception:
+            # Send to company email and BCC all admin emails
+            to_emails = [company_email] if company_email else []
+            bcc_emails = sorted({email for email in admin_emails if email and email != company_email})
+            
+            # If no company email, send to first admin email
+            if not to_emails and admin_emails:
+                to_emails = [admin_emails[0]]
+                bcc_emails = admin_emails[1:] if len(admin_emails) > 1 else []
+            
+            if to_emails or bcc_emails:
+                email_message = EmailMultiAlternatives(
+                    subject=subject,
+                    body=text_body,
+                    from_email=from_email,
+                    to=to_emails if to_emails else None,
+                    bcc=bcc_emails if bcc_emails else None,
+                    reply_to=[message.email],
+                )
+                email_message.attach_alternative(html_body, "text/html")
+                _send_email_message(email_message)
+                logger.info(f"Contact email sent to {len(to_emails)} recipients and {len(bcc_emails)} BCC recipients")
+        except Exception as e:
             logger.exception("Failed to build/send contact email")
+            # Don't fail the request if email fails
 
     return JsonResponse({"status": "success", "message": "پیام شما با موفقیت ارسال شد"})
 
@@ -554,3 +603,27 @@ def health_check(request):
         "time": timezone.now().isoformat(),
     }
     return JsonResponse(payload, status=200 if db_ok else 503)
+
+
+def react_app(request, path=""):
+    """
+    Serve the React application for all frontend routes.
+    This view serves the built React app's index.html for all routes
+    that don't match API endpoints or admin.
+    """
+    base_dir = Path(getattr(settings, "BASE_DIR", Path.cwd()))
+    frontend_dist = base_dir / "frontend" / "dist"
+    index_html = frontend_dist / "index.html"
+    
+    if not index_html.exists():
+        return HttpResponse(
+            "<h1>Frontend not built</h1><p>Please run 'npm run build' in the frontend directory.</p>",
+            status=503
+        )
+    
+    try:
+        content = index_html.read_text(encoding="utf-8")
+        return HttpResponse(content, content_type="text/html")
+    except Exception as e:
+        logger.exception("Failed to serve React app")
+        return HttpResponse(f"<h1>Error loading frontend</h1><p>{str(e)}</p>", status=500)

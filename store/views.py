@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from auth_security.ratelimit import check_rate_limit
 
@@ -20,6 +21,7 @@ from .forms import ProductReviewForm
 from .invoice import render_manual_invoice_pdf
 from .models import Category, ManualInvoiceSequence, Product, ProductReview
 from .utils import build_gallery_images, get_primary_image_url
+from django.core.paginator import Paginator
 
 def _sanitize_query(value: str, max_length: int = 80) -> str:
     value = (value or "").strip()
@@ -349,3 +351,145 @@ def manual_invoice_pdf(request):
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{filename}.pdf"'
     return response
+
+
+# API Endpoints for React Frontend
+
+@csrf_exempt
+@require_GET
+def api_categories(request):
+    """API endpoint to get all categories."""
+    categories = Category.objects.all().order_by("name")
+    categories_data = [
+        {
+            "id": cat.id,
+            "name": cat.name,
+            "slug": cat.slug,
+        }
+        for cat in categories
+    ]
+    return JsonResponse({"categories": categories_data})
+
+
+@csrf_exempt
+@require_GET
+def api_products(request):
+    """API endpoint to get products with pagination and filtering."""
+    page = int(request.GET.get("page", 1))
+    page_size = int(request.GET.get("page_size", 20))
+    category_slug = request.GET.get("category", "").strip()
+    search_query = request.GET.get("search", "").strip()
+
+    products_query = Product.objects.filter(is_available=True).prefetch_related("images", "category")
+
+    if category_slug:
+        products_query = products_query.filter(category__slug=category_slug)
+
+    if search_query:
+        products_query = products_query.filter(
+            Q(name__icontains=search_query)
+            | Q(summary__icontains=search_query)
+            | Q(description__icontains=search_query)
+            | Q(brand__icontains=search_query)
+            | Q(tags__icontains=search_query)
+            | Q(sku__icontains=search_query)
+        )
+
+    paginator = Paginator(products_query.order_by("-created_at"), page_size)
+    page_obj = paginator.get_page(page)
+
+    products_data = []
+    for product in page_obj:
+        primary_image = get_primary_image_url(product)
+        products_data.append({
+            "id": product.id,
+            "name": product.name,
+            "slug": product.slug,
+            "summary": product.summary,
+            "description": product.description,
+            "price": product.price,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "slug": product.category.slug,
+            },
+            "brand": product.brand,
+            "sku": product.sku,
+            "image_url": primary_image,
+            "view_count": product.view_count,
+        })
+
+    return JsonResponse({
+        "products": products_data,
+        "total": paginator.count,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": paginator.num_pages,
+    })
+
+
+@csrf_exempt
+@require_GET
+def api_product_detail(request, category_slug: str, product_slug: str):
+    """API endpoint to get a single product detail."""
+    try:
+        product = Product.objects.prefetch_related("images", "features", "reviews").get(
+            slug=product_slug,
+            category__slug=category_slug,
+            is_available=True
+        )
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found"}, status=404)
+
+    # Increment view count
+    product.view_count = F("view_count") + 1
+    product.save(update_fields=["view_count"])
+    product.refresh_from_db()
+
+    # Get all images
+    images = build_gallery_images(product)
+    primary_image = get_primary_image_url(product)
+
+    # Get features
+    features_data = [
+        {
+            "id": feat.id,
+            "title": feat.title,
+            "description": feat.description,
+        }
+        for feat in product.features.all()
+    ]
+
+    # Get reviews summary
+    reviews = product.reviews.filter(is_approved=True)
+    reviews_count = reviews.count()
+    avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"] or 0.0
+
+    product_data = {
+        "id": product.id,
+        "name": product.name,
+        "slug": product.slug,
+        "summary": product.summary,
+        "description": product.description,
+        "price": product.price,
+        "category": {
+            "id": product.category.id,
+            "name": product.category.name,
+            "slug": product.category.slug,
+        },
+        "brand": product.brand,
+        "sku": product.sku,
+        "tags": [tag.strip() for tag in product.tags.split(",") if tag.strip()] if product.tags else [],
+        "domain": product.domain,
+        "primary_image": primary_image,
+        "images": images,
+        "features": features_data,
+        "datasheet_url": product.datasheet.url if product.datasheet else None,
+        "view_count": product.view_count,
+        "reviews": {
+            "count": reviews_count,
+            "average_rating": round(avg_rating, 1),
+        },
+    }
+
+    return JsonResponse(product_data)
