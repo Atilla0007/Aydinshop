@@ -52,7 +52,7 @@ CSRF_TRUSTED_ORIGINS = [
 if not CSRF_TRUSTED_ORIGINS and DEBUG:
     CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://127.0.0.1"]
 
-_admin_path_raw = (os.getenv("ADMIN_PATH", "admin/") or "admin/").strip()
+_admin_path_raw = (os.getenv("ADMIN_PATH", "admin") or "admin").strip()
 _admin_path_clean = _admin_path_raw.strip("/")
 ADMIN_PATH = f"{_admin_path_clean}/" if _admin_path_clean else "admin/"
 
@@ -138,14 +138,25 @@ else:
         }
     }
 
-STATIC_URL = os.getenv("STATIC_URL", "/static/")
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-    BASE_DIR / 'frontend' / 'dist',  # React build output
-]
+def _normalize_url(value: str | None, default: str) -> str:
+    cleaned = (value or default).strip() or default
+    if not cleaned.endswith("/"):
+        cleaned += "/"
+    if not cleaned.startswith("/") and "://" not in cleaned:
+        cleaned = f"/{cleaned}"
+    return cleaned
+
+
+STATIC_URL = _normalize_url(os.getenv("STATIC_URL"), "/static/")
+MEDIA_URL = _normalize_url(os.getenv("MEDIA_URL"), "/media/")
+
 STATIC_ROOT = Path(os.getenv("STATIC_ROOT", str(BASE_DIR / "staticfiles")))
-MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(BASE_DIR / "media")))
+
+STATICFILES_DIRS = [BASE_DIR / "static"]
+frontend_dist = BASE_DIR / "frontend" / "dist"
+if frontend_dist.exists():
+    STATICFILES_DIRS.append(frontend_dist)
 LOGIN_REDIRECT_URL='/'
 LOGOUT_REDIRECT_URL='/'
 
@@ -255,7 +266,15 @@ RECEIPT_PURGE_DELAY_SECONDS = int(os.getenv('RECEIPT_PURGE_DELAY_SECONDS', '7200
 
 # Authentication security (login brute-force protection)
 _default_admin_login = f"/{ADMIN_PATH}login/"
-AUTH_SECURITY_LOGIN_PATHS = os.getenv("AUTH_SECURITY_LOGIN_PATHS", f"/{ADMIN_PATH}login/")
+_auth_security_login_paths = os.getenv("AUTH_SECURITY_LOGIN_PATHS", "").strip()
+if _auth_security_login_paths:
+    AUTH_SECURITY_LOGIN_PATHS = [
+        path.strip()
+        for path in _auth_security_login_paths.split(",")
+        if path.strip()
+    ]
+else:
+    AUTH_SECURITY_LOGIN_PATHS = ["/login/", _default_admin_login]
 AUTH_SECURITY_PROTECTED_PATHS = os.getenv("AUTH_SECURITY_PROTECTED_PATHS", "")
 AUTH_SECURITY_TRUST_X_FORWARDED_FOR = _env_bool("AUTH_SECURITY_TRUST_X_FORWARDED_FOR", False)
 AUTH_SECURITY_LOGIN_IP_MAX_ATTEMPTS = int(os.getenv("AUTH_SECURITY_LOGIN_IP_MAX_ATTEMPTS", "10"))

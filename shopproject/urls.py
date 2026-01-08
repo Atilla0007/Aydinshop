@@ -8,9 +8,11 @@ from core import views as core_views
 from django.conf import settings
 from django.conf.urls.static import static
 
+admin_path = (getattr(settings, "ADMIN_PATH", "admin/") or "admin/").strip("/")
+
 urlpatterns = [
     # Admin
-    path((getattr(settings, "ADMIN_PATH", "admin/") or "admin/").lstrip("/"), admin.site.urls),
+    path(f"{admin_path}/", admin.site.urls),
     
     # API endpoints (must come before React app routing)
     path('api/user/status/', core_views.user_status_api, name='user_status_api'),
